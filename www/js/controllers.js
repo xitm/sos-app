@@ -42,19 +42,29 @@ angular.module('starter.controllers', [])
     $scope.callArbeitsoberflaeche = function() {
         $state.go('arbeitsoberflaeche');
     }
+    $scope.callArbeitsmanager = function() {
+        $state.go('arbeitsmanager');
+    }
+    $scope.callFahrtenmanager = function() {
+        $state.go('fahrtenmanager');
+    }
 })
 
 .controller('SessionuebersichtCtrl', function($scope, $state) {
     $scope.callArbeitsoberflaeche = function() {
         $state.go('arbeitsoberflaeche');
     }
-});
+})
 
-
-var app = angular.module('app.controllers', [])
-
-app.controller('sessionmanager', function($scope) {
+.controller('ArbeitsmanagerCtrl', function($scope, $state) {
     $scope.callSessionmanager = function() {
-        alert ("hello World")
+        $state.go('sessionmanager')
+    }
+})
+
+.controller('FahrtenmanagerCtrl', function($scope, $state) {
+    $scope.callSessionmanager = function() {
+        $state.go('sessionmanager')
     }
 });
+

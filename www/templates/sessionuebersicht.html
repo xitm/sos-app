@@ -1,6 +1,6 @@
 
 
-<ion-view view-title="Sessionmanager">
+<ion-view view-title="Sessionübersicht">
   
   <ion-header-bar align-title="left" class="bar-positive">
     <h1 class="title">Sessionübersicht</h1>
@@ -10,33 +10,39 @@
   </ion-header-bar>
 
   <ion-content class="padding has-header">
-    <div class="list card">
-      <div class="item item-divider">Recent Updates</div>
-      <div class="item item-body">
-        <div>
-          There is a fire in <b>sector 3</b>
-        </div>
+      <div class="list">
+        <a class="item item-icon-left item-icon-right" >
+          <i class="icon"><img href="#" style="width: 50%;" src="img/loeschen.png"></i>
+          <h2>Max Mustermann</h2>
+          <p>Völs</p>
+          <i class="icon"><img href="#" style="width: 50%;" src="img/bearbeiten.png"></i>
+        </a>
+        
+        <a class="item item-icon-left item-icon-right" >
+          <i class="icon"><img href="#" style="width: 50%;" src="img/loeschen.png"></i>
+          <h2>Simon Huber</h2>
+          <p>Innsbruck</p>
+          <i class="icon"><img href="#" style="width: 50%;" src="img/bearbeiten.png"></i>
+        </a>
+        
+        <a class="item item-icon-left item-icon-right" >
+          <i class="icon"><img href="#" style="width: 50%;" src="img/loeschen.png"></i>
+          <h2>Heidi Plumberger</h2>
+          <p>Wörgl</p>
+          <i class="icon"><img href="#" style="width: 50%;" src="img/bearbeiten.png"></i>
+        </a>
+        
+        <a class="item item-icon-left item-icon-right" >
+          <i class="icon"><img href="#" style="width: 50%;" src="img/loeschen.png"></i>
+          <h2>Maria Obermüller</h2>
+          <p>Zams</p>
+          <i class="icon"><img href="#" style="width: 50%;" src="img/bearbeiten.png"></i>
+        </a>
       </div>
-    </div>
-    <div class="list card">
-      <div class="item item-divider">Health</div>
-      <div class="item item-body">
-        <div>
-          You ate an apple today!
-        </div>
-      </div>
-    </div>
-    <div class="list card">
-      <div class="item item-divider">Upcoming</div>
-      <div class="item item-body">
-        <div>
-          You have <b>29</b> meetings on your calendar tomorrow.
-        </div>
-      </div>
-    </div>
+
   </ion-content>
   
-  <div  class="bar bar-footer bar-calm" ng-click="">
-    <div class="title">HOCHLADEN</div>
-  </div>
+    <ion-footer-bar class="bar-positive">
+      <button class="button button-full button-clear" ng-click="" style="margin-top: 0px"><b>HOCHLADEN</b></button>
+  </ion-footer-bar>
 </ion-view>

@@ -10,34 +10,20 @@
     </div>
   </ion-header-bar>
 
-  <ion-content class="padding has-header">
-    <div class="list card">
-      <div class="item item-divider">Recent Updates</div>
-      <div class="item item-body">
-        <div>
-          There is a fire in <b>sector 3</b>
+  <ion-content class="padding has-header" scroll="false" style="width: 100%; text-align: center;">
+        <div class="padding" style="margin: auto 0; height: 50%;">
+            <img src="../img/arbeitsmanager.png" style="height: 70%;" ng-click="callArbeitsmanager()"/>
         </div>
+      <div class="padding" style="margin: auto 0; height: 50%;">
+          <img src="../img/fahrtenmanager.png" style="height: 70%" ng-click="callFahrtenmanager()"/>
       </div>
+
     </div>
-    <div class="list card">
-      <div class="item item-divider">Health</div>
-      <div class="item item-body">
-        <div>
-          You ate an apple today!
-        </div>
-      </div>
-    </div>
-    <div class="list card">
-      <div class="item item-divider">Upcoming</div>
-      <div class="item item-body">
-        <div>
-          You have <b>29</b> meetings on your calendar tomorrow.
-        </div>
-      </div>
-    </div>
+    
   </ion-content>
   
-  <div  class="bar bar-footer bar-calm" ng-click="">
-    <div class="title">SESSION OK</div>
-  </div>
+  <ion-footer-bar class="bar-positive">
+      <button class="button button-full button-clear" ng-click="" style="margin-top: 0px"><b>SESSION OK</b></button>
+  </ion-footer-bar>
+
 </ion-view>

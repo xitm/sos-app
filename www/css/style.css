@@ -1,4 +1,3 @@
-/* Empty. Add your own CSS if you like */
 .center-vertical {
     display: -webkit-box;
     display: -moz-box;
@@ -54,3 +53,27 @@
     margin-left: 15%;
 }
 
+
+
+.bar.item-input-inset .item-input-wrapper input {
+    width: 100%;
+}
+
+.search-wrapper-light {
+    border-bottom: 2px solid rgba(255,255,255,0.5);
+    background: none;
+    border-radius: 0;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.search-wrapper-light input, .search-wrapper-light input::-webkit-input-placeholder {
+    color: #ffffff;
+}
+
+.optionList{
+    position:absolute;
+    width:100%;
+    z-index:100;
+   /* height:200px;*/
+}

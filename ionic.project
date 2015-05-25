@@ -1,4 +1,12 @@
 {
   "name": "sosapp",
-  "app_id": "b78e3aee"
+  "app_id": "b78e3aee",
+  "gulpStartupTasks": [
+    "sass",
+    "watch"
+  ],
+  "watchPatterns": [
+    "www/**/*",
+    "!www/lib/**/*"
+  ]
 }

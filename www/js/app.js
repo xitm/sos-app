@@ -51,6 +51,18 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       url: '/sessionmanager',
       templateUrl: 'templates/sessionmanager.html',
       controller: 'SessionmanagerCtrl'
+  })
+    
+    .state('arbeitsmanager', {
+      url: '/arbeitsmanager',
+      templateUrl: 'templates/arbeitsmanager.html',
+      controller: 'ArbeitsmanagerCtrl'
+  })
+    
+    .state('fahrtenmanager', {
+      url: '/fahrtenmanager',
+      templateUrl: 'templates/fahrtenmanager.html',
+      controller: 'FahrtenmanagerCtrl'
   });
 
   
@@ -60,4 +72,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 });
 
 
-angular.module('app', ['ionic', 'app.controllers', 'app.services']);
+
+
+
+
