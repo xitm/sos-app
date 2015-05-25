@@ -29,28 +29,28 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   // Each state's controller can be found in controllers.js
   $stateProvider
 
-  // setup an abstract state for the tabs directive
-    /*.state('tab', {
-    url: "/tab",
-    abstract: true,
-    templateUrl: "templates/tabs.html"
-  })*/
-
-  // Each tab has its own nav history stack:
-
   .state('arbeitsoberflaeche', {
     url: '/arbeitsoberflaeche',
         templateUrl: 'templates/arbeitsoberflaeche.html',
         controller: 'DashCtrl'
-      
-    
   })
-
-    
+  
     .state('login', {
       url: '/login',
       templateUrl: 'templates/login.html',
       controller: 'LoginCtrl'
+  })
+    
+    .state('sessionuebersicht', {
+        url: '/sessionuebersicht',
+        templateUrl: 'templates/sessionuebersicht.html',
+        controller: 'SessionuebersichtCtrl'
+  })
+    
+    .state('sessionmanager', {
+      url: '/sessionmanager',
+      templateUrl: 'templates/sessionmanager.html',
+      controller: 'SessionmanagerCtrl'
   });
 
   
@@ -58,3 +58,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   $urlRouterProvider.otherwise('login');
 
 });
+
+
+angular.module('app', ['ionic', 'app.controllers', 'app.services']);
