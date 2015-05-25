@@ -5,52 +5,19 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', [
-  'ionic',
-  'ngCordova',
-  'ionic.service.core',
-  'ionic.service.push',
-  'ionic.service.deploy',
-  'starter.controllers'
-])
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
-.config(['$ionicAppProvider', function($ionicAppProvider) {
-  // Identify app
-  $ionicAppProvider.identify({
-    // The App ID (from apps.ionic.io) for the server
-    app_id: 'b78e3aee',
-    // The public API key all services will use for this app
-    api_key: 'db8e7c5fda746d2180abc7aa5d5e33c93cee182620bbad73',
-    // The GCM project ID (project number) from your Google Developer Console (un-comment if used)
-    // gcm_id: 'GCM_ID'
-  });
-}])
-
-.run(function($rootScope, $ionicDeploy, $ionicPlatform, $cordovaStatusbar) {
-
+.run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
-
-    // Hide the accessory bar by default
+    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+    // for form inputs)
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
     }
-
-    // Color the iOS status bar text to white
     if (window.StatusBar) {
-      $cordovaStatusbar.overlaysWebView(true);
-      $cordovaStatusBar.style(1); //Light
+      // org.apache.cordova.statusbar required
+      StatusBar.styleLightContent();
     }
-
-    // Default update checking
-    $rootScope.updateOptions = {
-      interval: 2 * 60 * 1000
-    };
-
-    // Watch Ionic Deploy service for new code
-    $ionicDeploy.watch($rootScope.updateOptions).then(function() {}, function() {}, function(hasUpdate) {
-      $rootScope.lastChecked = new Date();
-      console.log('WATCH RESULT', hasUpdate);
-    });
   });
 })
 
@@ -63,7 +30,7 @@ angular.module('starter', [
   $stateProvider
 
   // setup an abstract state for the tabs directive
-  .state('tab', {
+    .state('tab', {
     url: "/tab",
     abstract: true,
     templateUrl: "templates/tabs.html"
@@ -71,62 +38,46 @@ angular.module('starter', [
 
   // Each tab has its own nav history stack:
 
-  // Welcome tab
-  .state('tab.home', {
-    url: '/home',
+  .state('tab.dash', {
+    url: '/dash',
     views: {
-      'tab-home': {
-        templateUrl: 'templates/tab-home.html',
-        controller: 'HomeCtrl'
+      'tab-dash': {
+        templateUrl: 'templates/tab-dash.html',
+        controller: 'DashCtrl'
       }
     }
   })
 
-  // Ionic User tab
-  .state('tab.user', {
-    url: '/user',
-    views: {
-      'tab-user': {
-        templateUrl: 'templates/tab-user.html',
-        controller: 'UserCtrl'
+  .state('tab.chats', {
+      url: '/chats',
+      views: {
+        'tab-chats': {
+          templateUrl: 'templates/tab-chats.html',
+          controller: 'ChatsCtrl'
+        }
       }
-    }
-  })
-
-  // Ionic Push tab
-  .state('tab.push', {
-    url: '/push',
-    views: {
-      'tab-push': {
-        templateUrl: 'templates/tab-push.html',
-        controller: 'PushCtrl'
+    })
+    .state('tab.chat-detail', {
+      url: '/chats/:chatId',
+      views: {
+        'tab-chats': {
+          templateUrl: 'templates/chat-detail.html',
+          controller: 'ChatDetailCtrl'
+        }
       }
-    }
-  })
+    })
 
-  // Ionic Deploy tab
-  .state('tab.deploy', {
-    url: '/deploy',
+  .state('tab.account', {
+    url: '/account',
     views: {
-      'tab-deploy': {
-        templateUrl: 'templates/tab-deploy.html',
-        controller: 'DeployCtrl'
-      }
-    }
-  })
-
-  // Ionic Analytics tab
-  .state('tab.analytics', {
-    url: '/analytics',
-    views: {
-      'tab-analytics': {
-        templateUrl: 'templates/tab-analytics.html',
-        controller: 'AnalyticsCtrl'
+      'tab-account': {
+        templateUrl: 'templates/tab-account.html',
+        controller: 'AccountCtrl'
       }
     }
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/home');
+  $urlRouterProvider.otherwise('/tab/dash');
 
 });
