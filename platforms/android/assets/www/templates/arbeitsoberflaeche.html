@@ -1,0 +1,53 @@
+
+
+<ion-view view-title="Arbeitsoberfläche">
+  
+
+  
+  <ion-header-bar align-title="left" class="bar-positive">
+    <h1 class="title">Arbeitsoberfläche</h1>
+    <div class="buttons">
+      <button class="button" ng-click="callSessionuebersicht()">offene Sessions</button>
+    </div>
+  </ion-header-bar>
+
+  <ion-content class="padding has-header">
+      <div style="height:50px"><!-- Placeholder --></div>
+      <div class="padding row">
+        <div class="col col-25 padding">
+          <img src="img/datum.png" style="float: right;"/>
+        </div>
+        <div class="col col-75 padding" style="position: relative; ">
+          <label class="item item-input" style=" position: absolute; bottom:5px;">
+              <input placeholder="Datum" class="textbox-n" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" />
+          </label>
+        </div>
+      </div>
+        
+        <div style="height:30px"><!-- Placeholder --></div>
+        
+        <div class="padding" style="text-align: center">
+            <img src="img/family.png"/>
+        </div>
+      
+      <label class="item item-input">
+        <i class="icon ion-search placeholder-icon"></i>
+        <input type="search" placeholder="Kunde suchen" ng-model="Contacts.name" ng-change="searchContacts()">
+      </label>
+      <ion-list>
+        <div class="list">
+     
+          <a ng-repeat="name in Contacts" class="item">
+            <h2>{{name}}</h2>
+          </a>
+     
+        </div>
+      </ion-list>
+      
+      
+  </ion-content>
+  
+    <ion-footer-bar class="bar-positive">
+      <button class="button button-full button-clear" ng-click="callSessionmanager()" style="margin-top: 0px"><b>SESSION STARTEN</b></button>
+  </ion-footer-bar>
+</ion-view>
