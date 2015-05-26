@@ -1,6 +1,6 @@
 
 
-<ion-view view-title="Sessionmanager">
+<ion-view view-title="Fahrtenmanager">
   
   
     <ion-header-bar align-title="left" class="bar-assertive">
@@ -10,9 +10,101 @@
     </div>
   </ion-header-bar>
 
+  
   <ion-content class="padding has-header">
-
-    
+        <div class="row">
+            <div class="col col-50">
+                <img src="img/distanz.png" style="width: 70%;"/>
+            </div>
+            <div class="col col-50">
+                <label class="item item-input">
+                    <input placeholder="KFZ" class="textbox-n" type="text"/>
+                </label>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col col-50">
+                <label class="item item-input">
+                    <input placeholder="Kilometer Anfang" class="textbox-n" type="number"/>
+                </label>
+            </div>
+            <div class="col col-50">
+                <label class="item item-input">
+                    <input placeholder="Kilometer Ende" class="textbox-n" type="number"/>
+                </label>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col col-50">
+                <label class="item item-input">
+                    <input placeholder="Standort Anfang" class="textbox-n" type="text"/>
+                </label>
+            </div>
+            <div class="col col-50">
+                <label class="item item-input">
+                    <input placeholder="Standort Ende" class="textbox-n" type="text"/>
+                </label>
+            </div>
+        </div>
+        
+       <div class="padding">
+            <!--placeholder-->
+        </div>
+       
+        <!-- Uhre und Datum -->
+        <div class="row">
+             <div class="col col-50">
+                <img src="img/uhr_rot.png" style="width: 50%;" />
+            </div>
+            <div class="col col-50" style="position: relative;">
+                <label class="item item-input" style=" position: absolute; bottom:5px;">
+                    <input placeholder="Datum" class="textbox-n" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" />
+                </label>
+            </div>
+        </div>
+        
+        <!--Zeiten und Buttons-->
+        
+        
+        
+        <div class="row">
+            <div class="col col-50">
+                <label class="item item-input">
+                    <input placeholder="Anfangszeit" class="textbox-n" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                </label>
+            </div>
+            
+            <div class="col col-50">
+                <label class="item item-input">
+                    <input placeholder="Endzeit" class="textbox-n" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                </label>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col col-50">
+                <button class="button icon-right ion-chevron-right button-assertive">Jetzt</button>
+            </div>
+            <div class="col col-50">
+                <button class="button icon-right ion-chevron-right button-assertive">Jetzt</button>
+            </div>
+        </div>
+       
+       <div class="padding list">
+            <label class="item item-input item-select">
+                <div class="input-label">
+                  Fahrtyp
+                </div>
+                <select>
+                    <option selected>Hinfahrt</option>
+                    <option>Weiterfahrt</option>
+                    <option>Rückfahrt</option>
+                </select>
+            </label>
+      </div>
+       
   </ion-content>
   
   <ion-footer-bar class="bar-assertive">
