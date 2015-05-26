@@ -12,11 +12,17 @@
 
   
   <ion-content class="padding has-header">
+    
+        <div class="padding">
+            <!--placeholder-->
+        </div>
+    
+    
         <div class="row">
-            <div class="col col-50">
+            <div class="col col-25">
                 <img src="img/distanz.png" style="width: 70%;"/>
             </div>
-            <div class="col col-50">
+            <div class="col col-75">
                 <label class="item item-input">
                     <input placeholder="KFZ" class="textbox-n" type="text"/>
                 </label>
@@ -26,12 +32,14 @@
         <div class="row">
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Kilometer Anfang" class="textbox-n" type="number"/>
+                    <input placeholder="Kilometer Anfang" class="textbox-n" type="number" ng-model="kanfang"/>
+                    <span class="input-label" ng-if="kanfang" style="font-size: smaller; color: #aaa;">km</span> 
                 </label>
             </div>
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Kilometer Ende" class="textbox-n" type="number"/>
+                    <input placeholder="Kilometer Ende" class="textbox-n" type="number" ng-model="kende"/>
+                    <span class="input-label" ng-if="kende" style="font-size: smaller; color: #aaa;">km</span>
                 </label>
             </div>
         </div>
@@ -55,12 +63,13 @@
        
         <!-- Uhre und Datum -->
         <div class="row">
-             <div class="col col-50">
+             <div class="col col-25">
                 <img src="img/uhr_rot.png" style="width: 50%;" />
             </div>
-            <div class="col col-50" style="position: relative;">
-                <label class="item item-input" style=" position: absolute; bottom:5px;">
-                    <input placeholder="Datum" class="textbox-n" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" />
+            <div class="col col-75">
+                <label class="item item-input">
+                    <span class="input-label" ng-if="!datum" style="font-size: smaller; color: #aaa;">Datum</span> 
+                    <input type="date" ng-model="datum" />
                 </label>
             </div>
         </div>
@@ -72,13 +81,15 @@
         <div class="row">
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Anfangszeit" class="textbox-n" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                    <input placeholder="Anfangszeit" class="textbox-n" type="text" ng-model="uhranfang" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                    <span class="input-label" ng-if="uhranfang" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>
             
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Endzeit" class="textbox-n" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                    <input placeholder="Endzeit" class="textbox-n" type="text" ng-model="uhrende" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                    <span class="input-label" ng-if="uhrende" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>
         </div>
@@ -90,6 +101,11 @@
             <div class="col col-50">
                 <button class="button icon-right ion-chevron-right button-assertive">Jetzt</button>
             </div>
+        </div>
+       
+       
+       <div class="padding">
+            <!--placeholder-->
         </div>
        
        <div class="padding list">
