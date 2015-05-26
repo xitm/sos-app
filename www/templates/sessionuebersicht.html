@@ -3,46 +3,55 @@
 <ion-view view-title="Sessionübersicht">
   
   <ion-header-bar align-title="left" class="bar-positive">
+    <div class="buttons">
+     <button class="button button-icon icon ion-ios-minus-outline"
+          ng-click="data.showDelete = !data.showDelete;"></button>
+    </div>
     <h1 class="title">Sessionübersicht</h1>
     <div class="buttons">
-      <button class="button" ng-click="callArbeitsoberflaeche()">Zurück</button>
+      <button class="button" ng-click="callArbeitsoberflaeche(ListCtrl)">Zurück</button>
     </div>
   </ion-header-bar>
 
   <ion-content class="padding has-header">
-      <ion-list show-delete="shouldShowDelete()" ng-controller="ListCtrl">
-        <a class="item item-icon-left item-icon-right" >
-          <!--<ion-delete-button class="ion-minus-circled" ng-click="items.splice($index, 1)">
+      <ion-list show-delete="data.showDelete" ng-controller="ListCtrl" >
+        
+        <ion-item ng-repeat="item in items" item="item" href="#/sessionbearbeitung/arbeit" class="item-icon-right item-remove-animate">
           
-          </ion-delete-button>-->
-          <i class="icon"><img href="#" style="width: 50%;" src="img/loeschen.png"></i>
+          <h2>{{ item.name }}</h2>
+          <p>{{ item.ort }}</p>
+          <i class="icon icon-right ion-chevron-right"></i>
+          <ion-delete-button class="ion-minus-circled" ng-click="onItemDelete(item)"> </ion-delete-button>
+        </ion-item>
+        <!--
+        <ion-item class="item item-icon-left item-icon-right" href="#/sessionbearbeitung/arbeit">
+          <ion-delete-button class="ion-minus-circled" ng-click="onItemDelete(item)"></ion-delete-button>
           <h2>Max Mustermann</h2>
           <p>Völs</p>
           <i class="icon icon-right ion-chevron-right"></i>
-        </a>
+        </ion-item>
         
-        <a class="item item-icon-left item-icon-right" >
-          <i class="icon"><img href="#" style="width: 50%;" src="img/loeschen.png"></i>
+        <ion-item class="item item-icon-left item-icon-right" href="#/sessionbearbeitung/arbeit">
+          <ion-delete-button class="ion-minus-circled"></ion-delete-button>
           <h2>Simon Huber</h2>
           <p>Innsbruck</p>
           <i class="icon icon-right ion-chevron-right"></i>
-
-        </a>
+        </ion-item>
         
-        <a class="item item-icon-left item-icon-right" >
-          <i class="icon"><img href="#" style="width: 50%;" src="img/loeschen.png"></i>
+        <ion-item class="item item-icon-left item-icon-right" href="#/sessionbearbeitung/arbeit">
+          <ion-delete-button class="ion-minus-circled"></ion-delete-button>
           <h2>Heidi Plumberger</h2>
           <p>Wörgl</p>
           <i class="icon icon-right ion-chevron-right"></i>
-          </a>
+        </ion-item>
         
-        <a class="item item-icon-left item-icon-right" >
-          <i class="icon"><img href="#" style="width: 50%;" src="img/loeschen.png"></i>
+        <ion-item class="item item-icon-left item-icon-right" href="#/sessionbearbeitung/arbeit">
+          <ion-delete-button class="ion-minus-circled"></ion-delete-button>
           <h2>Maria Obermüller</h2>
           <p>Zams</p>
           <i class="icon icon-right ion-chevron-right"></i>
-        </a>
-      </ion-list>
+        </ion-item>-->
+        
 
   </ion-content>
   

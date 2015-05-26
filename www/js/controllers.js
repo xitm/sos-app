@@ -56,6 +56,12 @@ angular.module('starter.controllers', [])
     }
 })
 
+.controller('SessionbearbeitungCtrl', function($scope, $state) {
+    $scope.callSessionuebersicht = function() {
+        $state.go('sessionuebersicht');
+    }
+})
+
 .controller('ArbeitsmanagerCtrl', function($scope, $state) {
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
@@ -69,8 +75,33 @@ angular.module('starter.controllers', [])
 })
 
 .controller('ListCtrl', function($scope) {
- $scope.shouldShowDelete = false;
- //$scope.shouldShowReorder = false;
- //$scope.listCanSwipe = true
+    $scope.shouldShowDelete = false;
+ //$scope.data = {
+ //   showDelete: false
+ // }
+ $scope.onItemDelete = function(item) {
+   $scope.items.splice($scope.items.indexOf(item), 1);
+  };
+  
+   $scope.items = [
+    { id: 0, name:'Max Mustermann', ort:'Völs' },
+    { id: 1, name:'Peter Oberhuber', ort:'Wörgl'  },
+    { id: 2, name:'Julia Sargnagel', ort:'Innsbruck'  },
+    { id: 3, name:'Anna Fenninger', ort:'Telfs'  }
+    ]
+  
+})
+
+.controller('ArbeitCtrl', function($scope, $state) {
+ $scope.callSessionuebersicht = function() {
+    $state.go('sessionuebersicht')
+ }
+})
+ 
+ .controller('FahrtCtrl', function($scope, $state) {
+ $scope.callSessionuebersicht = function() {
+    $state.go('sessionuebersicht')
+ }
 });
+
 
