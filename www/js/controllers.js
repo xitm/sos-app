@@ -38,7 +38,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessionmanagerCtrl', function($scope, $state) {
+.controller('SessionmanagerCtrl', function($scope, $state, $ionicPopup) {
     $scope.callArbeitsoberflaeche = function() {
         $state.go('arbeitsoberflaeche');
     }
@@ -47,6 +47,26 @@ angular.module('starter.controllers', [])
     }
     $scope.callFahrtenmanager = function() {
         $state.go('fahrtenmanager');
+    }
+    $scope.finishSession = function() {
+        /*Routine um Daten zu checken und im model aktualisieren, danach werden Daten für Datenübersicht freigegeben*/
+        
+        /*Änderungen speichern?*/
+        /*Sessiondetails hier drin wären nett*/
+        var confirmPopup = $ionicPopup.confirm({
+          title: 'Session Abschließen?',
+          template: 'Möchtest du die Arbeits -und Fahrtzeiten zum hochladen freigeben?'
+        });
+        confirmPopup.then(function(res) {
+          if(res) {
+            console.log('Ja');
+            /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
+            $state.go('arbeitsoberflaeche');
+          } else {
+            console.log('Nein');
+            /*Alles bleibt so wie es ist!*/
+          }
+        });
     }
 })
 
@@ -62,15 +82,68 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('ArbeitsmanagerCtrl', function($scope, $state) {
+.controller('ArbeitsmanagerCtrl', function($scope, $state, $ionicPopup) {
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
     }
+    
+    $scope.finishArbeit = function() {
+        /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
+        /*Wenn Alles Passt*/
+        var passt=true //testvariable
+        
+        if (passt) {
+            var confirmPopup = $ionicPopup.confirm({
+                title: 'Arbeitszeit hinzufügen',
+                template: 'Folgende Arbeitsdaten werden erfasst:' //+Arbeitsdaten!!!
+            });
+            confirmPopup.then(function(res) {
+                if(res) {
+                  console.log('Ja');
+                  /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
+                  $state.go('sessionmanager');
+                } else {
+                  console.log('Nein');
+                  /*Alles bleibt so wie es ist!*/
+                }
+            });
+        } else {
+            console.log('Nein');
+            /*Alles bleibt so wie es ist!*/
+        }
+        
+    }
 })
 
-.controller('FahrtenmanagerCtrl', function($scope, $state) {
+.controller('FahrtenmanagerCtrl', function($scope, $state, $ionicPopup) {
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
+    }
+    
+    $scope.finishFahrt = function() {
+        /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
+        /*Wenn Alles Passt*/
+        var passt=true //testvariable
+        
+        if (passt) {
+            var confirmPopup = $ionicPopup.confirm({
+                title: 'Fahrtzeit hinzufügen',
+                template: 'Folgende Fahrtzeiten werden erfasst:' //+Arbeitsdaten!!!
+            });
+            confirmPopup.then(function(res) {
+                if(res) {
+                  console.log('Ja');
+                  /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
+                  $state.go('sessionmanager');
+                } else {
+                  console.log('Nein');
+                  /*Alles bleibt so wie es ist!*/
+                }
+            });
+        } else {
+            console.log('Nein');
+            /*Alles bleibt so wie es ist!*/
+        }   
     }
 })
 
@@ -102,6 +175,14 @@ angular.module('starter.controllers', [])
  $scope.callSessionuebersicht = function() {
     $state.go('sessionuebersicht')
  }
+ 
+ 
+ /*testanfang*/
+ 
+ 
+ /*testende*/
+ 
+ 
 });
 
 
