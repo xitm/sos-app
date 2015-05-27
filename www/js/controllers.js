@@ -87,6 +87,10 @@ angular.module('starter.controllers', [])
         $state.go('sessionmanager')
     }
     
+    $scope.getDateTime = {
+        date: new Date()
+    }
+    
     $scope.finishArbeit = function() {
         /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
         /*Wenn Alles Passt*/
@@ -149,20 +153,21 @@ angular.module('starter.controllers', [])
 
 .controller('ListCtrl', function($scope) {
     $scope.shouldShowDelete = false;
- //$scope.data = {
- //   showDelete: false
- // }
- $scope.onItemDelete = function(item) {
-   $scope.items.splice($scope.items.indexOf(item), 1);
-  };
-  
-   $scope.items = [
-    { id: 0, name:'Max Mustermann', ort:'Völs' },
-    { id: 1, name:'Peter Oberhuber', ort:'Wörgl'  },
-    { id: 2, name:'Julia Sargnagel', ort:'Innsbruck'  },
-    { id: 3, name:'Anna Fenninger', ort:'Telfs'  }
-    ]
-  
+    $scope.data = {
+      showDelete: false
+     }
+    $scope.onItemDelete = function(item) {
+      $scope.items.splice($scope.items.indexOf(item), 1);
+     };
+    
+    
+    $scope.items = [
+     { id: 0, name:'Max Mustermann', ort:'Völs' },
+     { id: 1, name:'Peter Oberhuber', ort:'Wörgl'  },
+     { id: 2, name:'Julia Sargnagel', ort:'Innsbruck'  },
+     { id: 3, name:'Anna Fenninger', ort:'Telfs'  }
+     ]
+   
 })
 
 .controller('ArbeitCtrl', function($scope, $state) {
@@ -175,14 +180,10 @@ angular.module('starter.controllers', [])
  $scope.callSessionuebersicht = function() {
     $state.go('sessionuebersicht')
  }
- 
+ })
+
  
  /*testanfang*/
- 
- 
- /*testende*/
- 
- 
-});
 
+ /*testende*/
 

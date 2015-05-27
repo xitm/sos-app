@@ -1,20 +1,19 @@
 
 
-<ion-view view-title="Sessionübersicht">
+<ion-view view-title="Sessionübersicht" ng-controller="ListCtrl">
   
   <ion-header-bar align-title="left" class="bar-positive">
     <div class="buttons">
-     <button class="button button-icon icon ion-ios-minus-outline"
-          ng-click="data.showDelete = !data.showDelete;"></button>
+     <button class="button button-icon icon ion-ios-minus-outline" ng-click="data.showDelete = !data.showDelete;"></button>
     </div>
     <h1 class="title">Sessionübersicht</h1>
     <div class="buttons">
-      <button class="button" ng-click="callArbeitsoberflaeche(ListCtrl)">Zurück</button>
+      <button class="button" ng-click="callArbeitsoberflaeche()">Zurück</button>
     </div>
   </ion-header-bar>
 
   <ion-content class="padding has-header">
-      <ion-list show-delete="data.showDelete" ng-controller="ListCtrl" >
+      <ion-list show-delete="data.showDelete">
         
         <ion-item ng-repeat="item in items" item="item" href="#/sessionbearbeitung/arbeit" class="item-icon-right item-remove-animate">
           

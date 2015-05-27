@@ -99,27 +99,5 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 });
 
 
-//angular.module('bearbeitung' ['ionic', 'bearbeitung.controllers', 'bearbeitung.services'])
-//
-//.config(function($stateProvider,$urlRouteProvider) {
-//  
-//  $stateProvider
-//  .state('sessionbearbeitung_fahrt', {
-//    url: '/fahrt',
-//    templateUrl: 'templates/sessionbearbeitung_fahrt.html',
-//    controller: 'FahrtCtrl'
-//    
-//  })
-//  
-//  .state('sessionbearbeitung_arbeit', {
-//    url: '/arbeit',
-//    templateUrl: 'templates/sessionbearbeitung_arbeit.html',
-//    controller: 'ArbeitCtrl'
-//  });
-//  
-//  $urlRouterProvider.otherwise('fahrt');
-//  
-//});
-
 
 
