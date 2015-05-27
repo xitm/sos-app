@@ -1,0 +1,46 @@
+<ion-view view-title="Sessiondetail">
+  
+  
+    <ion-header-bar class="bar-positive">
+    <div class="buttons">
+      <button class="button" ng-click="callSessionuebersicht()">Zurück</button>
+    </div>
+    <h1 class="title">Sessiondetails</h1>
+  </ion-header-bar>
+  
+  <ion-content>
+    <div class="row padding">
+      <div class="col">
+        <h2>Client</h2>
+      </div>
+      <div class="col">
+        Alex Monz
+      </div>
+    </div>
+    
+    <div class="row padding">
+      <div class="col">
+        <h2>Datum</h2>
+      </div>
+      <div class="col">
+        {{date}}
+      </div>
+    </div>
+    
+    <ion-list>
+        <ion-item ng-repeat="item in items" item="item" href="#/sessionbearbeitung_{{item.session}}" class="item-icon-right">
+          <h2>{{ item.session }}</h2>
+          <p>{{ item.leistung }}</p>
+          <i class="icon icon-right ion-chevron-right"></i>
+        </ion-item>
+    </ion-list>
+    
+    
+  </ion-content>
+  
+  
+  <ion-footer-bar class="bar-positive">
+      <button class="button button-full button-clear" ng-click="" style="margin-top: 0px"><b>OK</b></button>
+  </ion-footer-bar>
+
+</ion-view>

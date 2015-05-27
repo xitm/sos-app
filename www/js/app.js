@@ -65,32 +65,23 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       controller: 'FahrtenmanagerCtrl'
   })
     
-    .state('sessionbearbeitung', {
-      url: '/sessionbearbeitung',
-      abstract: true,
-      templateUrl: 'templates/sessionbearbeitung.html',
-      controller: 'SessionbearbeitungCtrl',
+    .state('sessiondetail', {
+      url: '/sessiondetail',
+      //abstract: true,
+      templateUrl: 'templates/sessiondetail.html',
+      controller: 'SessiondetailCtrl',
   })
-    .state('sessionbearbeitung.sessionbearbeitung_fahrt', {
-    url: '/fahrt',
-    views: {
-      'fahrt': {
-        templateUrl: 'templates/sessionbearbeitung_fahrt.html',
-        controller: 'FahrtCtrl'
-      }
-    }
-    
+    .state('sessionbearbeitung_Fahrt', {
+    url: '/sessionbearbeitung_Fahrt',
+    templateUrl: 'templates/sessionbearbeitung_fahrt.html',
+    controller: 'FahrtCtrl'    
   })
   
-  .state('sessionbearbeitung.sessionbearbeitung_arbeit', {
-    url: '/arbeit',
-    views: {
-      'arbeit': {
-        templateUrl: 'templates/sessionbearbeitung_arbeit.html',
-        controller: 'ArbeitCtrl'
-      }
-    }
-  });
+  .state('sessionbearbeitung_Arbeit', {
+    url: '/sessionbearbeitung_Arbeit',
+    templateUrl: 'templates/sessionbearbeitung_arbeit.html',
+    controller: 'ArbeitCtrl'
+});
 
   
   // if none of the above states are matched, use this as the fallback

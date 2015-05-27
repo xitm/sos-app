@@ -76,10 +76,18 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessionbearbeitungCtrl', function($scope, $state) {
+.controller('SessiondetailCtrl', function($scope, $state) {
     $scope.callSessionuebersicht = function() {
         $state.go('sessionuebersicht');
     }
+    
+    $scope.items = [
+     { id: 0, name:'Max Mustermann', ort:'Völs', session: "Fahrt", leistung: "Hinfahrt"},
+     { id: 1, name:'Peter Oberhuber', ort:'Wörgl', session: "Arbeit", leistung: "Sauna"},
+     { id: 2, name:'Julia Sargnagel', ort:'Innsbruck', session:  "Fahrt", leistung: "Rückfahrt"},
+     { id: 3, name:'Anna Fenninger', ort:'Telfs', session: "Arbeit", leistung: "Schwimmen"}
+     ]
+    
 })
 
 .controller('ArbeitsmanagerCtrl', function($scope, $state, $ionicPopup) {
@@ -171,14 +179,14 @@ angular.module('starter.controllers', [])
 })
 
 .controller('ArbeitCtrl', function($scope, $state) {
- $scope.callSessionuebersicht = function() {
-    $state.go('sessionuebersicht')
+ $scope.callSessiondetail = function() {
+    $state.go('sessiondetail')
  }
 })
  
  .controller('FahrtCtrl', function($scope, $state) {
- $scope.callSessionuebersicht = function() {
-    $state.go('sessionuebersicht')
+ $scope.callSessiondetail = function() {
+    $state.go('sessiondetail')
  }
  })
 
