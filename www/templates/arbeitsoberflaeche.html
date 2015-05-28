@@ -14,12 +14,15 @@
   <ion-content class="padding has-header">
       <div style="height:50px"><!-- Placeholder --></div>
       <div class="padding row">
+        
         <div class="col col-25 padding">
           <img src="img/datum.png" style="float: right;"/>
         </div>
-        <div class="col col-75 padding" style="position: relative; ">
-          <label class="item item-input" style=" position: absolute; bottom:5px;">
-              <input placeholder="Datum" class="textbox-n" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" />
+
+        <div class="col col-75 padding">
+          <label class="item item-input" style="top: 15px;">
+            <span>Datum</span>
+              <input type="date" style="text-align: right;"/>
           </label>
         </div>
       </div>
@@ -39,22 +42,23 @@
       
       <label class="item item-input">
         <i class="icon ion-search placeholder-icon"></i>
-        <input type="search" minlength="2" placeholder="Kunde suchen" ng-model="Contacts.name" ng-change="searchContacts()">
+        <input type="search" minlength="2" id="kunde" placeholder="Kunde suchen" ng-model="search" ng-change="searchContacts()">
       </label>
       <ion-list>
-        <div class="list">
-     
-          <a ng-repeat="name in Contacts" class="item">
-            <h2>{{name}}</h2>
+        <div class="list" ng-hide="clicked">
+          <a ng-repeat="contact in contacts | filter:search" class="item" ng-if="search" ng-click="updateInput(contact.name)">
+            <h2>{{contact.name}}</h2>
           </a>
      
         </div>
       </ion-list>
       
-      
+      <div class="padding">
+            <!--placeholder-->
+      </div>
   </ion-content>
   
     <ion-footer-bar class="bar-positive">
-      <button class="button button-full button-clear" ng-click="callSessionmanager()" style="margin-top: 0px"><b>SESSION STARTEN</b></button>
+      <button class="button button-full button-clear" ng-click="callSessionmanager()" style="font-size: xx-large;"><b>SESSION STARTEN</b></button>
   </ion-footer-bar>
 </ion-view>

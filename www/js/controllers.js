@@ -1,6 +1,7 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, $state) {
+.controller('DashCtrl', function($scope, $state, $filter) {
+    $scope.clicked = false
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
     }
@@ -8,6 +9,22 @@ angular.module('starter.controllers', [])
         $state.go('sessionuebersicht')
     }
     
+    $scope.searchContacts = function(query) {
+        $scope.clicked = false
+        $scope.contacts = [
+         { id: 0, name:'Max Mustermann', ort:'Völs', session: "Fahrt", leistung: "Hinfahrt"},
+         { id: 1, name:'Peter Oberhuber', ort:'Wörgl', session: "Arbeit", leistung: "Sauna"},
+         { id: 2, name:'Julia Sargnagel', ort:'Innsbruck', session:  "Fahrt", leistung: "Rückfahrt"},
+         { id: 3, name:'Anna Fenninger', ort:'Telfs', session: "Arbeit", leistung: "Schwimmen"}
+         ]
+        $scope.queryData = $filter('filter')($scope.contacts, query);
+    }
+    
+    $scope.updateInput = function (contact) {
+        var d=document.getElementById('kunde');
+        d.value=contact;
+        $scope.clicked = true;
+    }
 })
 
 
