@@ -113,10 +113,8 @@
                 <div class="input-label">
                   Fahrtyp
                 </div>
-                <select>
-                    <option selected>Hinfahrt</option>
-                    <option>Weiterfahrt</option>
-                    <option>Rückfahrt</option>
+                <select id="leistung" data-id=0>
+                    <option ng-repeat='leistung in leistungen' ng-click='updateDataId(leistung)'>{{leistung.name}}</option>
                 </select>
             </label>
       </div>

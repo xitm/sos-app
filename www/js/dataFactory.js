@@ -618,3 +618,7 @@ angular.module('starter.services', [])
     
     return(Arbeit);
 })
+
+.service('DataModel', function(BusinessObject){
+    return BusinessObject.create(JSON.parse(localStorage.getItem('mle_model')));
+})

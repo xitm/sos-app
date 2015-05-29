@@ -21,10 +21,8 @@
                 <div class="input-label">
                   Leistung
                 </div>
-                <select>
-                    <option>Schwimmen</option>
-                    <option selected>Laufen</option>
-                    <option>Sauna</option>
+                <select id='leistung' data-id=0>
+                    <option ng-repeat='leistung in leistungen' data-id={{leistung.id}} ng-click='updateDataId(leistung)'>{{leistung.name}}</option>
                 </select>
             </label>
       </div>

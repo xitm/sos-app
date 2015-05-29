@@ -1,8 +1,8 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, BusinessObject, $state, $filter, $ionicPopup) {
+.controller('DashCtrl', function($scope, DataModel, $state, $filter, $ionicPopup) {
     $scope.clicked = false;
-    $scope.dataModel = BusinessObject.create(JSON.parse(localStorage.getItem('mle_model')));
+    $scope.dataModel = DataModel;
     $scope.date = new Date();
     $scope.callSessionmanager = function() {
         
@@ -52,17 +52,6 @@ angular.module('starter.controllers', [])
         d.setAttribute('data-id', contact.id);
         $scope.clicked = true;
     }
-    
-    //$scope.checkInput = function(){
-    //    var d = document.getElementById('kunde');
-    //    var clients = $scope.dataModel.getClienten();
-    //    for(var i=0,anz=clients.length;i<anz;i++){
-    //        if (d.value === (clients[i].getVorname + " " + clients[i].getNachname) && d.getAttribute('data-id')!=clients[i].getId()) {
-    //            d.setAttribute('data-id',clients[i].getId());
-    //        }
-    //    }
-    //    console.log("now");
-    //}
 })
 
 
@@ -145,12 +134,16 @@ angular.module('starter.controllers', [])
     
 })
 
-.controller('ArbeitsmanagerCtrl', function($scope, $state, $ionicPopup) {
+.controller('ArbeitsmanagerCtrl', function($scope, DataModel, $state, $ionicPopup) {
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
     }
-
-    
+    $scope.dataModel = DataModel;
+    $scope.leistungen = $scope.dataModel.getLeistungList('arbeit');
+    $scope.updateDataId = function(leistung){
+        document.getElementById('leistung').setAttribute('data-id', leistung.id);
+    }
+    //ANMERKUNG: eine function, anderes ELEMENT mitgeben!
     $scope.getCurrentStartTime = function() {
         var date=new Date()
         var hours = date.getHours();
@@ -207,16 +200,22 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('FahrtenmanagerCtrl', function($scope, $state, $ionicPopup) {
+.controller('FahrtenmanagerCtrl', function($scope, DataModel, $state, $ionicPopup) {
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
+    }
+    
+    $scope.dataModel = DataModel;
+    $scope.leistungen = DataModel.getLeistungList('fahrt');
+    $scope.updateDataId = function(leistung){
+        document.getElementById('leistung').setAttribute('data-id', leistung.id);
     }
     
     $scope.finishFahrt = function() {
         /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
         /*Wenn Alles Passt*/
         var passt=true //testvariable
-        
+        console.log(document.getElementById('leistung').value);
         if (passt) {
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Fahrtzeit hinzufügen',
