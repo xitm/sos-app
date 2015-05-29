@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title></title>
+    <script>
+      var json = {mitarbeiter:{id: 0, vorname:"Alex", nachname:"Monz", adresse:"Brenjurweg3", kfz:"I123456", sesssions:[]},clienten:[{ id: 0, vorname:'Max',nachname:'Mustermann', ort:'Völs'},{ id: 1, vorname:'Peter', nachname:'Oberhuber', ort:'Wörgl'},{ id: 2, vorname:'Julia', nachname:'Sargnagel', ort:'Innsbruck'},{ id: 3, name:'Anna Fenninger', ort:'Telfs'}], leistungen:[{id: 0, name:"hinfahrt", typ:"fahrt"},{id: 1, name:"rueckfahrt", typ:"fahrt"},{id: 2, name:"schwimmen", typ:"arbeit"},{id: 3, name:"beratung", typ:"arbeit"}]};
+      localStorage.setItem("mle_model", JSON.stringify(json));
+      //localStorage.setItem("mle_model",JSON.stringify({mitarbeiter:{id: 0, vorname:"Alex", nachname:"Monz", adresse:"Brenjurweg3", kfz:"I123456", sesssions:[]},clienten:[{ id: 0, vorname:'Max',nachname:'Mustermann', ort:'Völs'},{ id: 1, vorname:'Peter', nachname:'Oberhuber', ort:'Wörgl'},{ id: 2, vorname:'Julia', nachname:'Sargnagel', ort:'Innsbruck'},{ id: 3, name:'Anna Fenninger', ort:'Telfs'}]}));
+    </script>
 
 
     <!-- compiled css output -->
@@ -20,6 +25,7 @@
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
+    <script src="js/dataFactory.js"></script>
   </head>
   <body ng-app="starter">
     <!--
