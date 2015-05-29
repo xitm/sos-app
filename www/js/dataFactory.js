@@ -27,18 +27,52 @@ angular.module('starter.services', [])
  *-------2. Argumente automatisch mit this.setXx festlegen/
  *-------3. JSON-Struktur umwandeln und jeweils eigens instanzieren/
  *-------4. alle Prototype-functions!-------------------------------*/
+.factory('AppError', function(){
+    AppError = function(message, functionName, objectName, attachment){
+        this.name = name || "AppError";
+        this.message = message || "Unbekannter Fehler";
+        this.functionName = functionName || "Unbekannt";
+        this.objectName = objectName || "Unbekannt";
+        this.attachment = attachment || "Unbekannt";
+    }
+    
+    AppError.prototype = Error.prototype;
+    
+    AppError.prototype.toString = function(){
+        return this.message + "\nFunktion: " + this.functionName +
+        "\nObjekt: " + this.objectName + "\nTyp uebergebenes Object: " + this.attachment;
+    }
+    
+    AppError.create = function(JSONstructure){
+        var err = new AppError(JSONstructure.msg, JSONstructure.fnc, JSONstructure.object, JSONstructure.type);
+        return err;
+    }
+    return(AppError);
+})
+
 
 //----------- 1. - BusinessObject_Class_Definition------//
-.factory('BusinessObject',function(Mitarbeiter, Leistung, Client){
-    
+.factory('BusinessObject',function(Mitarbeiter, Leistung, Client, AppError){
     function BusinessObject(){
+        var ERR_MSG ={
+            TYPE_ERR_MA : "Objektfehler; Mitarbeiter erwartet!",
+            TYPE_ERR_LS : "Objektfehler; Leistung erwartet!",
+            TYPE_ERR_CS : "Objektfehler; Client erwartet!",
+            TYPE_ERR_PIN : "Objektfehler; string erwartet!",
+            LENGTH_ERR_PIN : "Dimensionsfehler: string mit Laenge 4 erwartet!"
+            
+        };
         var _mitarbeiter = undefined;
         var _pin = undefined;
         var _leistungen = new Array();
         var _clienten = new Array();
+
         
         //1.1 mitarbeiter_definitionen
         this.setMitarbeiter = function(mitarbeiter) {
+            if (!(mitarbeiter instanceof Mitarbeiter)) {
+                throw new AppError(ERR_MSG.TYPE_ERR_MA, 'setMitarbeiter', 'BusinessObject', typeof mitarbeiter).toString();
+            }
             _mitarbeiter = mitarbeiter;
         }
         this.getMitarbeiter = function() {
@@ -47,6 +81,9 @@ angular.module('starter.services', [])
         
         //1.2 leistung_definitionen
         this.addLeistung = function(leistung) {
+            if (!(leistung instanceof Leistung)) {
+                throw new AppError(ERR_MSG.TYPE_ERR_LS, 'addLeistung', 'BusinessObject', typeof leistung).toString();
+            }
             _leistungen.push(leistung);
         }
         this.getLeistungen = function() {
@@ -55,6 +92,9 @@ angular.module('starter.services', [])
         
         //1.3 client_definitionen
         this.addClient = function(client) {
+            if (!(client instanceof Client)) {
+                throw new AppError(ERR_MSG.TYPE_ERR_CL, 'addClient', 'BusinessObject', typeof client).toString();
+            }
             _clienten.push(client);
         }
         this.getClienten = function() {
@@ -63,6 +103,12 @@ angular.module('starter.services', [])
         
         //1.4 pin_definitionen
         this.setPin = function(pin) {
+            if (typeof pin != 'string') {
+                throw new AppError(ERR_MSG.TYPE_ERR_PIN, 'setPin', 'BusinessObject', typeof pin).toString();
+            }
+            if (pin.length != 4) {
+                throw new AppError(ERR_MSG.LENGTH_ERR_PIN, 'setPin', 'BusinessObject', pin.length).toString();
+            }
             _pin = pin;
         }
         this.getPin = function() {
@@ -139,6 +185,7 @@ angular.module('starter.services', [])
         
         ba.setMitarbeiter(ma);
         
+        //ba.setMitarbeiter("asdfasdf");
         for(var i = 0, anz=JSONstructure.clienten.length; i<anz; i++){
             var cl = new Client.create(JSONstructure.clienten[i]);
             ba.addClient(cl);
@@ -161,6 +208,10 @@ angular.module('starter.services', [])
 .factory('Mitarbeiter', function(Session){
     
     function Mitarbeiter(id, vorname, nachname, adresse, kfz){
+        var ERR_MSG ={
+            
+        };
+        
         var _id = undefined;
         var _vorname = undefined;
         var _nachname = undefined;
