@@ -17,13 +17,11 @@
         <div class="padding" style="text-align: center;">
             <img src="img/notizenbild.png" />
         </div>
-        <div class="padding">
-            <!--placeholder-->
-        </div>
+        
        <div class="padding list">
             <label class="item item-input item-select">
                 <div class="input-label">
-                  Leistung
+                  <b>Leistung</b>
                 </div>
                 <select>
                     <option>Schwimmen</option>
@@ -37,14 +35,18 @@
             <!--placeholder-->
         </div>
        
+       
         <!-- Uhre und Datum -->
-        <div class="padding row">
-             <div class="col col-50">
-                <img src="img/uhr_gruen.png" />
-            </div>
-            <div class="col col-50" style="position: relative; ">
-                <label class="item item-input" style=" position: absolute; bottom:5px;">
-                    <input placeholder="Datum" class="textbox-n" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" />
+        <div class="row">
+          <div class="col" style="text-align: center;">
+                  <img src="img/uhr_gruen.png"/>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col" ng-model="date">
+                <label class="item item-input">
+                    <span><b>Datum</b></span>
+                    <input class="textbox-n" type="date" style="text-align: right"/>
                 </label>
             </div>
         </div>
@@ -53,14 +55,16 @@
         
         <div class="row">
             <div class="col col-50">
-                <label class="item item-input">
-                    <input placeholder="Anfangszeit" class="textbox-n" type="text" ng-model="date" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                <label class="item item-input" ng-click="hideSpanA = !hideSpanA">
+                    <span ng-hide="hideSpanA" ng-if="!anfangszeit" >Anfangszeit</span>
+                    <input class="textbox-n" ng-model="anfangszeit" type="time"/>
                 </label>
             </div>
             
             <div class="col col-50">
-                <label class="item item-input">
-                    <input placeholder="Endzeit" class="textbox-n" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                <label class="item item-input" ng-click="hideSpanE = !hideSpanE">
+                    <span ng-hide="hideSpanE" ng-if="!endzeit" >Endzeit</span>
+                    <input class="textbox-n" ng-model="endzeit" type="time" />
                 </label>
             </div>
         </div>

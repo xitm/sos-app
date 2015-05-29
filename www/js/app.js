@@ -73,13 +73,13 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   })
     .state('sessionbearbeitung_Fahrt', {
     url: '/sessionbearbeitung_Fahrt',
-    templateUrl: 'templates/sessionbearbeitung_fahrt.html',
+    templateUrl: 'templates/sessionbearbeitungfahrt.html',
     controller: 'FahrtCtrl'    
   })
   
   .state('sessionbearbeitung_Arbeit', {
     url: '/sessionbearbeitung_Arbeit',
-    templateUrl: 'templates/sessionbearbeitung_arbeit.html',
+    templateUrl: 'templates/sessionbearbeitungarbeit.html',
     controller: 'ArbeitCtrl'
 });
 
