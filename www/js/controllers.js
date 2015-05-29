@@ -1,18 +1,35 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, $state, $filter, $ionicPopup) {
-    $scope.clicked = false
+.controller('DashCtrl', function($scope, BusinessObject, $state, $filter, $ionicPopup) {
+    $scope.clicked = false;
+    $scope.dataModel = BusinessObject.create(JSON.parse(localStorage.getItem('mle_model')));
     $scope.date = new Date();
     $scope.callSessionmanager = function() {
         
         //$scope.date in model speichern
         // Kunde im model suchen
         //Wenn noch kein Kunde, Kunde anlegen
+        var clients = $scope.dataModel.getClienten();
+        var check = false;
         
+        for(var i=0,anz=clients.length;i<anz;i++){
+            if(document.getElementById('kunde').value === (clients[i].getVorname() + ' ' + clients[i].getNachname())){
+                
+                document.getElementById('kunde').setAttribute('data-id', clients[i].getId());
+                check = true;
+            }
+        }
         if (document.getElementById('kunde').value=="") {
             $ionicPopup.alert ({
                 title: "Kein Klient eingetragen!",
                 template: "Bitte zuerst einen Klienten angeben"
+            })
+            return;
+        }
+        if (!check) {
+            $ionicPopup.alert ({
+                title: "Klient nicht bekannt!",
+                template: "Bitte einen Klienten gültigen angeben"
             })
             return;
         }
@@ -25,20 +42,27 @@ angular.module('starter.controllers', [])
     
     $scope.searchContacts = function(query) {
         $scope.clicked = false
-        $scope.contacts = [
-         { id: 0, name:'Max Mustermann', ort:'Völs', session: "Fahrt", leistung: "Hinfahrt"},
-         { id: 1, name:'Peter Oberhuber', ort:'Wörgl', session: "Arbeit", leistung: "Sauna"},
-         { id: 2, name:'Julia Sargnagel', ort:'Innsbruck', session:  "Fahrt", leistung: "Rückfahrt"},
-         { id: 3, name:'Anna Fenninger', ort:'Telfs', session: "Arbeit", leistung: "Schwimmen"}
-         ]
+        $scope.contacts = $scope.dataModel.getClientList();
         $scope.queryData = $filter('filter')($scope.contacts, query);
     }
     
     $scope.updateInput = function (contact) {
         var d=document.getElementById('kunde');
-        d.value=contact;
+        d.value=contact.vorname + ' ' + contact.nachname;
+        d.setAttribute('data-id', contact.id);
         $scope.clicked = true;
     }
+    
+    //$scope.checkInput = function(){
+    //    var d = document.getElementById('kunde');
+    //    var clients = $scope.dataModel.getClienten();
+    //    for(var i=0,anz=clients.length;i<anz;i++){
+    //        if (d.value === (clients[i].getVorname + " " + clients[i].getNachname) && d.getAttribute('data-id')!=clients[i].getId()) {
+    //            d.setAttribute('data-id',clients[i].getId());
+    //        }
+    //    }
+    //    console.log("now");
+    //}
 })
 
 

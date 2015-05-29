@@ -46,8 +46,8 @@
       </label>
       <ion-list>
         <div class="list" ng-hide="clicked">
-          <a ng-repeat="contact in contacts | filter:search" class="item" ng-if="search" ng-click="updateInput(contact.name)">
-            <h2>{{contact.name}}</h2>
+          <a ng-repeat="contact in contacts | filter:search" class="item" ng-if="search" data-id=null ng-model="change" ng-click="updateInput(contact)">
+            <h2>{{contact.vorname}} {{contact.nachname}}</h2>
           </a>
      
         </div>

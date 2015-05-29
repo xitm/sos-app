@@ -78,7 +78,6 @@ angular.module('starter.services', [])
         for(var i=0, anz=_clienten.length;i<anz;i++){
             _clientList.push(_clienten[i].toJson());
         }
-        
         return _clientList;
     }
     
