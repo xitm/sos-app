@@ -1,28 +1,5 @@
 angular.module('starter.services', [])
 
-.service('LoginService', function($q) {
-    return {
-        loginUser: function(pw) {
-            var deferred = $q.defer();
-            var promise = deferred.promise;
- 
-            if ( pw == '1234') {
-                deferred.resolve('Welcome ' + ' Alex' + '!');
-            } else {
-                deferred.reject('Wrong credentials.');
-            }
-            promise.success = function(fn) {
-                promise.then(fn);
-                return promise;
-            }
-            promise.error = function(fn) {
-                promise.then(null, fn);
-                return promise;
-            }
-            return promise;
-        }
-    }
-})
 /*-----------Arbeiten noch zu erledigen:-----------/
  *-------1. Klassendefinitionen mit Argumenten befüllen/
  *-------2. Argumente automatisch mit this.setXx festlegen/
@@ -30,7 +7,7 @@ angular.module('starter.services', [])
  *-------4. alle Prototype-functions!-------------------------------*/
 
 //----------- 1. - BusinessObject_Class_Definition------//
-.factory('BusinessObject',function(Mitarbeiter, Leistung){
+.factory('BusinessObject',function(Mitarbeiter, Leistung, Client){
     
     function BusinessObject(){
         var _mitarbeiter = undefined;
@@ -56,7 +33,7 @@ angular.module('starter.services', [])
         
         //1.3 client_definitionen
         this.addClient = function(client) {
-            _sessions.push(client);
+            _clienten.push(client);
         }
         this.getClienten = function() {
             return _clienten;
@@ -72,6 +49,16 @@ angular.module('starter.services', [])
         
     }
     
+    //1.z1 Prototype functions  
+    BusinessObject.prototype.getClientList = function(){
+        var _clientList = new Array();
+        for(var i=0, anz=this.getClienten().length;i<anz;i++){
+            _clientList.push(this.getClienten()[i].toJson());
+        }
+        
+        return _clientList;
+    }
+    
     //1.Zusatz Create_option
     BusinessObject.create = function(JSONstructure){
         //Methoden zur Aufbereitung des JSON-Strings
@@ -80,24 +67,25 @@ angular.module('starter.services', [])
         //Ausgabe des fertigen BuisnessObjects
         var ba = new BusinessObject(/*hier kommen evtl die ausgearbeiteten Variablen hinein!*/);
         ba.setPin('1234');
-        var ma = new Mitarbeiter.create();
-        ma.setVorname("Alex");
-        ma.setNachname("Monz");
+        var ma = new Mitarbeiter.create(JSONstructure.mitarbeiter);
         ba.setMitarbeiter(ma);
+        for(var i = 0, anz=JSONstructure.clienten.length; i<anz; i++){
+            var cl = new Client.create(JSONstructure.clienten[i]);
+            ba.addClient(cl);
+        }
         //zusätzliche Sessions usw adden!
         return(
             ba
         )
     }
-    
     return(BusinessObject);
     
 })
 
 //----------- 2. - Mitarbeiter_Class_Definition------//
 .factory('Mitarbeiter', function(){
-    function Mitarbeiter(){
-        var _personId = undefined;
+    function Mitarbeiter(id, vorname, nachname, adresse, kfz){
+        var _id = undefined;
         var _vorname = undefined;
         var _nachname = undefined;
         var _adresse = undefined;
@@ -105,11 +93,11 @@ angular.module('starter.services', [])
         var _sessions = new Array();
         
         //2.1 personId_definitionen
-        this.setPersonId = function(personId) {
-            _personId = personId;
+        this.setId = function(id) {
+            _id = id;
         }
         this.getPersonId = function() {
-            return _personId;
+            return _id;
         }
         
         //2.2 vorname_definitionen
@@ -151,16 +139,21 @@ angular.module('starter.services', [])
         this.getSessions = function() {
             return _sessions;
         }
+        
+        this.setId(id);
+        this.setVorname(vorname);
+        this.setNachname(nachname);
+        this.setAdresse(adresse);
+        this.setStandKfz(kfz);
     }
     
     //2.Zusatz Create_option
     Mitarbeiter.create = function(JSONstructure){
         //Methoden zur Aufbereitung des JSON-Strings
-        
+        //SESSIONS erstellen!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         
         //Ausgabe des fertigen Mitarbeiters
-        var ma = new Mitarbeiter(/*hier kommen evtl die ausgearbeiteten Variablen hinein!*/);
-        ma.setVorname('Alex');
+        var ma = new Mitarbeiter(JSONstructure.id, JSONstructure.vorname, JSONstructure.nachname, JSONstructure.kfz);
         //zusätzliche Sessions usw adden!
         return(
             ma
@@ -225,18 +218,18 @@ angular.module('starter.services', [])
 //----------- 4. - Client_Class_Definition------//
 .factory('Client', function(){
     
-    function Client(){
-        var _personId = undefined;
+    function Client(id, vorname, nachname, adresse){
+        var _id = undefined;
         var _vorname = undefined;
         var _nachname = undefined;
         var _adresse = undefined;
         
         //4.1 personId_definitionen
-        this.setPersonId = function(personId) {
-            _personId = personId;
+        this.setId = function(id) {
+            _id = id;
         }
-        this.getPersonId = function() {
-            return _personId;
+        this.getId = function() {
+            return _id;
         }
         
         //4.2 vorname_definitionen
@@ -262,17 +255,28 @@ angular.module('starter.services', [])
         this.getAdresse = function() {
             return _adresse;
         }
+        this.setId(id);
+        this.setVorname(vorname);
+        this.setNachname(nachname);
+        this.setAdresse(adresse);
+    }
+
+    //4. z1 Prototype functions
+    Client.prototype.toJson= function(){
+        return {
+            id: this.getId(),
+            vorname: this.getVorname(),
+            nachname: this.getNachname(),
+            adresse : this.getAdresse(),
+        }
     }
     
     //4.Zusatz Create_option
     Client.create = function(JSONstructure){
         //Methoden zur Aufbereitung des JSON-Strings
         
-        
         //Ausgabe des fertigen Mitarbeiters
-        var cl = new Client(/*hier kommen evtl die ausgearbeiteten Variablen hinein!*/);
-        cl.getVorname('Hansl');
-        //zusätzliche Sessions usw adden!
+        var cl = new Client(JSONstructure.id, JSONstructure.vorname, JSONstructure.nachname, JSONstructure.ort);
         return(
             cl
         )
@@ -289,7 +293,10 @@ angular.module('starter.services', [])
         var _sessionDatum = new Date();
         var _client = undefined;
         var _fahrten = new Array();
-        var _arbeiten = new Arbeiten();
+        var _arbeiten = new Array();
+        var _deleted = false;
+        var _active = false;
+        
         
         //5.1 sessionId_definitionen
         this.setSessionId = function(sessionId) {
