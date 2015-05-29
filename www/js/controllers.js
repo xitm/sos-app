@@ -1,8 +1,17 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, $state, $filter) {
+.controller('DashCtrl', function($scope, $state, $filter, $ionicPopup) {
     $scope.clicked = false
     $scope.callSessionmanager = function() {
+        
+        if (document.getElementById('kunde').value=="") {
+            $ionicPopup.alert ({
+                title: "Kein Klient eingetragen!",
+                template: "Bitte zuerst einen Klienten angeben"
+            })
+            return;
+        }
+        
         $state.go('sessionmanager')
     }
     $scope.callSessionuebersicht = function() {
