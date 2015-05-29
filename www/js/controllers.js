@@ -2,7 +2,12 @@ angular.module('starter.controllers', [])
 
 .controller('DashCtrl', function($scope, $state, $filter, $ionicPopup) {
     $scope.clicked = false
+    $scope.date = new Date();
     $scope.callSessionmanager = function() {
+        
+        //$scope.date in model speichern
+        // Kunde im model suchen
+        //Wenn noch kein Kunde, Kunde anlegen
         
         if (document.getElementById('kunde').value=="") {
             $ionicPopup.alert ({
