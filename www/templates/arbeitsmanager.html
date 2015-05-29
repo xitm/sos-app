@@ -1,13 +1,11 @@
-
-
 <ion-view view-title="Sessionmanager">
   
   
   <ion-header-bar class="bar-balanced">
-    <div class="buttons">
-      <button class="button" ng-click="callSessionmanager()">Zurück</button>
-    </div>
-    <h1 class="title">Arbeitsmanager</h1>
+	<div class="buttons">
+	  <button class="button" ng-click="callSessionmanager()">Zurück</button>
+	</div>
+	<h1 class="title">Arbeitsmanager</h1>
   </ion-header-bar>
 
   <ion-content class="padding has-header">
@@ -21,7 +19,7 @@
        <div class="padding list">
             <label class="item item-input item-select">
                 <div class="input-label">
-                  <b>Leistung</b>
+                  Leistung
                 </div>
                 <select>
                     <option>Schwimmen</option>
@@ -45,7 +43,7 @@
         <div class="row">
             <div class="col" ng-model="date">
                 <label class="item item-input">
-                    <span><b>Datum</b></span>
+                    <span>Datum</span>
                     <input class="textbox-n" type="date" style="text-align: right"/>
                 </label>
             </div>
@@ -57,24 +55,24 @@
             <div class="col col-50">
                 <label class="item item-input" ng-click="hideSpanA = !hideSpanA">
                     <span ng-hide="hideSpanA" ng-if="!anfangszeit" >Anfangszeit</span>
-                    <input class="textbox-n" ng-model="anfangszeit" type="time"/>
+                    <input class="textbox-n" ng-model="anfangszeit" id="anfangszeit" type="time"/>
                 </label>
             </div>
             
             <div class="col col-50">
                 <label class="item item-input" ng-click="hideSpanE = !hideSpanE">
                     <span ng-hide="hideSpanE" ng-if="!endzeit" >Endzeit</span>
-                    <input class="textbox-n" ng-model="endzeit" type="time" />
+                    <input class="textbox-n" ng-model="endzeit" id="endzeit" type="time" />
                 </label>
             </div>
         </div>
         
         <div class="row">
             <div class="col col-50">
-                <button class="button icon-right ion-chevron-right button-balanced" ng-click="getDateTime.date">Jetzt</button>
+                <button class="button icon-right ion-chevron-right button-balanced" ng-click="anfangszeit = getCurrentStartTime()">Jetzt</button>
             </div>
             <div class="col col-50">
-                <button class="button icon-right ion-chevron-right button-balanced">Jetzt</button>
+                <button class="button icon-right ion-chevron-right button-balanced" ng-click="endzeit = getCurrentEndTime()">Jetzt</button>
             </div>
         </div>
        
@@ -85,7 +83,7 @@
   </ion-content>
   
   <ion-footer-bar class="bar-balanced">
-      <button class="button button-full button-clear" ng-click="finishArbeit()" style="font-size: xx-large"><b>OK</b></button>
+	  <button class="button button-full button-clear" ng-click="finishArbeit()" style="font-size: xx-large"><b>OK</b></button>
   </ion-footer-bar>
 
 </ion-view>

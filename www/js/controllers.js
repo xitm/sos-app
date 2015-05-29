@@ -120,9 +120,34 @@ angular.module('starter.controllers', [])
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
     }
+
     
-    $scope.getDateTime = {
-        date: new Date()
+    $scope.getCurrentStartTime = function() {
+        var date=new Date()
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        var time = hours + ":" + minutes + ":" + "00";
+        
+        $scope.anfangszeit = time;
+        $scope.hideSpanA = true;
+        document.getElementById("anfangszeit").value = time;
+    }
+    
+    $scope.getCurrentEndTime = function() {
+        var date=new Date()
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        var time = hours + ":" + minutes + ":" + "00";
+        
+        $scope.endzeit = time;
+        $scope.hideSpanE = true;
+        document.getElementById("endzeit").value = time;
     }
     
     $scope.finishArbeit = function() {
