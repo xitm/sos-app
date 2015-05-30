@@ -26,7 +26,9 @@ angular.module('starter.services', [])
  *-------1. Klassendefinitionen mit Argumenten befüllen/
  *-------2. Argumente automatisch mit this.setXx festlegen/
  *-------3. JSON-Struktur umwandeln und jeweils eigens instanzieren/
- *-------4. alle Prototype-functions!-------------------------------*/
+ *-------4. alle Prototype-functions!-------------------------------/+
+ *-------5. fromJson -function zum Erstellen des Models ausgehend der JSON-Structur in ALLEN Klassen implementieren!!---/
+ *-------5. alle addXx-functionen so weiterentwickeln, dass auch gleich mehrere Unterobjekte (Sessions, Fahrten, etc.) entgegengenommen werdern können! ---*/
 .factory('AppError', function(){
     AppError = function(message, functionName, objectName, attachment){
         this.name = name || "AppError";
@@ -209,7 +211,9 @@ angular.module('starter.services', [])
     
     function Mitarbeiter(id, vorname, nachname, adresse, kfz){
         var ERR_MSG ={
-            
+            TYPE_ERR_VN : "Typenfehler: string für Vornamen erwartet!",
+            TYPE_ERR_NN : "Typenfehler: string für Nachnamen erwartet!",
+            TYPE_ERR_SES : "Typenfehler: object Session erwartet!"
         };
         
         var _id = undefined;
@@ -223,12 +227,15 @@ angular.module('starter.services', [])
         this.setId = function(id) {
             _id = id;
         }
-        this.getPersonId = function() {
+        this.getId = function() {
             return _id;
         }
         
         //2.2 vorname_definitionen
         this.setVorname = function(vorname) {
+            if (typeof vorname != "string") {
+                throw new AppError(ERR_MSG.TYPE_ERR_VN, 'setVorname', 'Mitarbeiter', typeof vorname);
+            }
             _vorname = vorname;
         }
         this.getVorname = function() {
@@ -237,6 +244,9 @@ angular.module('starter.services', [])
         
         //2.3 nachname_definitionen
         this.setNachname = function(nachname) {
+            if (typeof vorname != "string") {
+                throw new AppError(ERR_MSG.TYPE_ERR_NN, 'setNachname', 'Mitarbeiter', typeof nachname);
+            }
             _nachname = nachname;
         }
         this.getNachname = function() {
@@ -261,6 +271,9 @@ angular.module('starter.services', [])
         
         //2.6 session_definitionen
         this.addSession = function(session) {
+            if (typeof session != Session) {
+                throw new AppError(ERR_MSG.TYPE_ERR_SES, 'addSession', 'Mitarbeiter', typeof sesseion);
+            }
             _sessions.push(session);
         }
         this.getSessions = function() {
@@ -410,9 +423,6 @@ angular.module('starter.services', [])
     
     //4.Zusatz Create_option
     Client.create = function(JSONstructure){
-        //Methoden zur Aufbereitung des JSON-Strings
-        
-        //Ausgabe des fertigen Mitarbeiters
         var cl = new Client(JSONstructure.id, JSONstructure.vorname, JSONstructure.nachname, JSONstructure.ort);
         return(
             cl
@@ -429,8 +439,8 @@ angular.module('starter.services', [])
         var _id = undefined;
         var _datum = new Date();
         var _clientId = undefined;
-        var _fahrtenId = new Array();
-        var _arbeitenId = new Array();
+        var _fahrten= new Array();
+        var _arbeiten = new Array();
         var _deleted = false;
         var _active = false;
         
@@ -461,30 +471,38 @@ angular.module('starter.services', [])
         }
         
         //5.4 fahrten_definitionen
-        this.addFahrtId = function(fahrtId){
-            _fahrtenId.push(fahrtId);
+        this.addFahrt = function(fahrt){
+            _fahrten.push(fahrt);
         }
         this.getFahrten = function(){
-            return _fahrtenId;
+            return _fahrten;
         }
         
         //5.5 arbeiten_definitionen
-        this.addArbeitId = function(arbeitId){
-            _arbeitenId.push(arbeitId);
+        this.addArbeit = function(arbeit){
+            _arbeiten.push(arbeit);
         }
-        this.getArbeitenId = function(){
-            return _arbeitenId;
+        this.getArbeiten = function(){
+            return _arbeiten;
         }
         this.setId(id);
         this.setDatum(datum);
         this.setClient(client);
     }
     
+    Session.prototype.toJson = function(){
+        
+        return {
+            id : this.getId(),
+            datum : this.getDatum(),
+            client : this.getClient(),
+            fahrten : this.getFahrten(),
+            arbeiten : this.getArbeiten()
+        }
+    }
+    
     Session.create = function(JSONstructure){
-        //Methoden zur Aufbereitung des JSON-Strings
-        
-        
-        //Ausgabe des fertigen Mitarbeiters
+
         var ses = new Session(JSONstructure.id, JSONstructure.datum, JSONstructure.client);
         //zusätzliche Sessions usw adden!
         return(
@@ -592,11 +610,22 @@ angular.module('starter.services', [])
         this.setLeistung(leistung);
     }
     
+    Fahrt.prototype.toJson = function(){
+        return {
+            id : this.getId(),
+            datum : this.getDatum(),
+            anfangszeit : this.getAnfangszeit(),
+            endzeit : this.getEndzeit(),
+            anfangskilometer : this.getAnfangskilometer(),
+            endkilomenter : this.getEndkilometer(),
+            anfangsort : this.getAnfangsort(),
+            endort : this.getEndort(),
+            leistung : this.getLeistung()
+        }
+    }
+    
     Fahrt.create = function(JSONstructure){
-        //Methoden zur Aufbereitung des JSON-Strings
-        
-        
-        //Ausgabe des fertigen Mitarbeiters
+
         var fa = new Session(JSONstructure.id,JSONstructure.datum,JSONstructure.anfangszeit,JSONstructure.endzeit,JSONstructure.anfangskilometer,JSONstructure.endkilometer,JSONstructure.anfangsort,JSONstructure.endort,JSONstructure.leistung);
         return(
             fa
@@ -612,13 +641,13 @@ angular.module('starter.services', [])
         var _datum = undefined;
         var _anfangszeit = undefined;
         var _endzeit = undefined;
-        var _leistung = undefined;
+        var _leistung = undefined; //ID????
         
         //7.1 arbeitsId_definitionen
         this.setId = function(arbeitsId) {
             _id= arbeitsId;
         }
-        this.getArbeitsId = function() {
+        this.getId = function() {
             return _id;
         }
         
@@ -653,20 +682,31 @@ angular.module('starter.services', [])
         this.getLeistung = function() {
             return _leistung;
         }
+        
+        this.setId(id);
+        this.setDatum(datum);
+        this.setAnfangszeit(anfangszeit);
+        this.setEndzeit(endzeit);
+        this.setLeistung(leistung);
+    }
+    
+    Arbeit.prototype.toJson = function(){
+        return {
+            id : this.getId(),
+            datum : this.getDatum(),
+            anfangszeit : this.getAnfangszeit(),
+            endzeit : this.getEndzeit(),
+            leistung : this.getLeistung()
+        }
     }
     
     Arbeit.create = function(JSONstructure){
-        //Methoden zur Aufbereitung des JSON-Strings
         
-        
-        //Ausgabe des fertigen Mitarbeiters
         var ar = new Session(JSONstructure.id, JSONstructure.datum, JSONstructure.anfangszeit,JSONstructure.endzeit);
-        //zusätzliche Sessions usw adden!
         return(
             ar
         )
     }
-    
     return(Arbeit);
 })
 

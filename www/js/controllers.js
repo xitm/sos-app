@@ -140,8 +140,11 @@ angular.module('starter.controllers', [])
     }
     $scope.dataModel = DataModel;
     $scope.leistungen = $scope.dataModel.getLeistungList('arbeit');
-    $scope.updateDataId = function(leistung){
-        document.getElementById('leistung').setAttribute('data-id', leistung.id);
+    $scope.updateDataId = function(){
+        var leistung = document.getElementById("leistung");
+        var leistung_name = leistung.options[leistung.selectedIndex].getAttribute('data-id');
+        console.log(leistung_name);
+        //document.getElementById('leistung').setAttribute('data-id', leistung.id);
     }
     //ANMERKUNG: eine function, anderes ELEMENT mitgeben!
     $scope.getCurrentStartTime = function() {
@@ -175,9 +178,13 @@ angular.module('starter.controllers', [])
     $scope.finishArbeit = function() {
         /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
         /*Wenn Alles Passt*/
-        var passt=true //testvariable
+        var passt=false; //testvariable
+        var sel = document.getElementById("leistung");
+        var lsId = sel.options[sel.selectedIndex].getAttribute('data-id');
         
+        console.log(lsId);
         if (passt) {
+            
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Arbeitszeit hinzufügen',
                 template: 'Folgende Arbeitsdaten werden erfasst:' //+Arbeitsdaten!!!
@@ -209,6 +216,7 @@ angular.module('starter.controllers', [])
     $scope.leistungen = DataModel.getLeistungList('fahrt');
     $scope.updateDataId = function(leistung){
         document.getElementById('leistung').setAttribute('data-id', leistung.id);
+        document.getElementById('leistung').getAttribute('data-id');
     }
     
     $scope.finishFahrt = function() {
