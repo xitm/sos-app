@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, DataModel, $state, $filter, $ionicPopup) {
+.controller('DashCtrl', function($scope, DataModel, Session, $state, $filter, $ionicPopup) {
     $scope.clicked = false;
     $scope.dataModel = DataModel;
     $scope.date = new Date;
@@ -8,8 +8,7 @@ angular.module('starter.controllers', [])
         
         //$scope.date in model speichern
         //Session anlegen!
-        
-        
+
         var clients = $scope.dataModel.getClienten();
         var check = false;
         

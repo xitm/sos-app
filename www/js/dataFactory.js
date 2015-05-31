@@ -487,7 +487,7 @@ angular.module('starter.services', [])
         }
         this.setId(id);
         this.setDatum(datum);
-        this.setClient(client);
+        this.setClientId(clientId); //change from this.setClient(client); to this.setClientId(clientId);
     }
     
     Session.prototype.toJson = function(){
