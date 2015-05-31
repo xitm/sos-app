@@ -3,12 +3,13 @@ angular.module('starter.controllers', [])
 .controller('DashCtrl', function($scope, DataModel, $state, $filter, $ionicPopup) {
     $scope.clicked = false;
     $scope.dataModel = DataModel;
-    $scope.date = new Date();
+    $scope.date = new Date;
     $scope.callSessionmanager = function() {
         
         //$scope.date in model speichern
-        // Kunde im model suchen
-        //Wenn noch kein Kunde, Kunde anlegen
+        //Session anlegen!
+        
+        
         var clients = $scope.dataModel.getClienten();
         var check = false;
         
@@ -147,33 +148,6 @@ angular.module('starter.controllers', [])
         //document.getElementById('leistung').setAttribute('data-id', leistung.id);
     }
     //ANMERKUNG: eine function, anderes ELEMENT mitgeben!
-    $scope.getCurrentStartTime = function() {
-        var date=new Date()
-        var hours = date.getHours();
-        var minutes = date.getMinutes();
-        if (minutes < 10) {
-            minutes = "0" + minutes;
-        }
-        var time = hours + ":" + minutes + ":" + "00";
-        
-        $scope.anfangszeit = time;
-        $scope.hideSpanA = true;
-        document.getElementById("anfangszeitArbeit").value = time;
-    }
-    
-    $scope.getCurrentEndTime = function() {
-        var date=new Date()
-        var hours = date.getHours();
-        var minutes = date.getMinutes();
-        if (minutes < 10) {
-            minutes = "0" + minutes;
-        }
-        var time = hours + ":" + minutes + ":" + "00";
-        
-        $scope.endzeit = time;
-        $scope.hideSpanE = true;
-        document.getElementById("endzeitArbeit").value = time;
-    }
     
     $scope.finishArbeit = function() {
         /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
@@ -219,34 +193,7 @@ angular.module('starter.controllers', [])
         document.getElementById('leistung').getAttribute('data-id');
     }
     
-    $scope.getCurrentStartTime = function() {
-        var date=new Date()
-        var hours = date.getHours();
-        var minutes = date.getMinutes();
-        if (minutes < 10) {
-            minutes = "0" + minutes;
-        }
-        var time = hours + ":" + minutes + ":" + "00";
-        
-        $scope.anfangszeit = time;
-        $scope.hideSpanA = true;
-        document.getElementById("anfangszeitFahrt").value = time;
-    }
-    
-    $scope.getCurrentEndTime = function() {
-        var date=new Date()
-        var hours = date.getHours();
-        var minutes = date.getMinutes();
-        if (minutes < 10) {
-            minutes = "0" + minutes;
-        }
-        var time = hours + ":" + minutes + ":" + "00";
-        
-        $scope.endzeit = time;
-        $scope.hideSpanE = true;
-        document.getElementById("endzeitFahrt").value = time;
-    }
-    
+   
     $scope.finishFahrt = function() {
         /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
         /*Wenn Alles Passt*/

@@ -81,7 +81,7 @@
         <div class="row">
             <div class="col col-50">
                 <label class="item item-input" ng-click="hideSpanA = !hideSpanA">
-                    <span ng-hide="hideSpanA" ng-if="!anfangszeit" >Anfangszeit</span>
+                    <span ng-hide="hideSpanA" ng-if="!uhranfang" >Anfangszeit</span>
                     <input class="textbox-n" type="time" ng-model="uhranfang"/>
                     <span class="input-label" ng-if="uhranfang" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
@@ -89,7 +89,7 @@
             
             <div class="col col-50">
                 <label class="item item-input"  ng-click="hideSpanE = !hideSpanE">
-                    <span ng-hide="hideSpanE" ng-if="!endzeit" >Endzeit</span>
+                    <span ng-hide="hideSpanE" ng-if="!uhrende" >Endzeit</span>
                     <input class="textbox-n" type="time" ng-model="uhrende"/>
                     <span class="input-label" ng-if="uhrende" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
