@@ -80,26 +80,19 @@
         
         <div class="row">
             <div class="col col-50">
-                <label class="item item-input">
-                    <input placeholder="Anfangszeit" class="textbox-n" type="text" ng-model="uhranfang" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                <label class="item item-input" ng-click="hideSpanA = !hideSpanA">
+                    <span ng-hide="hideSpanA" ng-if="!anfangszeit" >Anfangszeit</span>
+                    <input class="textbox-n" type="time" ng-model="uhranfang"/>
                     <span class="input-label" ng-if="uhranfang" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>
             
             <div class="col col-50">
-                <label class="item item-input">
-                    <input placeholder="Endzeit" class="textbox-n" type="text" ng-model="uhrende" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                <label class="item item-input"  ng-click="hideSpanE = !hideSpanE">
+                    <span ng-hide="hideSpanE" ng-if="!endzeit" >Endzeit</span>
+                    <input class="textbox-n" type="time" ng-model="uhrende"/>
                     <span class="input-label" ng-if="uhrende" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col col-50">
-                <button class="button icon-right ion-chevron-right button-assertive">Jetzt</button>
-            </div>
-            <div class="col col-50">
-                <button class="button icon-right ion-chevron-right button-assertive">Jetzt</button>
             </div>
         </div>
        

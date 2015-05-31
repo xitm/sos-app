@@ -158,7 +158,7 @@ angular.module('starter.controllers', [])
         
         $scope.anfangszeit = time;
         $scope.hideSpanA = true;
-        document.getElementById("anfangszeit").value = time;
+        document.getElementById("anfangszeitArbeit").value = time;
     }
     
     $scope.getCurrentEndTime = function() {
@@ -172,7 +172,7 @@ angular.module('starter.controllers', [])
         
         $scope.endzeit = time;
         $scope.hideSpanE = true;
-        document.getElementById("endzeit").value = time;
+        document.getElementById("endzeitArbeit").value = time;
     }
     
     $scope.finishArbeit = function() {
@@ -217,6 +217,34 @@ angular.module('starter.controllers', [])
     $scope.updateDataId = function(leistung){
         document.getElementById('leistung').setAttribute('data-id', leistung.id);
         document.getElementById('leistung').getAttribute('data-id');
+    }
+    
+    $scope.getCurrentStartTime = function() {
+        var date=new Date()
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        var time = hours + ":" + minutes + ":" + "00";
+        
+        $scope.anfangszeit = time;
+        $scope.hideSpanA = true;
+        document.getElementById("anfangszeitFahrt").value = time;
+    }
+    
+    $scope.getCurrentEndTime = function() {
+        var date=new Date()
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        var time = hours + ":" + minutes + ":" + "00";
+        
+        $scope.endzeit = time;
+        $scope.hideSpanE = true;
+        document.getElementById("endzeitFahrt").value = time;
     }
     
     $scope.finishFahrt = function() {
