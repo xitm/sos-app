@@ -120,9 +120,13 @@ angular.module('starter.controllers', [])
     
     $scope.callArbeitsoberflaeche = function() {
         //Routine um aktive Session zu verwerfen
-        
+        var goArbeitsoberflaeche = true;
         //Prüfen ob bereits Arbeits und/oder Fahrtzeiten vorhanden sind
-        if (model.dataModel.getMitarbeiter().getSessions()[currentsession].getFahrten() == [] || model.dataModel.getMitarbeiter().getSessions()[currentsession].getArbeiten() == []) {
+        if (!(model.dataModel.getMitarbeiter().getSessions()[currentsession].getFahrten()[0]) && !(model.dataModel.getMitarbeiter().getSessions()[currentsession].getArbeiten()[0])) {
+            //Akutelle Session noch löschen!!
+            $state.go('arbeitsoberflaeche');
+        }
+        else {
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Session Verwerfen?',
                 template: 'Du hast noch offene Fahrt- und Arbeitszeiten gespeichert. Möchtest du diese verwerfen?'
@@ -139,7 +143,6 @@ angular.module('starter.controllers', [])
                 }
             });
         }
-        $state.go('arbeitsoberflaeche');
     }
     $scope.callArbeitsmanager = function() {
         $state.go('arbeitsmanager');
