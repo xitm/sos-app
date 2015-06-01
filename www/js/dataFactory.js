@@ -635,7 +635,7 @@ angular.module('starter.services', [])
     
     Fahrt.create = function(JSONstructure){
 
-        var fa = new Session(JSONstructure.id,JSONstructure.datum,JSONstructure.anfangszeit,JSONstructure.endzeit,JSONstructure.anfangskilometer,JSONstructure.endkilometer,JSONstructure.anfangsort,JSONstructure.endort,JSONstructure.leistung);
+        var fa = new Fahrt(JSONstructure.id,JSONstructure.datum,JSONstructure.anfangszeit,JSONstructure.endzeit,JSONstructure.anfangskilometer,JSONstructure.endkilometer,JSONstructure.anfangsort,JSONstructure.endort,JSONstructure.leistung);
         return(
             fa
         )
@@ -711,7 +711,7 @@ angular.module('starter.services', [])
     
     Arbeit.create = function(JSONstructure){
         
-        var ar = new Session(JSONstructure.id, JSONstructure.datum, JSONstructure.anfangszeit,JSONstructure.endzeit);
+        var ar = new Arbeit(JSONstructure.id, JSONstructure.datum, JSONstructure.anfangszeit,JSONstructure.endzeit);
         return(
             ar
         )

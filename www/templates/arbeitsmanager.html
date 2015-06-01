@@ -19,7 +19,7 @@
        <div class="list">
             <label class="item item-input item-select">
                 <div class="input-label">
-                  Leistung
+                  <span id="beschriftung">Leistung</span>
                 </div>
                 <select id='leistung' data-id=0 ng-model='updateId' ng-change='updateDataId()'>
                     <option ng-repeat='leistung in leistungen' data-id='{{leistung.id}}'>{{leistung.name}}</option>
@@ -39,10 +39,10 @@
           </div>
         </div>
         <div class="row">
-            <div class="col" ng-model="date">
+            <div class="col">
                 <label class="item item-input">
                     <span>Datum</span>
-                    <input class="textbox-n" type="date" style="text-align: right"/>
+                    <input class="textbox-n" type="date" id="datum" ng-model="date" style="text-align: right"/>
                 </label>
             </div>
         </div>
@@ -51,17 +51,17 @@
         
         <div class="row">
             <div class="col col-50">
-                <label class="item item-input" ng-click="hideSpanA = !hideSpanA">
+                <label class="item item-input" id="styleA" ng-click="hideSpanA = !hideSpanA">
                     <span ng-hide="hideSpanA" ng-if="!anfangszeit" >Anfangszeit</span>
-                    <input class="textbox-n" type="time" ng-model="uhranfang"/>
+                    <input class="textbox-n" id="timeA" type="time" ng-model="uhranfang"/>
                     <span class="input-label" ng-if="uhranfang" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>
             
             <div class="col col-50">
-                <label class="item item-input" ng-click="hideSpanE = !hideSpanE">
+                <label class="item item-input" id="styleE" ng-click="hideSpanE = !hideSpanE">
                     <span ng-hide="hideSpanE" ng-if="!endzeit" >Endzeit</span>
-                    <input class="textbox-n" type="time" ng-model="uhrende"/>
+                    <input class="textbox-n" id="timeE" type="time" ng-model="uhrende"/>
                     <span class="input-label" ng-if="uhrende" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>

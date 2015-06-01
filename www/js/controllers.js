@@ -3,21 +3,17 @@ angular.module('starter.controllers', [])
 .controller('DashCtrl', function($scope, DataModel, Session, $state, $filter, $ionicPopup) {
     $scope.clicked = false;
     model.dataModel = DataModel;
-    $scope.date = new Date;
+    $scope.date = new Date();
+    
     $scope.callSessionmanager = function() {
-        
-        
-        
-        //writeLocalstorage(JSON.stringify(model))
-        
-        //$scope.date in model speichern
-        //Session anlegen!
-
+        //clients für Auswahllisten
         var clients = model.dataModel.getClienten();
         
+        //client für ausgewählten Kunden
         var client = document.getElementById('kunde')
         var check = false;
         
+        //Überprüfen ob Client exisitert und ID speichern
         for(var i=0,anz=clients.length;i<anz;i++){
             if(client.value === (clients[i].getVorname() + ' ' + clients[i].getNachname())){
                 
@@ -25,6 +21,8 @@ angular.module('starter.controllers', [])
                 check = true;
             }
         }
+        
+        //Fehlerbehandlung Kunde
         if (document.getElementById('kunde').value=="") {
             $ionicPopup.alert ({
                 title: "Kein Klient eingetragen!",
@@ -35,28 +33,35 @@ angular.module('starter.controllers', [])
         if (!check) {
             $ionicPopup.alert ({
                 title: "Klient nicht bekannt!",
-                template: "Bitte einen Klienten gültigen angeben"
+                template: "Bitte einen gültigen Klienten angeben"
             })
             return;
         }
         
+        //Sessionmanager aufrufen
         $state.go('sessionmanager')
-        //SessionId vergeben
-        /*------------------*/
-        //Setactive von Session
-        //clientId = document.getElementById(kunde).getAttribute('data-id')
-        //onsole.log(clientId);
         
+        //SessionId vergeben
+        if (!model.dataModel.getMitarbeiter().getSessions()){
+            var sessionid = 0
+        } else {
+            var sessionid = model.dataModel.getMitarbeiter().getSessions().length 
+        }
+        //Routine, das im localstorage zu speicher fehlt noch! --> damit das App auch geschlossen und wieder geöffnet werden kann.
+        
+        /*------------------*/
+        
+        //Session erstellen
         var session = new Session.create(
-            {id: 1,
-            datum: new Date(),
+            {id: sessionid,
+            datum: new Date(document.getElementById("datum").value), //Datum vom Auswahlfeld
             clientId: client.getAttribute('data-id')//clientId
             }
-            
         )
-        console.log(session)
-        console.log(typeof session)
-        session.setActive(true);
+        //Setactive von Session
+        session.setActive(true); //Routine erstellen die setActives überprüft!!!!
+        
+        //Session hinzufügen
         model.dataModel.getMitarbeiter().addSession(session)
     }
     $scope.callSessionuebersicht = function() {
@@ -106,11 +111,39 @@ angular.module('starter.controllers', [])
 })
 
 .controller('SessionmanagerCtrl', function($scope, $state, $ionicPopup) {
+    //Aktuelle Session definieren, diese Methode gehört zentralisiert!!
+    for (var i=0; i<=model.dataModel.getMitarbeiter().getSessions().length-1; i++){
+            if (model.dataModel.getMitarbeiter().getSessions()[i].getActive()==true) {
+            var currentsession = model.dataModel.getMitarbeiter().getSessions()[i].getId();
+        }
+    }
+    
     $scope.callArbeitsoberflaeche = function() {
+        //Routine um aktive Session zu verwerfen
+        
+        //Prüfen ob bereits Arbeits und/oder Fahrtzeiten vorhanden sind
+        if (model.dataModel.getMitarbeiter().getSessions()[currentsession].getFahrten() == [] || model.dataModel.getMitarbeiter().getSessions()[currentsession].getArbeiten() == []) {
+            var confirmPopup = $ionicPopup.confirm({
+                title: 'Session Verwerfen?',
+                template: 'Du hast noch offene Fahrt- und Arbeitszeiten gespeichert. Möchtest du diese verwerfen?'
+            });
+            confirmPopup.then(function(res) {
+                if(res) {
+                    console.log('Ja');
+                    /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
+                    $state.go('arbeitsoberflaeche');
+                } else {
+                    console.log('Nein');
+                    return;
+                    /*Alles bleibt so wie es ist!*/
+                }
+            });
+        }
         $state.go('arbeitsoberflaeche');
     }
     $scope.callArbeitsmanager = function() {
         $state.go('arbeitsmanager');
+        
     }
     $scope.callFahrtenmanager = function() {
         $state.go('fahrtenmanager');
@@ -157,38 +190,81 @@ angular.module('starter.controllers', [])
     
 })
 
-.controller('ArbeitsmanagerCtrl', function($scope, DataModel, $state, $ionicPopup) {
+.controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, $ionicPopup) {
+    //Aktuelle Session definieren, diese Methode gehört zentralisiert!!
+    for (var i=0; i<=model.dataModel.getMitarbeiter().getSessions().length-1; i++){
+            if (model.dataModel.getMitarbeiter().getSessions()[i].getActive()==true) {
+            var currentsession = model.dataModel.getMitarbeiter().getSessions()[i].getId();
+        }
+    }
+    
+    //Sessionmanager Aufrufen
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
     }
-    $scope.dataModel = DataModel;
-    $scope.leistungen = $scope.dataModel.getLeistungList('arbeit');
+    //Gespeichertes Datum voreintragen
+    $scope.date = model.dataModel.getMitarbeiter().getSessions()[currentsession].getDatum()
+
+    $scope.leistungen = model.dataModel.getLeistungList('arbeit');
     $scope.updateDataId = function(){
         var leistung = document.getElementById("leistung");
         var leistung_name = leistung.options[leistung.selectedIndex].getAttribute('data-id');
-        console.log(leistung_name);
-        //document.getElementById('leistung').setAttribute('data-id', leistung.id);
     }
     //ANMERKUNG: eine function, anderes ELEMENT mitgeben!
     
     $scope.finishArbeit = function() {
         /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
         /*Wenn Alles Passt*/
-        var passt=false; //testvariable
+        var passt=true; //testvariable
         var sel = document.getElementById("leistung");
         var lsId = sel.options[sel.selectedIndex].getAttribute('data-id');
         
-        console.log(lsId);
+        //Fehlerbehandlung, zuerst CSS wieder normal machen
+        document.getElementById("beschriftung").style.color = "black"
+        document.getElementById("styleA").style.backgroundColor = "rgb(255,255,255)"
+        document.getElementById("styleE").style.backgroundColor = "rgb(255,255,255)"
+        
+        if (sel.options[sel.selectedIndex].text == "") {
+            document.getElementById("beschriftung").style.color = "rgba(255,0,0,0.5)"  
+            passt=false;
+        } if (document.getElementById("timeA").value=="") {
+            document.getElementById("styleA").style.backgroundColor = "rgba(255,0,0,0.3)"
+            passt=false;
+        } if (document.getElementById("timeE").value=="") {
+            document.getElementById("styleE").style.backgroundColor = "rgba(255,0,0,0.3)"
+            passt=false;
+        }
+        
+        //ArbeitsId ermitteln
+        if (!model.dataModel.getMitarbeiter().getSessions()[currentsession].getArbeiten()){
+            var arbeitsId = 0
+        } else {
+            var arbeitsId = model.dataModel.getMitarbeiter().getSessions()[currentsession].getArbeiten().length;
+        }
+        
+        //Testvariable abfragen
         if (passt) {
-            
+            var dauer = document.getElementById("timeA").value - document.getElementById("timeE").value;
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Arbeitszeit hinzufügen',
-                template: 'Folgende Arbeitsdaten werden erfasst:' //+Arbeitsdaten!!!
+                template: 'Folgende Arbeitsdaten werden erfasst: <br/>'
+                        + '<ul><li>Leistung: ' + sel.options[sel.selectedIndex].text
+                        + ' </li><li>Dauer: von ' + document.getElementById("timeA").value
+                        +  '  bis '  + document.getElementById("timeE").value
+                        + ' (' + dauer + ' Stunden) </li></ul>'  //Arbeitsdaten!!! Geht das noch schöner?
+                        
             });
             confirmPopup.then(function(res) {
                 if(res) {
-                  console.log('Ja');
-                  /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
+                    
+                  /*arbeitssession freigeben und in sessionmanager wechseln*/
+                  var arbeit = new Arbeit.create({
+                        id: arbeitsId,
+                        datum: new Date(document.getElementById("datum").value),
+                        anfangszeit: document.getElementById("timeA").value,
+                        endzeit: document.getElementById("timeE").value
+                    })
+                  model.dataModel.getMitarbeiter().getSessions()[currentsession].addArbeit(arbeit)
                   $state.go('sessionmanager');
                 } else {
                   console.log('Nein');
