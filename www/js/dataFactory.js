@@ -271,8 +271,8 @@ angular.module('starter.services', [])
         
         //2.6 session_definitionen
         this.addSession = function(session) {
-            if (typeof session != Session) {
-                throw new AppError(ERR_MSG.TYPE_ERR_SES, 'addSession', 'Mitarbeiter', typeof sesseion);
+            if (!(session instanceof Session)) {
+                throw new AppError(ERR_MSG.TYPE_ERR_SES, 'addSession', 'Mitarbeiter', typeof session);
             }
             _sessions.push(session);
         }
@@ -466,7 +466,7 @@ angular.module('starter.services', [])
         this.setClientId = function(clientId) {
             _clientId = clientId;
         }
-        this.getClient = function() {
+        this.getClientId = function() {
             return _clientId;
         }
         
@@ -485,9 +485,18 @@ angular.module('starter.services', [])
         this.getArbeiten = function(){
             return _arbeiten;
         }
-        this.setId(id);
+        //5.6 set/get active
+        this.setActive = function(active) {
+            _active = active;
+        }
+        this.getActive = function() {
+            return _active;
+        }
+        
+        this.setId(id); //Errorhandling!
         this.setDatum(datum);
         this.setClientId(clientId); //change from this.setClient(client); to this.setClientId(clientId);
+        
     }
     
     Session.prototype.toJson = function(){
@@ -503,7 +512,7 @@ angular.module('starter.services', [])
     
     Session.create = function(JSONstructure){
 
-        var ses = new Session(JSONstructure.id, JSONstructure.datum, JSONstructure.client);
+        var ses = new Session(JSONstructure.id, JSONstructure.datum, JSONstructure.clientId);
         //zusätzliche Sessions usw adden!
         return(
             ses

@@ -2,20 +2,26 @@ angular.module('starter.controllers', [])
 
 .controller('DashCtrl', function($scope, DataModel, Session, $state, $filter, $ionicPopup) {
     $scope.clicked = false;
-    $scope.dataModel = DataModel;
+    model.dataModel = DataModel;
     $scope.date = new Date;
     $scope.callSessionmanager = function() {
+        
+        
+        
+        //writeLocalstorage(JSON.stringify(model))
         
         //$scope.date in model speichern
         //Session anlegen!
 
-        var clients = $scope.dataModel.getClienten();
+        var clients = model.dataModel.getClienten();
+        
+        var client = document.getElementById('kunde')
         var check = false;
         
         for(var i=0,anz=clients.length;i<anz;i++){
-            if(document.getElementById('kunde').value === (clients[i].getVorname() + ' ' + clients[i].getNachname())){
+            if(client.value === (clients[i].getVorname() + ' ' + clients[i].getNachname())){
                 
-                document.getElementById('kunde').setAttribute('data-id', clients[i].getId());
+                client.setAttribute('data-id', clients[i].getId());
                 check = true;
             }
         }
@@ -35,6 +41,23 @@ angular.module('starter.controllers', [])
         }
         
         $state.go('sessionmanager')
+        //SessionId vergeben
+        /*------------------*/
+        //Setactive von Session
+        //clientId = document.getElementById(kunde).getAttribute('data-id')
+        //onsole.log(clientId);
+        
+        var session = new Session.create(
+            {id: 1,
+            datum: new Date(),
+            clientId: client.getAttribute('data-id')//clientId
+            }
+            
+        )
+        console.log(session)
+        console.log(typeof session)
+        session.setActive(true);
+        model.dataModel.getMitarbeiter().addSession(session)
     }
     $scope.callSessionuebersicht = function() {
         $state.go('sessionuebersicht')
@@ -42,14 +65,14 @@ angular.module('starter.controllers', [])
     
     $scope.searchContacts = function(query) {
         $scope.clicked = false
-        $scope.contacts = $scope.dataModel.getClientList();
+        $scope.contacts = model.dataModel.getClientList();
         $scope.queryData = $filter('filter')($scope.contacts, query);
     }
     
     $scope.updateInput = function (contact) {
-        var d=document.getElementById('kunde');
-        d.value=contact.vorname + ' ' + contact.nachname;
-        d.setAttribute('data-id', contact.id);
+        var kunde=document.getElementById('kunde');
+        kunde.value=contact.vorname + ' ' + contact.nachname;
+        kunde.setAttribute('data-id', contact.id);
         $scope.clicked = true;
     }
 })
