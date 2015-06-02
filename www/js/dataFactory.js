@@ -200,6 +200,33 @@ angular.module('starter.services', [])
         return _resLs;
     }
     
+    BusinessObject.prototype.toJson = function(){
+        //Array für Clienten
+        var _clients = this.getClienten();
+        //leerer Resultatsarray für JSON von Clienten
+        var _clRes = [];
+        for(var i=0,anz=_clients.length;i<anz;i++){
+            var _cl = _clients[i]; //client an der jeweiligen Stelle des Arrays, welches i entspricht
+            _clRes.push(_cl.toJson()); //Json wird in den Resultatsarray gepushed
+        }
+        
+        //Array für Leistungen
+        var _leistungen = this.getLeistungen();
+        //leerer Resultatsarray für JSON von Leistungen
+        var _lsRes = [];
+        for(var i=0,anz=_leistungen.length;i<anz;i++){
+            var _ls = _leistungen[i]; //leistungen an der jeweiligen Stelle des Arrays, welches i entspricht
+            _lsRes.push(_ls.toJson()); //Json wird in den Resultatsarray gepushed
+        }
+        
+        return {
+            mitarbeiter : this.getMitarbeiter(),
+            pin : this.getPin(),
+            leistungen : _lsRes,
+            clienten : _clRes
+        };
+    }
+    
     //1.Zusatz Create_option
     BusinessObject.create = function(JSONstructure){
         //Methoden zur Aufbereitung des JSON-Strings
@@ -462,7 +489,7 @@ angular.module('starter.services', [])
     
     function Session(id, datum, clientId){
         var _id = undefined;
-        var _datum = new Date();
+        var _datum = undefined;
         var _clientId = undefined;
         var _fahrten= new Array();
         var _arbeiten = new Array();
@@ -744,6 +771,12 @@ angular.module('starter.services', [])
     return(Arbeit);
 })
 
+//Zusammenführen aller Model-Funktionen in einem Service
 .service('DataModel', function(BusinessObject){
-    return BusinessObject.create(JSON.parse(localStorage.getItem('mle_model')));
+    this.create = function(){
+        return BusinessObject.create(JSON.parse(localStorage.getItem('mle_model')));
+    };
+    this.update = function(objectBusinessObject){
+        return objectBusinessObject.toJson();
+    }
 })

@@ -2,8 +2,9 @@ angular.module('starter.controllers', [])
 
 .controller('DashCtrl', function($scope, DataModel, Session, $state, $filter, $ionicPopup) {
     $scope.clicked = false;
-    model.dataModel = DataModel;
+    model.dataModel = DataModel.create(); //Anpassung an neue Service-Gestaltung
     $scope.date = new Date();
+        console.log(DataModel.update(model.dataModel));
     
     $scope.callSessionmanager = function() {
         //clients für Auswahllisten
@@ -50,7 +51,8 @@ angular.module('starter.controllers', [])
         //Routine, das im localstorage zu speicher fehlt noch! --> damit das App auch geschlossen und wieder geöffnet werden kann.
         
         /*------------------*/
-        
+        console.log(document.getElementById("datum").value);
+        console.log(new Date(document.getElementById("datum").value));
         //Session erstellen
         var session = new Session.create(
             {id: sessionid,
@@ -84,7 +86,6 @@ angular.module('starter.controllers', [])
 
 
 .controller('LoginCtrl', function($scope, LoginService, $state) {
- 
     $scope.init = function() {
       $scope.passcode = "";
     }
@@ -211,7 +212,7 @@ angular.module('starter.controllers', [])
         $state.go('sessionmanager')
     }
     //Gespeichertes Datum voreintragen
-    $scope.date = model.dataModel.getMitarbeiter().getSessions()[currentsession].getDatum()
+    $scope.date = currentsession.getDatum(); //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
 
     $scope.leistungen = model.dataModel.getLeistungList('arbeit');
     $scope.updateDataId = function(){
@@ -244,10 +245,10 @@ angular.module('starter.controllers', [])
         }
         
         //ArbeitsId ermitteln
-        if (!model.dataModel.getMitarbeiter().getSessions()[currentsession].getArbeiten()){
+        if (!currentsession.getArbeiten()){ //currentsession instanceof Session -> keine Suche im Array mehr notwendig
             var arbeitsId = 0
         } else {
-            var arbeitsId = model.dataModel.getMitarbeiter().getSessions()[currentsession].getArbeiten().length;
+            var arbeitsId = currentsession.getArbeiten().length; //currentsession instanceof Session -> keine Suche im Array mehr notwendig
         }
         
         //Testvariable abfragen
@@ -272,7 +273,7 @@ angular.module('starter.controllers', [])
                         anfangszeit: document.getElementById("timeA").value,
                         endzeit: document.getElementById("timeE").value
                     })
-                  model.dataModel.getMitarbeiter().getSessions()[currentsession].addArbeit(arbeit)
+                  currentsession.addArbeit(arbeit); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
                   $state.go('sessionmanager');
                 } else {
                   console.log('Nein');
