@@ -125,7 +125,7 @@ angular.module('starter.controllers', [])
         //Prüfen ob bereits Arbeits und/oder Fahrtzeiten vorhanden sind
         if (!(model.dataModel.getMitarbeiter().getSessions()[currentsession].getFahrten()[0]) && !(model.dataModel.getMitarbeiter().getSessions()[currentsession].getArbeiten()[0])) {
             //Akutelle Session noch löschen!!
-            model.dataModel.deleteActiveSession();
+            model.dataModel.deleteActiveSession();//löscht aktive Session - keine offenen Sessions mehr
             $state.go('arbeitsoberflaeche');
         }
         else {
@@ -136,7 +136,7 @@ angular.module('starter.controllers', [])
             confirmPopup.then(function(res) {
                 if(res) {
                     console.log('Ja');
-                    model.dataModel.deleteActiveSession();
+                    model.dataModel.deleteActiveSession();//löscht aktive Session - keine offenen Sessions mehr
                     /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
                     $state.go('arbeitsoberflaeche');
                 } else {

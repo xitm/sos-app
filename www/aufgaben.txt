@@ -1,0 +1,6 @@
+- nur ein activeSession
+- typeof -> instanceof
+- mehrere KFZs?
+- aktuelle Session löschen //ERLEDIGT
+- FM: Fehlerbehandlung
+- Sessionmanager grafishe Überarbeitung
