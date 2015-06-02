@@ -43,7 +43,7 @@ angular.module('starter.controllers', [])
         
         //SessionId vergeben
         if (!model.dataModel.getMitarbeiter().getSessions()){
-            var sessionid = 0
+            var sessionid = 0;
         } else {
             var sessionid = model.dataModel.getMitarbeiter().getSessions().length 
         }
@@ -112,11 +112,12 @@ angular.module('starter.controllers', [])
 
 .controller('SessionmanagerCtrl', function($scope, $state, $ionicPopup) {
     //Aktuelle Session definieren, diese Methode gehört zentralisiert!!
-    for (var i=0; i<=model.dataModel.getMitarbeiter().getSessions().length-1; i++){
-            if (model.dataModel.getMitarbeiter().getSessions()[i].getActive()==true) {
-            var currentsession = model.dataModel.getMitarbeiter().getSessions()[i].getId();
-        }
-    }
+    //for (var i=0; i<=model.dataModel.getMitarbeiter().getSessions().length-1; i++){
+    //        if (model.dataModel.getMitarbeiter().getSessions()[i].getActive()==true) {
+    //        var currentsession = model.dataModel.getMitarbeiter().getSessions()[i].getId();
+    //    }
+    //}
+    var currentsession = model.dataModel.getActiveSession();
     
     $scope.callArbeitsoberflaeche = function() {
         //Routine um aktive Session zu verwerfen
@@ -124,6 +125,7 @@ angular.module('starter.controllers', [])
         //Prüfen ob bereits Arbeits und/oder Fahrtzeiten vorhanden sind
         if (!(model.dataModel.getMitarbeiter().getSessions()[currentsession].getFahrten()[0]) && !(model.dataModel.getMitarbeiter().getSessions()[currentsession].getArbeiten()[0])) {
             //Akutelle Session noch löschen!!
+            model.dataModel.deleteActiveSession();
             $state.go('arbeitsoberflaeche');
         }
         else {
@@ -134,6 +136,7 @@ angular.module('starter.controllers', [])
             confirmPopup.then(function(res) {
                 if(res) {
                     console.log('Ja');
+                    model.dataModel.deleteActiveSession();
                     /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
                     $state.go('arbeitsoberflaeche');
                 } else {
@@ -163,6 +166,7 @@ angular.module('starter.controllers', [])
         confirmPopup.then(function(res) {
           if(res) {
             console.log('Ja');
+            model.dataModel.getActiveSession().setActive(false);
             /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
             $state.go('arbeitsoberflaeche');
           } else {
@@ -195,11 +199,12 @@ angular.module('starter.controllers', [])
 
 .controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, $ionicPopup) {
     //Aktuelle Session definieren, diese Methode gehört zentralisiert!!
-    for (var i=0; i<=model.dataModel.getMitarbeiter().getSessions().length-1; i++){
-            if (model.dataModel.getMitarbeiter().getSessions()[i].getActive()==true) {
-            var currentsession = model.dataModel.getMitarbeiter().getSessions()[i].getId();
-        }
-    }
+    //for (var i=0; i<=model.dataModel.getMitarbeiter().getSessions().length-1; i++){
+    //        if (model.dataModel.getMitarbeiter().getSessions()[i].getActive()==true) {
+    //        var currentsession = model.dataModel.getMitarbeiter().getSessions()[i].getId();
+    //    }
+    //}
+    var currentsession = model.dataModel.getActiveSession();
     
     //Sessionmanager Aufrufen
     $scope.callSessionmanager = function() {

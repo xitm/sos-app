@@ -119,7 +119,32 @@ angular.module('starter.services', [])
         
     }
     
-    //1.z1 Prototype functions  
+    //1.z1 Prototype functions
+    
+    //returns aktive Session!
+    BusinessObject.prototype.getActiveSession = function(){
+        var _sessions = this.getMitarbeiter().getSessions(); //alle sessions
+        for(var i=0,anz=_sessions.length;i<anz;i++){
+            var _ses = _sessions[i]; //caching Session der aktuellen Iteration
+            if (_ses.getActive()) {//wenn active==true
+                return _ses;
+            }
+        }
+    }
+    
+    //löscht die aktuell offene Session aus dem Array für Sessions!
+    BusinessObject.prototype.deleteActiveSession = function(){
+        var _sessions = this.getMitarbeiter().getSessions(); //alle Sessions
+        for (var i=0,anz=_sessions.length;i<anz;i++) {
+            var _ses = _sessions[i];//caching Session der aktuellen Iteration
+            if (_ses.getActive()) { //wenn active==true
+                _sessions.splice(i,1);//löscht an der Stelle i genau das nachfolgende (also selbe) 1 Objekt
+                return
+            }
+        }
+        
+    }
+    
     BusinessObject.prototype.getClientList = function(){
         var _clienten = this.getClienten();
         var _clientList = new Array();
