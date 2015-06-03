@@ -196,7 +196,7 @@ angular.module('starter.controllers', [])
     
 })
 
-.controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, $ionicPopup) {
+.controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, $ionicPopup, FormvalidationService) {
     //Aktuelle Session definieren, diese Methode gehört zentralisiert!!
     //for (var i=0; i<=model.dataModel.getMitarbeiter().getSessions().length-1; i++){
     //        if (model.dataModel.getMitarbeiter().getSessions()[i].getActive()==true) {
@@ -227,20 +227,8 @@ angular.module('starter.controllers', [])
         var lsId = sel.options[sel.selectedIndex].getAttribute('data-id');
         
         //Fehlerbehandlung, zuerst CSS wieder normal machen
-        document.getElementById("beschriftung").style.color = "black"
-        document.getElementById("styleA").style.backgroundColor = "rgb(255,255,255)"
-        document.getElementById("styleE").style.backgroundColor = "rgb(255,255,255)"
         
-        if (sel.options[sel.selectedIndex].text == "") {
-            document.getElementById("beschriftung").style.color = "rgba(255,0,0,0.5)"  
-            passt=false;
-        } if (document.getElementById("timeA").value=="") {
-            document.getElementById("styleA").style.backgroundColor = "rgba(255,0,0,0.3)"
-            passt=false;
-        } if (document.getElementById("timeE").value=="") {
-            document.getElementById("styleE").style.backgroundColor = "rgba(255,0,0,0.3)"
-            passt=false;
-        }
+        passt = FormvalidationService.validateArbeit(passt);
         
         //ArbeitsId ermitteln
         if (!currentsession.getArbeiten()){ //currentsession instanceof Session -> keine Suche im Array mehr notwendig
@@ -294,26 +282,22 @@ angular.module('starter.controllers', [])
     //aktuelle Session
     var currentsession = model.dataModel.getActiveSession();
     
-<<<<<<< HEAD
-    $scope.leistungen = model.dataModel.getLeistungList('fahrt');
-    $scope.updateDataId = function(leistung){
-        document.getElementById('leistung').setAttribute('data-id', leistung.id);
-        document.getElementById('leistung').getAttribute('data-id');
-=======
+
+
     //Datum eintragen
     $scope.datum = currentsession.getDatum();
     //Anfangsort eintragen
     if (model.dataModel.getMitarbeiter().getLetzteFahrt()) {
         document.getElementById('anfangsort').value = model.dataModel.getMitarbeiter().getLetzteFahrt();
->>>>>>> branch-1
     }
     
     
     //Leistungen Laden
     $scope.leistungen = model.dataModel.getLeistungList('fahrt');
-    $scope.updateDataId = function(){
-        var leistung = document.getElementById("leistung");
-        var leistung_name = leistung.options[leistung.selectedIndex].getAttribute('data-id');
+    $scope.updateDataId = function(leistung){ 
+        var leis = document.getElementById("leistung");
+        leis.setAttribute('data-id', leistung.id);
+        var leistung_name = leis.options[leistung.selectedIndex].getAttribute('data-id');
     }
     
     //KFZ voreintragen
@@ -342,7 +326,7 @@ angular.module('starter.controllers', [])
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Fahrtzeit hinzufügen',
                 template: 'Folgende Fahrtzeiten werden erfasst:\n' 
-                           + '<ul><li>Leistung: ' + leistung.options[leistung.selectedIndex].text
+                           + '<ul><li>Leistung: ' + leis.options[leistung.selectedIndex].text
                             + ' </li><li>Dauer: von ' + document.getElementById("timeA").value
                             +  '  bis '  + document.getElementById("timeE").value
                             + ' (' + gesamtkilometer + ' Kilometer) </li></ul>' 

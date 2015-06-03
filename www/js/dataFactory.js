@@ -22,6 +22,36 @@ angular.module('starter.services', [])
         }
     }
 })
+
+.service('FormvalidationService', function() {
+    return {
+        validateArbeit: function (passt) {
+            //CSS auf Standard stellen
+            document.getElementById("beschriftung").style.color = "black"
+            document.getElementById("styleA").style.backgroundColor = "rgb(255,255,255)"
+            document.getElementById("styleE").style.backgroundColor = "rgb(255,255,255)"
+            
+            //Dropdown vordefinieren
+            var sel = document.getElementById("leistung")
+            
+            //Einzelne zu prüfende Felder durchgehen
+            if (sel.options[sel.selectedIndex].text == "") {
+                document.getElementById("beschriftung").style.color = "rgba(255,0,0,0.5)"  
+                passt=false;
+            } if (document.getElementById("timeA").value=="") {
+                document.getElementById("styleA").style.backgroundColor = "rgba(255,0,0,0.3)"
+                passt=false;
+            } if (document.getElementById("timeE").value=="") {
+                document.getElementById("styleE").style.backgroundColor = "rgba(255,0,0,0.3)"
+                passt=false;
+            }
+            
+            //Testvariable zurückgeben
+            return passt;
+        }
+    }
+})
+
 /*-----------Arbeiten noch zu erledigen:-----------/
  *-------1. Klassendefinitionen mit Argumenten befüllen/
  *-------2. Argumente automatisch mit this.setXx festlegen/
