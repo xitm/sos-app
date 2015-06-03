@@ -5,9 +5,9 @@
 	<div class="buttons paddingtop">
 	  <button class="button icon-left ion-chevron-left button-clear" ng-click="callSessionmanager()"></button>
 	</div>
-	<h1 class="title paddingtop">Arbeitsmanager</h1>
-    <div class="buttons paddingtop">
-	  <button class="button button-clear" ng-click="finishArbeit()"><b>OK</b></button>
+	<h1 class="title paddingtop" >Arbeitsmanager</h1>
+    <div class="buttons padding" style="padding-top: 8px;">
+	  <button class="button button-clear" ng-click="finishArbeit()"><h4 style="color: rgb(255,255,255)">OK</h4></button>
 	</div>
   </ion-header-bar>
 
@@ -55,15 +55,17 @@
         <div class="row">
             <div class="col col-50">
                 <label class="item item-input" id="styleA" ng-click="hideSpanA = !hideSpanA">
-                    <span ng-hide="hideSpanA" ng-if="!anfangszeit" >Anfangszeit</span>
+                    <span ng-hide="hideSpanA" ng-if="!uhranfang" >Anfangszeit</span>
                     <input class="textbox-n" id="timeA" type="time" ng-model="uhranfang"/>
                     <span class="input-label" ng-if="uhranfang" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>
             
+            
+            
             <div class="col col-50">
                 <label class="item item-input" id="styleE" ng-click="hideSpanE = !hideSpanE">
-                    <span ng-hide="hideSpanE" ng-if="!endzeit" >Endzeit</span>
+                    <span ng-hide="hideSpanE" ng-if="!uhrende" >Endzeit</span>
                     <input class="textbox-n" id="timeE" type="time" ng-model="uhrende"/>
                     <span class="input-label" ng-if="uhrende" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
