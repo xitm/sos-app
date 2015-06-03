@@ -4,17 +4,19 @@
   
   
   <ion-header-bar class="bar-positive">
-    <div class="buttons">
-      <button class="button" ng-click="callArbeitsoberflaeche()">Zurück</button>
+    <div class="buttons paddingtop">
+      <button class="button icon-left ion-chevron-left button-clear paddingtop" ng-click="callArbeitsoberflaeche()" ></button>
     </div>
-    <h1 class="title">Sessionmanager</h1>
+    <h1 class="title paddingtop" >Sessionmanager</h1>
+
   </ion-header-bar>
 
   <ion-content class="has-header" scroll="false" style="width: 100%; text-align: center;">
         <div style="height: 50%; background-color: rgb(61,150,25); background-image: url('../img/arbeitsmanager.png'); background-repeat: no-repeat; background-position: center;" ng-click="callArbeitsmanager()">
-            <h3 class="padding" style="color:white;">Arbeitszeit hinzufügen</h3>
+            <div style="padding-top: 5px;"></div>
+            <h3  style="color:white;">Arbeitszeit hinzufügen</h3>
         </div>
-      <div style="height: 50%; background-color: rgb(204,58,8); background-image: url('../img/fahrtenmanager.png'); background-repeat: no-repeat; background-position: center;" ng-click="callFahrtenmanager()">
+      <div style="height:47%; background-color: rgb(204,58,8); background-image: url('../img/fahrtenmanager.png'); background-repeat: no-repeat; background-position: center;" ng-click="callFahrtenmanager()">
           <!--<img src="../img/fahrtenmanager.png" style="height: 40%" />-->
           <h3 class="padding" style="color:white;">Fahrtzeit hinzufügen</h3>
       </div>
@@ -26,9 +28,7 @@
       </div>
     
   </ion-content>
-  
-  <ion-footer-bar class="bar-positive">
-      <button class="button button-full button-clear" ng-click="finishSession()" style="font-size: xx-large"><b>SESSION OK</b></button>
+    <ion-footer-bar class="bar-positive">
+      <button class="button button-full button-clear" ng-click="finishSession()" style="font-size: xx-large;"><b>SESSION OK</b></button>
   </ion-footer-bar>
-
 </ion-view>

@@ -83,5 +83,9 @@ height: 70px !important;
 }
 
 .bar-header{
-height: 50px !important;
+height: 60px !important;
+}
+
+.paddingtop {
+    padding-top: 10px;
 }

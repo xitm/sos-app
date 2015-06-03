@@ -2,10 +2,13 @@
   
   
   <ion-header-bar class="bar-balanced">
-	<div class="buttons">
-	  <button class="button" ng-click="callSessionmanager()">Zurück</button>
+	<div class="buttons paddingtop">
+	  <button class="button icon-left ion-chevron-left button-clear" ng-click="callSessionmanager()"></button>
 	</div>
-	<h1 class="title">Arbeitsmanager</h1>
+	<h1 class="title paddingtop">Arbeitsmanager</h1>
+    <div class="buttons paddingtop">
+	  <button class="button button-clear" ng-click="finishArbeit()"><b>OK</b></button>
+	</div>
   </ion-header-bar>
 
   <ion-content class="padding has-header">
@@ -74,8 +77,8 @@
        
   </ion-content>
   
-  <ion-footer-bar class="bar-balanced">
+<!--  <ion-footer-bar class="bar-balanced">
 	  <button class="button button-full button-clear" ng-click="finishArbeit()" style="font-size: xx-large"><b>OK</b></button>
-  </ion-footer-bar>
+  </ion-footer-bar>-->
 
 </ion-view>

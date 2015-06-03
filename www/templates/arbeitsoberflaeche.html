@@ -5,9 +5,9 @@
 
   
   <ion-header-bar align-title="left" class="bar-positive">
-    <h1 class="title">Arbeitsoberfläche</h1>
-    <div class="buttons">
-      <button class="button" ng-click="callSessionuebersicht()">offene Sessions</button>
+    <h1 class="title paddingtop">Arbeitsoberfläche</h1>
+    <div class="button icon-right ion-chevron-right button-clear" style="padding-top: 10px;" ng-click="callSessionuebersicht()" >
+        Sessions
     </div>
   </ion-header-bar>
 
@@ -52,12 +52,15 @@
         </div>
       </ion-list>
       
-      <div class="padding">
-            <!--placeholder-->
+      <div class="padding"></div>
+      
+      <div class="button button-block button-positive" ng-click="callSessionmanager()" style="vertical-align: bottom;">
+        Session Starten
       </div>
+
   </ion-content>
   
-    <ion-footer-bar class="bar-positive">
+    <!--<ion-footer-bar class="bar-positive">
       <button class="button button-full button-clear" ng-click="callSessionmanager()" style="font-size: xx-large;"><b>SESSION STARTEN</b></button>
-  </ion-footer-bar>
+  </ion-footer-bar>-->
 </ion-view>
