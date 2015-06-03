@@ -261,7 +261,7 @@ angular.module('starter.services', [])
 //----------- 2. - Mitarbeiter_Class_Definition------//
 .factory('Mitarbeiter', function(Session){
     
-    function Mitarbeiter(id, vorname, nachname, adresse, kfz){
+    function Mitarbeiter(id, vorname, nachname, adresse, kfz, letzteFahrt){
         var ERR_MSG ={
             TYPE_ERR_VN : "Typenfehler: string für Vornamen erwartet!",
             TYPE_ERR_NN : "Typenfehler: string für Nachnamen erwartet!",
@@ -332,11 +332,20 @@ angular.module('starter.services', [])
             return _sessions;
         }
         
+        //2.7 letzteFahrt_definitionen
+        this.setLetzteFahrt = function(letzteFahrt) {
+            _letzteFahrt = letzteFahrt;
+        }
+        this.getLetzteFahrt = function() {
+            return _letzteFahrt;
+        }
+        
         this.setId(id);
         this.setVorname(vorname);
         this.setNachname(nachname);
         this.setAdresse(adresse);
         this.setStandKfz(kfz);
+        this.setLetzteFahrt(letzteFahrt);
     }
     
     //2.Zusatz Create_option
@@ -345,7 +354,7 @@ angular.module('starter.services', [])
         //SESSIONS erstellen!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         
         //Ausgabe des fertigen Mitarbeiters
-        var ma = new Mitarbeiter(JSONstructure.id, JSONstructure.vorname, JSONstructure.nachname, JSONstructure.kfz);
+        var ma = new Mitarbeiter(JSONstructure.id, JSONstructure.vorname, JSONstructure.nachname, JSONstructure.adresse, JSONstructure.kfz, JSONstructure.letzteFahrt);
         //zusätzliche Sessions usw adden!
         return(
             ma
@@ -586,6 +595,7 @@ angular.module('starter.services', [])
         var _anfangsort = undefined;
         var _endort = undefined;
         var _leistung = undefined;
+        var _letzteFahrt = undefined;
         
         //6.1 fahrtId_definition
         this.setId = function(arbeitsId) {
@@ -659,6 +669,8 @@ angular.module('starter.services', [])
             return _leistung;
         }
         
+        
+        
 
         this.setId(id);
         this.setDatum(datum);
@@ -669,6 +681,7 @@ angular.module('starter.services', [])
         this.setAnfangsort(anfangsort);
         this.setEndort(endort);
         this.setLeistung(leistung);
+        
     }
     
     Fahrt.prototype.toJson = function(){
