@@ -25,24 +25,34 @@ angular.module('starter.services', [])
 
 .service('FormvalidationService', function() {
     this.validateArbeit = function (passt) {
-        //CSS auf Standard stellen
-        document.getElementById("beschriftung").style.color = "black"
-        document.getElementById("styleA").style.backgroundColor = "rgb(255,255,255)"
-        document.getElementById("styleE").style.backgroundColor = "rgb(255,255,255)"
         
-        //Dropdown vordefinieren
-        var sel = document.getElementById("leistung")
+        //Errorfelder
+        var errors = [
+            document.getElementById('datum'),
+            document.getElementById('timeA'),
+            document.getElementById('timeE'),
+        ]
+        //Felder zum Kennzeichnen
+        var changes = [
+            document.getElementById("styledatum"),
+            document.getElementById("styleA"),
+            document.getElementById("styleE")
+        ]
+        //Felder markieren, wenn Error
+        for (var i=0; i<errors.length; i++) {
+            changes[i].style.backgroundColor = "rgb(255,255,255)"
+            if (errors[i].value == "") {
+                changes[i].style.backgroundColor = "rgba(255,0,0,0.3)"
+                passt = false;
+            }
+        }
         
-        //Einzelne zu prüfende Felder durchgehen
-        if (sel.options[sel.selectedIndex].text == "") {
-            document.getElementById("beschriftung").style.color = "rgba(255,0,0,0.5)"  
-            passt=false;
-        } if (document.getElementById("timeA").value=="") {
-            document.getElementById("styleA").style.backgroundColor = "rgba(255,0,0,0.3)"
-            passt=false;
-        } if (document.getElementById("timeE").value=="") {
-            document.getElementById("styleE").style.backgroundColor = "rgba(255,0,0,0.3)"
-            passt=false;
+        //Dropdownfeld - andere Methodik
+        var leistung = document.getElementById('leistung')
+        document.getElementById('beschriftung').style.backgroundColor =  "rgb(255,255,255)"
+        if (leistung.options[leistung.selectedIndex].text == "") {
+            document.getElementById('beschriftung').style.backgroundColor = "rgba(255,0,0,0.3)"
+            passt = false
         }
         
         //Testvariable zurückgeben
@@ -94,6 +104,25 @@ angular.module('starter.services', [])
         return passt;
     }
 })
+
+.service("TimeCalculatorService", function() {
+    this.time = function (start, ende) {
+
+        var hours = ende.split(':')[0] - start.split(':')[0];
+        var minutes = ende.split(':')[1] - start.split(':')[1];
+
+         minutes = minutes.toString().length<2?'0'+minutes:minutes;
+        if(minutes<0){ 
+            hours--;
+            minutes = 60 + minutes;
+        }
+        minutes = minutes.toString();
+        hours = hours.toString();
+        
+        return [hours, minutes];
+    }
+})
+
 
 /*-----------Arbeiten noch zu erledigen:-----------/
  *-------1. Klassendefinitionen mit Argumenten befüllen/

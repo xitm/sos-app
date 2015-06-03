@@ -2,11 +2,15 @@
   
   
     <ion-header-bar class="bar-positive">
-    <div class="buttons">
-      <button class="button" ng-click="callSessionuebersicht()">Zurück</button>
-    </div>
-    <h1 class="title">Sessiondetails</h1>
-  </ion-header-bar>
+      <div class="buttons paddingtop">
+       <button class="button icon-left ion-chevron-left button-clear" ng-click="callSessionuebersicht()"></button>
+      </div>
+      <h1 class="title paddingtop">Sessiondetails</h1>
+      <div class="buttons paddingtop" style="padding-top: 8px;">
+        <button class="button button-clear" ng-click="" ><h4 style="color: rgb(255,255,255)">OK</h4></button>
+      </div>
+    </ion-header-bar>
+
   
   <ion-content class="padding has-header">
     
@@ -56,10 +60,6 @@
       </div>
     
   </ion-content>
-  
-  
-  <ion-footer-bar class="bar-positive">
-      <button class="button button-full button-clear" ng-click="" style="font-size: xx-large"><b>OK</b></button>
-  </ion-footer-bar>
+
 
 </ion-view>

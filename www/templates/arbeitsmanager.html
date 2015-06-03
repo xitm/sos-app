@@ -20,9 +20,9 @@
         </div>
         
        <div class="list">
-            <label class="item item-input item-select">
-                <div class="input-label">
-                  <span id="beschriftung">Leistung</span>
+            <label class="item item-input item-select" id="beschriftung">
+                <div class="input-label" >
+                  <span >Leistung</span>
                 </div>
                 <select id='leistung' data-id=0 ng-model="updateId" ng-change='updateDataId(leistung)'>
                     <option ng-repeat='leistung in leistungen' data-id="{{leistung.id}}">{{leistung.name}}</option>
@@ -43,7 +43,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <label class="item item-input">
+                <label class="item item-input" id="styledatum">
                     <span>Datum</span>
                     <input class="textbox-n" type="date" id="datum" ng-model="date" style="text-align: right"/>
                 </label>

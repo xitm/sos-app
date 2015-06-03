@@ -128,12 +128,10 @@ angular.module('starter.controllers', [])
             });
             confirmPopup.then(function(res) {
                 if(res) {
-                    console.log('Ja');
                     model.dataModel.deleteActiveSession();//löscht aktive Session - keine offenen Sessions mehr
                     /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
                     $state.go('arbeitsoberflaeche');
                 } else {
-                    console.log('Nein');
                     return;
                     /*Alles bleibt so wie es ist!*/
                 }
@@ -150,6 +148,16 @@ angular.module('starter.controllers', [])
     $scope.finishSession = function() {
         /*Routine um Daten zu checken und im model aktualisieren, danach werden Daten für Datenübersicht freigegeben*/
         DataModel.update(model.dataModel, true);
+        
+        //Wenn noch keine Session eingetragen ist, kann nichts abgeschlossen werden.
+        if ((!currentsession.getFahrten()[0]) && !(currentsession.getArbeiten()[0])) {
+            var alertPopup = $ionicPopup.alert({
+                title: "Fehler",
+                template: "Es wurde noch keine Session eingetragen"
+            })
+            return;
+        }
+        
         /*Änderungen speichern?*/
         /*Sessiondetails hier drin wären nett*/
         var confirmPopup = $ionicPopup.confirm({
@@ -158,12 +166,10 @@ angular.module('starter.controllers', [])
         });
         confirmPopup.then(function(res) {
           if(res) {
-            console.log('Ja');
             model.dataModel.getActiveSession().setActive(false);
-            /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
+            //Muss noch in localstorage geschrieben wreden!!
             $state.go('arbeitsoberflaeche');
           } else {
-            console.log('Nein');
             /*Alles bleibt so wie es ist!*/
           }
         });
@@ -171,7 +177,8 @@ angular.module('starter.controllers', [])
 })
 
 .controller('SessionuebersichtCtrl', function($scope, $state) {
-    $scope.items = model.dataModel.getSessionList();
+    $scope.items = model.dataModel.toJson().mitarbeiter.sessions
+    
     //console.log($scope.items);
     
     $scope.callSessiondetail=function(sessionId){
@@ -198,7 +205,7 @@ angular.module('starter.controllers', [])
     
 })
 
-.controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, $ionicPopup, FormvalidationService) {
+.controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, $ionicPopup, FormvalidationService, TimeCalculatorService) {
     //aktuelle Session des Modells
     var currentsession = model.dataModel.getActiveSession();
     
@@ -219,10 +226,21 @@ angular.module('starter.controllers', [])
         
         var leis = document.getElementById("leistung");
         var leisId = leis.options[leis.selectedIndex].getAttribute('data-id');
-
+        
+        var start = document.getElementById("timeA").value;
+        var ende = document.getElementById("timeE").value;
+        var dauer = TimeCalculatorService.time(start, ende);
+        var stunden = dauer[0];
+        if (parseInt(stunden)<0) {
+            var alertPopup = $ionicPopup.alert({
+                title:"Fehler",
+                template: "Die Dauer der Arbeit ist kleiner 0!"
+            })
+            return
+        }
+        var minuten = dauer[1];
         
         //Fehlerbehandlung, zuerst CSS wieder normal machen
-        
         passt = FormvalidationService.validateArbeit(passt);
         
         
@@ -239,10 +257,9 @@ angular.module('starter.controllers', [])
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Arbeitszeit hinzufügen',
                 template: 'Folgende Arbeitsdaten werden erfasst: <br/>'
-                        + '<ul><li>Leistung: ' + leis.options[leis.selectedIndex].text
-                        + ' </li><li>Dauer: von ' + document.getElementById("timeA").value
-                        +  '  bis '  + document.getElementById("timeE").value
-                        + ' (' + dauer + ' Stunden) </li></ul>'  //Arbeitsdaten!!! Geht das noch schöner?
+                        + leis.options[leis.selectedIndex].text + " am " + document.getElementById("datum").value 
+                        + ' von ' + start +  '  bis '  + ende
+                        + ' (' + stunden + 'h ' + minuten + 'min)'  //Arbeitsdaten!!! Geht das noch schöner?
                         
             });
             confirmPopup.then(function(res) {
@@ -259,19 +276,18 @@ angular.module('starter.controllers', [])
                   currentsession.addArbeit(arbeit); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
                   $state.go('sessionmanager');
                 } else {
-                  console.log('Nein');
+                  
                   /*Alles bleibt so wie es ist!*/
                 }
             });
         } else {
-            console.log('Nein');
             /*Alles bleibt so wie es ist!*/
         }
         
     }
 })
 
-.controller('FahrtenmanagerCtrl', function($scope, DataModel, Fahrt, $state, $ionicPopup, FormvalidationService) {
+.controller('FahrtenmanagerCtrl', function($scope, DataModel, Fahrt, $state, $ionicPopup, FormvalidationService, TimeCalculatorService) {
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
     }
@@ -314,17 +330,42 @@ angular.module('starter.controllers', [])
         
         passt = FormvalidationService.validateFahrt(passt);
         
+        
+        
         var gesamtkilometer = parseInt(document.getElementById('kmende').value) - parseInt(document.getElementById('kanfang').value);
+        if (gesamtkilometer<0) {
+            var alertPopup = $ionicPopup.alert({
+                title: "Fehler",
+                template: "Gesamtkilometer sind kleiner 0!"
+            })
+            return;
+        }
         //Routine auf gesamtkilometer < 0 !!!
+        
+        var anfangsort = document.getElementById('anfangsort').value;
+        var endort = document.getElementById('endort').value;
+        var datum = document.getElementById("datum").value;
+        var anfangszeit = document.getElementById("timeA").value;
+        var endzeit = document.getElementById("timeE").value;
+        
+        var dauer = TimeCalculatorService.time(anfangszeit, endzeit);
+        var stunden = dauer[0];
+        if (parseInt(stunden)<0) {
+            var alertPopup = $ionicPopup.alert({
+                title:"Fehler",
+                template: "Die Dauer der Fahrt ist kleiner 0!"
+            })
+            return
+        }
+        var minuten = dauer[1];
         
         if (passt) {
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Fahrtzeit hinzufügen',
-                template: 'Folgende Fahrtzeiten werden erfasst:\n' 
-                           + '<ul><li>Leistung: ' + leis.options[leistung.selectedIndex].text
-                            + ' </li><li>Dauer: von ' + document.getElementById("timeA").value
-                            +  '  bis '  + document.getElementById("timeE").value
-                            + ' (' + gesamtkilometer + ' Kilometer) </li></ul>' 
+                template: 'Folgende Fahrtzeiten werden erfasst: <br />' 
+                            + leis.options[leistung.selectedIndex].text + " von " + anfangsort + " bis " + endort
+                            + ' am ' + datum + ' von ' + anfangszeit +  ' bis '  + endzeit
+                            + ' (' + gesamtkilometer + ' Kilometer, ' + stunden + "h " + minuten + "min)" 
             });
             confirmPopup.then(function(res) {
                 if(res) {
@@ -334,25 +375,23 @@ angular.module('starter.controllers', [])
                   
                   var fahrt = new Fahrt.create({
                         id: fahrtId,
-                        datum: new Date(document.getElementById("datum").value),
-                        anfangszeit: document.getElementById("timeA").value,
-                        endzeit: document.getElementById("timeE").value,
+                        datum: new Date(datum),
+                        anfangszeit: anfangszeit,
+                        endzeit: endzeit,
                         anfangskilometer: document.getElementById('kanfang').value,
                         endkilometer: document.getElementById('kmende').value,
-                        anfangsort: document.getElementById('anfangsort').value,
-                        endort:  document.getElementById('endort').value,
+                        anfangsort: endort,
+                        endort:  anfangsort,
                         leistungsId: leisId
                     })
                   currentsession.addFahrt(fahrt); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
                  
                   $state.go('sessionmanager');
                 } else {
-                  console.log('Nein');
                   /*Alles bleibt so wie es ist!*/
                 }
             });
         } else {
-            console.log('Nein');
             /*Alles bleibt so wie es ist!*/
         }   
     }
