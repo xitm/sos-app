@@ -24,7 +24,7 @@
             </div>
             <div class="col col-75">
                 <label class="item item-input">
-                    <input placeholder="KFZ" class="textbox-n" type="text"/>
+                    <input placeholder="KFZ" ng-model="kfz" class="textbox-n" type="text"/>
                 </label>
             </div>
         </div>
@@ -32,13 +32,13 @@
         <div class="row">
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Kilometer Anfang" class="textbox-n" type="number" ng-model="kanfang"/>
-                    <span class="input-label" ng-if="kanfang" style="font-size: smaller; color: #aaa;">km</span> 
+                    <input placeholder="Kilometer Anfang" class="textbox-n" type="number" id="kanfang" ng-model="kanfang"/>
+                    <span class="input-label" ng-if="kanfang" id="kende" style="font-size: smaller; color: #aaa;">km</span> 
                 </label>
             </div>
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Kilometer Ende" class="textbox-n" type="number" ng-model="kende"/>
+                    <input placeholder="Kilometer Ende" class="textbox-n" type="number" id="kmende" ng-model="kende"/>
                     <span class="input-label" ng-if="kende" style="font-size: smaller; color: #aaa;">km</span>
                 </label>
             </div>
@@ -47,12 +47,12 @@
         <div class="row">
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Standort Anfang" class="textbox-n" type="text"/>
+                    <input placeholder="Standort Anfang" class="textbox-n" type="text" id="anfangsort"/>
                 </label>
             </div>
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Standort Ende" class="textbox-n" type="text"/>
+                    <input placeholder="Standort Ende" class="textbox-n" type="text" id="endort"/>
                 </label>
             </div>
         </div>
@@ -69,7 +69,7 @@
             <div class="col col-75">
                 <label class="item item-input">
                     <span class="input-label" ng-if="!datum" style="font-size: smaller; color: #aaa;">Datum</span> 
-                    <input type="date" ng-model="datum" />
+                    <input type="date" ng-model="datum" id="datum"/>
                 </label>
             </div>
         </div>
@@ -82,7 +82,7 @@
             <div class="col col-50">
                 <label class="item item-input" ng-click="hideSpanA = !hideSpanA">
                     <span ng-hide="hideSpanA" ng-if="!uhranfang" >Anfangszeit</span>
-                    <input class="textbox-n" type="time" ng-model="uhranfang"/>
+                    <input class="textbox-n" type="time" ng-model="uhranfang" id="timeA"/>
                     <span class="input-label" ng-if="uhranfang" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>
@@ -90,7 +90,7 @@
             <div class="col col-50">
                 <label class="item item-input"  ng-click="hideSpanE = !hideSpanE">
                     <span ng-hide="hideSpanE" ng-if="!uhrende" >Endzeit</span>
-                    <input class="textbox-n" type="time" ng-model="uhrende"/>
+                    <input class="textbox-n" type="time" ng-model="uhrende" id="timeE"/>
                     <span class="input-label" ng-if="uhrende" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>

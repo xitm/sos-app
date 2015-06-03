@@ -51,8 +51,6 @@ angular.module('starter.controllers', [])
         //Routine, das im localstorage zu speicher fehlt noch! --> damit das App auch geschlossen und wieder geöffnet werden kann.
         
         /*------------------*/
-        console.log(document.getElementById("datum").value);
-        console.log(new Date(document.getElementById("datum").value));
         //Session erstellen
         var session = new Session.create(
             {id: sessionid,
@@ -289,32 +287,85 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('FahrtenmanagerCtrl', function($scope, DataModel, $state, $ionicPopup) {
+.controller('FahrtenmanagerCtrl', function($scope, DataModel, Fahrt, $state, $ionicPopup) {
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
     }
+    //aktuelle Session
+    var currentsession = model.dataModel.getActiveSession();
     
+<<<<<<< HEAD
     $scope.leistungen = model.dataModel.getLeistungList('fahrt');
     $scope.updateDataId = function(leistung){
         document.getElementById('leistung').setAttribute('data-id', leistung.id);
         document.getElementById('leistung').getAttribute('data-id');
+=======
+    //Datum eintragen
+    $scope.datum = currentsession.getDatum();
+    //Anfangsort eintragen
+    if (model.dataModel.getMitarbeiter().getLetzteFahrt()) {
+        document.getElementById('anfangsort').value = model.dataModel.getMitarbeiter().getLetzteFahrt();
+>>>>>>> branch-1
     }
     
+    
+    //Leistungen Laden
+    $scope.leistungen = model.dataModel.getLeistungList('fahrt');
+    $scope.updateDataId = function(){
+        var leistung = document.getElementById("leistung");
+        var leistung_name = leistung.options[leistung.selectedIndex].getAttribute('data-id');
+    }
+    
+    //KFZ voreintragen
+    $scope.kfz = model.dataModel.getMitarbeiter().getStandKfz();
+    
+    //Letzt eingetragenen Standort holen. Könnte man als Variable im Model speichern und dann in
+    //localstorage schreiben, oder überhaupt glleich in localstorage schreiben
    
     $scope.finishFahrt = function() {
         /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
         /*Wenn Alles Passt*/
         var passt=true //testvariable
-        console.log(document.getElementById('leistung').value);
+        
+        //ArbeitsId ermitteln
+        if (!currentsession.getFahrten()){ //currentsession instanceof Session -> keine Suche im Array mehr notwendig
+            var fahrtId = 0
+        } else {
+            var fahrtId = currentsession.getFahrten().length; //currentsession instanceof Session -> keine Suche im Array mehr notwendig
+        }
+        
+
+        var gesamtkilometer = parseInt(document.getElementById('kmende').value) - parseInt(document.getElementById('kanfang').value);
+        //Routine auf gesamtkilometer < 0 !!!
+        
         if (passt) {
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Fahrtzeit hinzufügen',
-                template: 'Folgende Fahrtzeiten werden erfasst:' //+Arbeitsdaten!!!
+                template: 'Folgende Fahrtzeiten werden erfasst:\n' 
+                           + '<ul><li>Leistung: ' + leistung.options[leistung.selectedIndex].text
+                            + ' </li><li>Dauer: von ' + document.getElementById("timeA").value
+                            +  '  bis '  + document.getElementById("timeE").value
+                            + ' (' + gesamtkilometer + ' Kilometer) </li></ul>' 
             });
             confirmPopup.then(function(res) {
                 if(res) {
-                  console.log('Ja');
-                  /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
+                  /*fahrtssession freigeben und in sessionmanager wechseln*/
+                  
+                  model.letzteFahrt = document.getElementById('endort').value;
+                  
+                  var fahrt = new Fahrt.create({
+                        id: fahrtId,
+                        datum: new Date(document.getElementById("datum").value),
+                        anfangszeit: document.getElementById("timeA").value,
+                        endzeit: document.getElementById("timeE").value,
+                        anfangskilometer: document.getElementById('kanfang').value,
+                        endkilometer: document.getElementById('kmende').value,
+                        anfangsort: document.getElementById('anfangsort').value,
+                        endort:  document.getElementById('endort').value,
+                        leistung: leistung.options[leistung.selectedIndex].text
+                    })
+                  currentsession.addFahrt(fahrt); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
+                 
                   $state.go('sessionmanager');
                 } else {
                   console.log('Nein');
