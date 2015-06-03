@@ -4,7 +4,6 @@ angular.module('starter.controllers', [])
     $scope.clicked = false;
     model.dataModel = DataModel.create(); //Anpassung an neue Service-Gestaltung
     $scope.date = new Date();
-        console.log(DataModel.update(model.dataModel));
     
     $scope.callSessionmanager = function() {
         //clients für Auswahllisten
@@ -109,7 +108,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessionmanagerCtrl', function($scope, $state, $ionicPopup) {
+.controller('SessionmanagerCtrl', function($scope, DataModel, $state, $ionicPopup) {
     //aktive Session aus dem Datenmodell
     var currentsession = model.dataModel.getActiveSession();
     
@@ -150,7 +149,7 @@ angular.module('starter.controllers', [])
     }
     $scope.finishSession = function() {
         /*Routine um Daten zu checken und im model aktualisieren, danach werden Daten für Datenübersicht freigegeben*/
-        
+        DataModel.update(model.dataModel, true);
         /*Änderungen speichern?*/
         /*Sessiondetails hier drin wären nett*/
         var confirmPopup = $ionicPopup.confirm({
