@@ -203,22 +203,21 @@ angular.module('starter.controllers', [])
     $scope.date = currentsession.getDatum(); //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
 
     $scope.leistungen = model.dataModel.getLeistungList('arbeit');
-    $scope.updateDataId = function(){
-        var leistung = document.getElementById("leistung");
-        var leistung_name = leistung.options[leistung.selectedIndex].getAttribute('data-id');
-    }
     //ANMERKUNG: eine function, anderes ELEMENT mitgeben!
     
     $scope.finishArbeit = function() {
         /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
         /*Wenn Alles Passt*/
         var passt=true; //testvariable
-        var sel = document.getElementById("leistung");
-        var lsId = sel.options[sel.selectedIndex].getAttribute('data-id');
+        
+        var leis = document.getElementById("leistung");
+        var leisId = leis.options[leis.selectedIndex].getAttribute('data-id');
+
         
         //Fehlerbehandlung, zuerst CSS wieder normal machen
         
         passt = FormvalidationService.validateArbeit(passt);
+        
         
         //ArbeitsId ermitteln
         if (!currentsession.getArbeiten()){ //currentsession instanceof Session -> keine Suche im Array mehr notwendig
@@ -233,7 +232,7 @@ angular.module('starter.controllers', [])
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Arbeitszeit hinzufügen',
                 template: 'Folgende Arbeitsdaten werden erfasst: <br/>'
-                        + '<ul><li>Leistung: ' + sel.options[sel.selectedIndex].text
+                        + '<ul><li>Leistung: ' + leis.options[leis.selectedIndex].text
                         + ' </li><li>Dauer: von ' + document.getElementById("timeA").value
                         +  '  bis '  + document.getElementById("timeE").value
                         + ' (' + dauer + ' Stunden) </li></ul>'  //Arbeitsdaten!!! Geht das noch schöner?
@@ -248,7 +247,7 @@ angular.module('starter.controllers', [])
                         datum: new Date(document.getElementById("datum").value),
                         anfangszeit: document.getElementById("timeA").value,
                         endzeit: document.getElementById("timeE").value,
-                        leistungsId : "testid"
+                        leistungsId : leisId
                     })
                   currentsession.addArbeit(arbeit); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
                   $state.go('sessionmanager');
@@ -265,7 +264,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('FahrtenmanagerCtrl', function($scope, DataModel, Fahrt, $state, $ionicPopup) {
+.controller('FahrtenmanagerCtrl', function($scope, DataModel, Fahrt, $state, $ionicPopup, FormvalidationService) {
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
     }
@@ -284,10 +283,6 @@ angular.module('starter.controllers', [])
     
     //Leistungen Laden
     $scope.leistungen = model.dataModel.getLeistungList('fahrt');
-    $scope.updateDataId = function(leistung){ 
-        var leis = document.getElementById("leistung");
-        leis.setAttribute('data-id', leistung.id);
-    }
     
     //KFZ voreintragen
     $scope.kfz = model.dataModel.getMitarbeiter().getStandKfz();
@@ -300,6 +295,9 @@ angular.module('starter.controllers', [])
         /*Wenn Alles Passt*/
         var passt=true //testvariable
         
+        var leis = document.getElementById("leistung");
+        var leisId = leis.options[leis.selectedIndex].getAttribute('data-id');
+        
         //ArbeitsId ermitteln
         if (!currentsession.getFahrten()){ //currentsession instanceof Session -> keine Suche im Array mehr notwendig
             var fahrtId = 0
@@ -307,7 +305,8 @@ angular.module('starter.controllers', [])
             var fahrtId = currentsession.getFahrten().length; //currentsession instanceof Session -> keine Suche im Array mehr notwendig
         }
         
-
+        passt = FormvalidationService.validateFahrt(passt);
+        
         var gesamtkilometer = parseInt(document.getElementById('kmende').value) - parseInt(document.getElementById('kanfang').value);
         //Routine auf gesamtkilometer < 0 !!!
         
@@ -335,7 +334,7 @@ angular.module('starter.controllers', [])
                         endkilometer: document.getElementById('kmende').value,
                         anfangsort: document.getElementById('anfangsort').value,
                         endort:  document.getElementById('endort').value,
-                        leistungsId: leis.options[leistung.selectedIndex].getAttribute('data-id')
+                        leistungsId: leisId
                     })
                   currentsession.addFahrt(fahrt); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
                  

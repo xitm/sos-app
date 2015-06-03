@@ -24,31 +24,74 @@ angular.module('starter.services', [])
 })
 
 .service('FormvalidationService', function() {
-    return {
-        validateArbeit: function (passt) {
-            //CSS auf Standard stellen
-            document.getElementById("beschriftung").style.color = "black"
-            document.getElementById("styleA").style.backgroundColor = "rgb(255,255,255)"
-            document.getElementById("styleE").style.backgroundColor = "rgb(255,255,255)"
-            
-            //Dropdown vordefinieren
-            var sel = document.getElementById("leistung")
-            
-            //Einzelne zu prüfende Felder durchgehen
-            if (sel.options[sel.selectedIndex].text == "") {
-                document.getElementById("beschriftung").style.color = "rgba(255,0,0,0.5)"  
-                passt=false;
-            } if (document.getElementById("timeA").value=="") {
-                document.getElementById("styleA").style.backgroundColor = "rgba(255,0,0,0.3)"
-                passt=false;
-            } if (document.getElementById("timeE").value=="") {
-                document.getElementById("styleE").style.backgroundColor = "rgba(255,0,0,0.3)"
-                passt=false;
-            }
-            
-            //Testvariable zurückgeben
-            return passt;
+    this.validateArbeit = function (passt) {
+        //CSS auf Standard stellen
+        document.getElementById("beschriftung").style.color = "black"
+        document.getElementById("styleA").style.backgroundColor = "rgb(255,255,255)"
+        document.getElementById("styleE").style.backgroundColor = "rgb(255,255,255)"
+        
+        //Dropdown vordefinieren
+        var sel = document.getElementById("leistung")
+        
+        //Einzelne zu prüfende Felder durchgehen
+        if (sel.options[sel.selectedIndex].text == "") {
+            document.getElementById("beschriftung").style.color = "rgba(255,0,0,0.5)"  
+            passt=false;
+        } if (document.getElementById("timeA").value=="") {
+            document.getElementById("styleA").style.backgroundColor = "rgba(255,0,0,0.3)"
+            passt=false;
+        } if (document.getElementById("timeE").value=="") {
+            document.getElementById("styleE").style.backgroundColor = "rgba(255,0,0,0.3)"
+            passt=false;
         }
+        
+        //Testvariable zurückgeben
+        return passt;
+    }
+    this.validateFahrt = function (passt) {
+        
+        //Zu überprüfende Felder
+        var errors = [
+            document.getElementById('kfz'), //KFZ
+            document.getElementById('kanfang'), //Kilometer Anfang
+            document.getElementById('kmende'), //Kilometer Ende
+            document.getElementById('anfangsort'), //Standort Anfang
+            document.getElementById('endort'), //Standort Ende
+            document.getElementById('datum'), //Datum 
+            document.getElementById('timeA'), //Zeit Anfang
+            document.getElementById('timeE'), //Zeit Ende
+            
+        ]
+        //Zu hervorhebende Felder
+        var changes = [
+            document.getElementById('stylekfz'), //KFZ
+            document.getElementById('stylekanfang'), //Kilometer Anfang
+            document.getElementById('stylekmende'), //Kilometer Ende
+            document.getElementById('styleanfangsort'), //Standort Anfang
+            document.getElementById('styleendort'), //Standort Ende
+            document.getElementById('styledatum'), //Datum 
+            document.getElementById('styletimeA'), //Zeit Anfang
+            document.getElementById('styletimeE'), //Zeit Ende
+        ]
+        
+        //Errorhandling. Daten werden überprüft ob sie leer sind.
+        for (var i=0; i<errors.length; i++) {
+            changes[i].style.backgroundColor = "rgb(255,255,255)"
+            if (errors[i].value == "") {
+                changes[i].style.backgroundColor = "rgba(255,0,0,0.3)"
+                passt = false;
+            }
+        }
+        
+        //Leistung gehört extra behandelt, da Dropdown
+        var leistung = document.getElementById('leistung')
+        document.getElementById('styleleistung').style.backgroundColor =  "rgb(255,255,255)"
+        if (leistung.options[leistung.selectedIndex].text == "") {
+            document.getElementById('styleleistung').style.backgroundColor = "rgba(255,0,0,0.3)"
+            passt = false
+        }
+        
+        return passt;
     }
 })
 
