@@ -215,12 +215,30 @@ angular.module('starter.services', [])
                 return
             }
         }
-        
+    }
+    
+    BusinessObject.prototype.getSessionById=function(id){
+        var _sessions = this.getMitarbeiter().getSessions();
+        for(var i=0,anz=_sessions.length;i<anz;i++){
+            var _ses = _sessions[i];
+            if (_ses.getId()===id || _ses.getId()===parseInt(id)) {
+                return _ses;
+            }
+        }
+    }
+    
+    BusinessObject.prototype.getSessionList=function(){
+        var _sessions = this.getMitarbeiter().getSessions();
+        var _sesList = [];
+        for(var i=0,anz=_sessions.length;i<anz;i++){
+            _sesList.push(_sessions[i].toJson());
+        }
+        return _sesList;
     }
     
     BusinessObject.prototype.getClientList = function(){
         var _clienten = this.getClienten();
-        var _clientList = new Array();
+        var _clientList = [];
         for(var i=0, anz=_clienten.length;i<anz;i++){
             _clientList.push(_clienten[i].toJson());
         }
@@ -245,7 +263,7 @@ angular.module('starter.services', [])
     BusinessObject.prototype.getClientById=function(id){
         var _clients = this.getClienten();
         for(var i=0, anz=_clients.length;i<anz;i++){
-            if (_clients[i].getId()===id) {
+            if (_clients[i].getId()===id || _clients[i].getId() ===parseInt(id)) {
                 return _clients[i];
             }
         }
@@ -564,13 +582,17 @@ angular.module('starter.services', [])
     }
 
     //4. z1 Prototype functions
-    Client.prototype.toJson= function(){
+    Client.prototype.toJson=function(){
         return {
             id: this.getId(),
             vorname: this.getVorname(),
             nachname: this.getNachname(),
             adresse : this.getAdresse(),
         }
+    }
+    
+    Client.prototype.getFullName=function(){
+        return this.getVorname() + " " + this.getNachname();
     }
     
     //4.Zusatz Create_option

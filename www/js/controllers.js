@@ -171,22 +171,30 @@ angular.module('starter.controllers', [])
 })
 
 .controller('SessionuebersichtCtrl', function($scope, $state) {
+    $scope.items = model.dataModel.getSessionList();
+    //console.log($scope.items);
+    
+    $scope.callSessiondetail=function(sessionId){
+        model.dataModel.getSessionById(sessionId).setActive(true);
+        $state.go('sessiondetail');
+    }
     $scope.callArbeitsoberflaeche = function() {
         $state.go('arbeitsoberflaeche');
     }
 })
 
 .controller('SessiondetailCtrl', function($scope, $state) {
+    console.log(model.dataModel.getActiveSession().toJson());
     $scope.callSessionuebersicht = function() {
         $state.go('sessionuebersicht');
     }
     
-    $scope.items = [
-     { id: 0, name:'Max Mustermann', ort:'Völs', session: "Fahrt", leistung: "Hinfahrt"},
-     { id: 1, name:'Peter Oberhuber', ort:'Wörgl', session: "Arbeit", leistung: "Sauna"},
-     { id: 2, name:'Julia Sargnagel', ort:'Innsbruck', session:  "Fahrt", leistung: "Rückfahrt"},
-     { id: 3, name:'Anna Fenninger', ort:'Telfs', session: "Arbeit", leistung: "Schwimmen"}
-     ]
+    //$scope.items = [
+    // { id: 0, name:'Max Mustermann', ort:'Völs', session: "Fahrt", leistung: "Hinfahrt"},
+    // { id: 1, name:'Peter Oberhuber', ort:'Wörgl', session: "Arbeit", leistung: "Sauna"},
+    // { id: 2, name:'Julia Sargnagel', ort:'Innsbruck', session:  "Fahrt", leistung: "Rückfahrt"},
+    // { id: 3, name:'Anna Fenninger', ort:'Telfs', session: "Arbeit", leistung: "Schwimmen"}
+    // ]
     
 })
 
@@ -359,13 +367,12 @@ angular.module('starter.controllers', [])
       $scope.items.splice($scope.items.indexOf(item), 1);
      };
     
-    
-    $scope.items = [
-     { id: 0, name:'Max Mustermann', ort:'Völs' },
-     { id: 1, name:'Peter Oberhuber', ort:'Wörgl'  },
-     { id: 2, name:'Julia Sargnagel', ort:'Innsbruck'  },
-     { id: 3, name:'Anna Fenninger', ort:'Telfs'  }
-     ]
+    $scope.sessions = model.dataModel.getSessionList(); //setzt die Sessions
+   
+    for(var i=0,anz=$scope.sessions.length;i<anz;i++){
+        //jeweils für die aktuelle session.client (welcher als ID angegeben ist) wird durch den vollen Namen des Clienten ersetzt
+        $scope.sessions[i].client = model.dataModel.getClientById($scope.sessions[i].client).getFullName();
+    }
    
 })
 
