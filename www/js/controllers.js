@@ -110,19 +110,14 @@ angular.module('starter.controllers', [])
 })
 
 .controller('SessionmanagerCtrl', function($scope, $state, $ionicPopup) {
-    //Aktuelle Session definieren, diese Methode gehört zentralisiert!!
-    //for (var i=0; i<=model.dataModel.getMitarbeiter().getSessions().length-1; i++){
-    //        if (model.dataModel.getMitarbeiter().getSessions()[i].getActive()==true) {
-    //        var currentsession = model.dataModel.getMitarbeiter().getSessions()[i].getId();
-    //    }
-    //}
+    //aktive Session aus dem Datenmodell
     var currentsession = model.dataModel.getActiveSession();
     
     $scope.callArbeitsoberflaeche = function() {
         //Routine um aktive Session zu verwerfen
         var goArbeitsoberflaeche = true;
         //Prüfen ob bereits Arbeits und/oder Fahrtzeiten vorhanden sind
-        if (!(model.dataModel.getMitarbeiter().getSessions()[currentsession].getFahrten()[0]) && !(model.dataModel.getMitarbeiter().getSessions()[currentsession].getArbeiten()[0])) {
+        if (!(currentsession.getFahrten()[0]) && !(currentsession.getArbeiten()[0])) {
             //Akutelle Session noch löschen!!
             model.dataModel.deleteActiveSession();//löscht aktive Session - keine offenen Sessions mehr
             $state.go('arbeitsoberflaeche');
@@ -197,12 +192,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, $ionicPopup, FormvalidationService) {
-    //Aktuelle Session definieren, diese Methode gehört zentralisiert!!
-    //for (var i=0; i<=model.dataModel.getMitarbeiter().getSessions().length-1; i++){
-    //        if (model.dataModel.getMitarbeiter().getSessions()[i].getActive()==true) {
-    //        var currentsession = model.dataModel.getMitarbeiter().getSessions()[i].getId();
-    //    }
-    //}
+    //aktuelle Session des Modells
     var currentsession = model.dataModel.getActiveSession();
     
     //Sessionmanager Aufrufen
@@ -258,7 +248,7 @@ angular.module('starter.controllers', [])
                         datum: new Date(document.getElementById("datum").value),
                         anfangszeit: document.getElementById("timeA").value,
                         endzeit: document.getElementById("timeE").value,
-                        id : "testid"
+                        leistungsId : "testid"
                     })
                   currentsession.addArbeit(arbeit); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
                   $state.go('sessionmanager');
@@ -297,7 +287,6 @@ angular.module('starter.controllers', [])
     $scope.updateDataId = function(leistung){ 
         var leis = document.getElementById("leistung");
         leis.setAttribute('data-id', leistung.id);
-        var leistung_name = leis.options[leistung.selectedIndex].getAttribute('data-id');
     }
     
     //KFZ voreintragen
@@ -346,7 +335,7 @@ angular.module('starter.controllers', [])
                         endkilometer: document.getElementById('kmende').value,
                         anfangsort: document.getElementById('anfangsort').value,
                         endort:  document.getElementById('endort').value,
-                        leistung: leistung.options[leistung.selectedIndex].text
+                        leistungsId: leis.options[leistung.selectedIndex].getAttribute('data-id')
                     })
                   currentsession.addFahrt(fahrt); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
                  

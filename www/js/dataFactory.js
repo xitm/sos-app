@@ -541,7 +541,7 @@ angular.module('starter.services', [])
     return(Client);
 })
 
-//----------- 6. - Session_Class_Definition------//
+//----------- 5. - Session_Class_Definition------//
 .factory('Session', function(){
     
     function Session(id, datum, clientId){
@@ -646,7 +646,7 @@ angular.module('starter.services', [])
 
 //----------- 6. - Fahrt_Class_Definition------//
 .factory('Fahrt', function(){
-    function Fahrt(id,datum,anfangszeit,endzeit,anfangskilometer,endkilometer,anfangsort,endort,leistung) {
+    function Fahrt(id,datum,anfangszeit,endzeit,anfangskilometer,endkilometer,anfangsort,endort,leistungsId) {
         var _id = undefined;
         var _datum = undefined;
         var _anfangszeit = undefined;
@@ -655,7 +655,7 @@ angular.module('starter.services', [])
         var _endkilometer = undefined;
         var _anfangsort = undefined;
         var _endort = undefined;
-        var _leistung = undefined;
+        var _leistungsId = undefined;
         var _letzteFahrt = undefined;
         
         //6.1 fahrtId_definition
@@ -723,11 +723,11 @@ angular.module('starter.services', [])
         }
         
         //6.9 leistung_definitionen
-        this.setLeistung = function(leistung) {
-            _leistung = leistung;
+        this.setLeistungsId = function(leistungsId) {
+            _leistungsId = leistungsId;
         }
-        this.getLeistung = function() {
-            return _leistung;
+        this.getLeistungsId = function() {
+            return _leistungsId;
         }
         
         
@@ -741,7 +741,7 @@ angular.module('starter.services', [])
         this.setEndkilometer(endkilometer);
         this.setAnfangsort(anfangsort);
         this.setEndort(endort);
-        this.setLeistung(leistung);
+        this.setLeistungsId(leistungsId);
         
     }
     
@@ -755,13 +755,13 @@ angular.module('starter.services', [])
             endkilomenter : this.getEndkilometer(),
             anfangsort : this.getAnfangsort(),
             endort : this.getEndort(),
-            leistung : this.getLeistung()
+            leistungsId : this.getLeistungsId()
         }
     }
     
     Fahrt.create = function(JSONstructure){
 
-        var fa = new Fahrt(JSONstructure.id,JSONstructure.datum,JSONstructure.anfangszeit,JSONstructure.endzeit,JSONstructure.anfangskilometer,JSONstructure.endkilometer,JSONstructure.anfangsort,JSONstructure.endort,JSONstructure.leistung);
+        var fa = new Fahrt(JSONstructure.id,JSONstructure.datum,JSONstructure.anfangszeit,JSONstructure.endzeit,JSONstructure.anfangskilometer,JSONstructure.endkilometer,JSONstructure.anfangsort,JSONstructure.endort,JSONstructure.leistungsId);
         return(
             fa
         )
@@ -771,12 +771,12 @@ angular.module('starter.services', [])
 })
 //----------- 7. - Arbeit_Class_Definition------//
 .factory('Arbeit', function(){
-    function Arbeit(id, datum, anfangszeit, endzeit, leistung) {
+    function Arbeit(id, datum, anfangszeit, endzeit, leistungsId) {
         var _id = undefined;
         var _datum = undefined;
         var _anfangszeit = undefined;
         var _endzeit = undefined;
-        var _leistung = undefined; //ID????
+        var _leistungsId = undefined;
         
         //7.1 arbeitsId_definitionen
         this.setId = function(arbeitsId) {
@@ -811,18 +811,18 @@ angular.module('starter.services', [])
         }
         
         //7.5 leistung_definitionen
-        this.setLeistung = function(leistung) {
-            _leistung = leistung;
+        this.setLeistungsId = function(leistungsId) {
+            _leistungsId = leistungsId;
         }
-        this.getLeistung = function() {
-            return _leistung;
+        this.getLeistungsId = function() {
+            return _leistungsId;
         }
         
         this.setId(id);
         this.setDatum(datum);
         this.setAnfangszeit(anfangszeit);
         this.setEndzeit(endzeit);
-        this.setLeistung(leistung);
+        this.setLeistungsId(leistungsId);
     }
     
     Arbeit.prototype.toJson = function(){
@@ -831,13 +831,13 @@ angular.module('starter.services', [])
             datum : this.getDatum(),
             anfangszeit : this.getAnfangszeit(),
             endzeit : this.getEndzeit(),
-            leistung : this.getLeistung()
+            leistungsId : this.getLeistungsId()
         }
     }
     
     Arbeit.create = function(JSONstructure){
         
-        var ar = new Arbeit(JSONstructure.id, JSONstructure.datum, JSONstructure.anfangszeit,JSONstructure.endzeit);
+        var ar = new Arbeit(JSONstructure.id, JSONstructure.datum, JSONstructure.anfangszeit,JSONstructure.endzeit, JSONstructure.leistungsId);
         return(
             ar
         )
