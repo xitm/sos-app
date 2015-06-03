@@ -4,3 +4,4 @@
 - aktuelle Session löschen //ERLEDIGT
 - FM: Fehlerbehandlung
 - Sessionmanager grafishe Überarbeitung
+- Klientsuchfeld - fullName!

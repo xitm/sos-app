@@ -220,7 +220,7 @@ angular.module('starter.services', [])
         }
         
         return {
-            mitarbeiter : this.getMitarbeiter(),
+            mitarbeiter : this.getMitarbeiter().toJson(),
             pin : this.getPin(),
             leistungen : _lsRes,
             clienten : _clRes
@@ -337,6 +337,24 @@ angular.module('starter.services', [])
         this.setNachname(nachname);
         this.setAdresse(adresse);
         this.setStandKfz(kfz);
+    }
+    
+    Mitarbeiter.prototype.toJson = function(){
+        var _sessions = this.getSessions(); //get all the Sessions
+        var _sesRes = []; //leerer Result-Array für Resultate
+        for(var i=0,anz=_sessions.length;i<anz;i++){
+            var _ses = _sessions[i]; //caching der aktuellen Session
+            _sesRes.push(_ses.toJson());
+        }
+        
+        return {
+            id : this.getId(),
+            vorname : this.getVorname(),
+            nachname : this.getNachname(),
+            adresse : this.getAdresse(),
+            kfz : this.getStandKfz(),
+            sessions : _sesRes
+        }
     }
     
     //2.Zusatz Create_option
@@ -552,13 +570,26 @@ angular.module('starter.services', [])
     }
     
     Session.prototype.toJson = function(){
+        var _arbeiten = this.getArbeiten(); //arbeiten werden ausgelesen
+        var _arRes = []; //leerer Arbeitenarray
+        for(var i=0,anz=_arbeiten.length;i<anz;i++){
+            _ar = _arbeiten[i];//caching der aktuellen Arbeit
+            _arRes.push(_ar.toJson());//fügt das JSON der aktuellen Arbeit hinzu
+        }
+        
+        var _fahrten = this.getFahrten(); //fahrten werden ausgelesen
+        var _faRes = []; //leerer FAhrtenarray
+        for(var i=0,anz=_fahrten.length;i<anz;i++){
+            _fa = _fahrten[i];//caching der aktuellen Arbeit
+            _faRes.push(_fa.toJson());//fügt das JSON der aktuellen Arbeit hinzu
+        }
         
         return {
             id : this.getId(),
             datum : this.getDatum(),
-            client : this.getClient(),
-            fahrten : this.getFahrten(),
-            arbeiten : this.getArbeiten()
+            client : this.getClientId(),
+            fahrten : _faRes,
+            arbeiten : _arRes
         }
     }
     
@@ -776,7 +807,11 @@ angular.module('starter.services', [])
     this.create = function(){
         return BusinessObject.create(JSON.parse(localStorage.getItem('mle_model')));
     };
-    this.update = function(objectBusinessObject){
-        return objectBusinessObject.toJson();
+    this.update = function(objectBusinessObject, save){
+        var res = objectBusinessObject.toJson();
+        if (save) {
+            localStorage.setItem('mle_model2', JSON.stringify(res));
+        }
+        return res;
     }
 })

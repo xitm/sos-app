@@ -271,7 +271,8 @@ angular.module('starter.controllers', [])
                         id: arbeitsId,
                         datum: new Date(document.getElementById("datum").value),
                         anfangszeit: document.getElementById("timeA").value,
-                        endzeit: document.getElementById("timeE").value
+                        endzeit: document.getElementById("timeE").value,
+                        id : "testid"
                     })
                   currentsession.addArbeit(arbeit); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
                   $state.go('sessionmanager');
@@ -293,8 +294,7 @@ angular.module('starter.controllers', [])
         $state.go('sessionmanager')
     }
     
-    $scope.dataModel = DataModel;
-    $scope.leistungen = DataModel.getLeistungList('fahrt');
+    $scope.leistungen = model.dataModel.getLeistungList('fahrt');
     $scope.updateDataId = function(leistung){
         document.getElementById('leistung').setAttribute('data-id', leistung.id);
         document.getElementById('leistung').getAttribute('data-id');
