@@ -44,17 +44,25 @@
     </label>
     
     <div class="padding">
-      <h1>Sessions</h1>
+        <h1>Arbeitseinheiten</h1>
+        <ion-list>
+            <ion-item ng-repeat="arbeit in arbeiten" item="item" ng-click="callSessionbearbeitungArbeit({{arbeit.id}})" class="item-icon-right">
+              <h2>{{ arbeit.id }}</h2>
+              <p>{{ arbeit.differenz}}</p>
+              <i class="icon icon-right ion-chevron-right"></i>
+            </ion-item>
+        </ion-list>
     </div>
-    
-    <ion-list>
-        <ion-item ng-repeat="item in items" item="item" href="#/sessionbearbeitung_{{item.session}}" class="item-icon-right">
-          <h2>{{ item.session }}</h2>
-          <p>{{ item.leistung }}</p>
-          <i class="icon icon-right ion-chevron-right"></i>
-        </ion-item>
-    </ion-list>
-    
+    <div class="padding">
+    <h1>Fahrteinheiten</h1>
+        <ion-list>
+            <ion-item ng-repeat="fahrt in fahrten" item="item" ng-click="callSessionbearbeitungFahrt({{fahrt.id}})" class="item-icon-right">
+              <h2>{{ fahrt.id }}</h2>
+              <p>{{ arbeit.anfangszeit}}</p>
+              <i class="icon icon-right ion-chevron-right"></i>
+            </ion-item>
+        </ion-list>
+    </div>
     <div class="padding">
             <!--placeholder-->
       </div>

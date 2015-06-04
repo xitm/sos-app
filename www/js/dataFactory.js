@@ -119,7 +119,7 @@ angular.module('starter.services', [])
         minutes = minutes.toString();
         hours = hours.toString();
         
-        return [hours, minutes];
+        return {"hours" : hours, "minutes" : minutes};
     }
 })
 
@@ -168,8 +168,8 @@ angular.module('starter.services', [])
         };
         var _mitarbeiter = undefined;
         var _pin = undefined;
-        var _leistungen = new Array();
-        var _clienten = new Array();
+        var _leistungen = [];
+        var _clienten = [];
 
         
         //1.1 mitarbeiter_definitionen
@@ -230,6 +230,28 @@ angular.module('starter.services', [])
             var _ses = _sessions[i]; //caching Session der aktuellen Iteration
             if (_ses.getActive()) {//wenn active==true
                 return _ses;
+            }
+        }
+    }
+    
+    //retuned die aktive Fahrt einer mitgegebenen Session
+    BusinessObject.prototype.getActiveFahrt=function(session){
+        var _fahrten = session.getFahrten();
+        for (var i=0,anz=_fahrten.length;i<anz;i++) {
+            var _fa = _fahrten[i];
+            if (_fa.getActive()) {
+                return _fa;
+            }
+        }
+    }
+    
+    //retuned die aktive Arbeit einer mitgegebenen Session
+    BusinessObject.prototype.getActiveArbeit=function(session){
+        var _arbeiten = session.getArbeiten();
+        for(var i=0,anz=_arbeiten.length;i<anz;i++){
+            var _ar = _arbeiten[i];
+            if (_ar.getActive()) {
+                return _ar;
             }
         }
     }
@@ -359,7 +381,7 @@ angular.module('starter.services', [])
         
         ba.setMitarbeiter(ma);
         
-        //ba.setMitarbeiter("asdfasdf");
+        //ba.setMitarbeiter("");
         for(var i = 0, anz=JSONstructure.clienten.length; i<anz; i++){
             var cl = new Client.create(JSONstructure.clienten[i]);
             ba.addClient(cl);
@@ -489,11 +511,14 @@ angular.module('starter.services', [])
     //2.Zusatz Create_option
     Mitarbeiter.create = function(JSONstructure){
         //Methoden zur Aufbereitung des JSON-Strings
-        //SESSIONS erstellen!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        
+        var _sessions = JSONstructure.sessions; //sessions werden gesondert ausgewiesen
         //Ausgabe des fertigen Mitarbeiters
         var ma = new Mitarbeiter(JSONstructure.id, JSONstructure.vorname, JSONstructure.nachname, JSONstructure.adresse, JSONstructure.kfz, JSONstructure.letzteFahrt);
         //zusätzliche Sessions usw adden!
+        for(var i = 0, anz=_sessions.length; i<anz; i++){
+            var ses = new Session.create(_sessions[i]);
+            ma.addSession(ses);
+        }
         return(
             ma
         )
@@ -636,14 +661,14 @@ angular.module('starter.services', [])
 })
 
 //----------- 5. - Session_Class_Definition------//
-.factory('Session', function(){
+.factory('Session', function(Arbeit, Fahrt){
     
     function Session(id, datum, clientId){
         var _id = undefined;
         var _datum = undefined;
         var _clientId = undefined;
-        var _fahrten= new Array();
-        var _arbeiten = new Array();
+        var _fahrten= [];
+        var _arbeiten = [];
         var _deleted = false;
         var _active = false;
         
@@ -702,6 +727,26 @@ angular.module('starter.services', [])
         
     }
     
+    Session.prototype.getFahrtById=function(id){
+        var _fahrten = this.getFahrten();
+        for(var i=0,anz=_fahrten.length;i<anz;i++){
+            var _fa = _fahrten[i];
+            if (_fa.getId()===id || _fa.getId()===parseInt(id)) {
+                return _fa;
+            }
+        }
+    }
+    
+    Session.prototype.getArbeitById=function(id){
+        var _arbeiten = this.getArbeiten();
+        for(var i=0,anz=_arbeiten.length;i<anz;i++){
+            var _fa = _arbeiten[i];
+            if (_ar.getId()===id || _ar.getId===parseInt(id)) {
+                return _ar;
+            }
+        }
+    }
+    
     Session.prototype.toJson = function(){
         var _arbeiten = this.getArbeiten(); //arbeiten werden ausgelesen
         var _arRes = []; //leerer Arbeitenarray
@@ -720,16 +765,33 @@ angular.module('starter.services', [])
         return {
             id : this.getId(),
             datum : this.getDatum(),
-            client : this.getClientId(),
+            clientId : this.getClientId(),
             fahrten : _faRes,
             arbeiten : _arRes
         }
     }
     
     Session.create = function(JSONstructure){
-
+        //Varbiablendeklarationen
+        var _fahrten = JSONstructure.fahrten;//fahrconsole.log(JSONstructure.fahrten);
+        var _arbeiten = JSONstructure.arbeiten;//arbeiten gesondert ausweisen
         var ses = new Session(JSONstructure.id, JSONstructure.datum, JSONstructure.clientId);
-        //zusätzliche Sessions usw adden!
+        //zusätzliche Fahrten adden
+        if (_fahrten) {//wenn keine Fahrten vorhanden sind -> undefined!
+            for(var i = 0, anz=_fahrten.length; i<anz; i++){
+                var fa = new Fahrt.create(_fahrten[i]);
+                ses.addFahrt(fa);
+            }
+        }
+ 
+        //zusätzliche Arbeiten adden
+        if (_arbeiten) {//wenn keine Arbeiten vorhanden sind -> undefined!
+             for(var i=0,anz=_arbeiten.length;i<anz;i++){
+                var ar = new Arbeit.create(_arbeiten[i]);
+                ses.addArbeit(ar);
+            }
+        }
+
         return(
             ses
         )
@@ -751,6 +813,7 @@ angular.module('starter.services', [])
         var _endort = undefined;
         var _leistungsId = undefined;
         var _letzteFahrt = undefined;
+        var _active = false;
         
         //6.1 fahrtId_definition
         this.setId = function(arbeitsId) {
@@ -824,7 +887,13 @@ angular.module('starter.services', [])
             return _leistungsId;
         }
         
-        
+        //6.10 active
+        this.setActive = function(active) {
+            _active = active;
+        }
+        this.getActive = function() {
+            return _active;
+        }
         
 
         this.setId(id);
@@ -836,7 +905,6 @@ angular.module('starter.services', [])
         this.setAnfangsort(anfangsort);
         this.setEndort(endort);
         this.setLeistungsId(leistungsId);
-        
     }
     
     Fahrt.prototype.toJson = function(){
@@ -871,6 +939,7 @@ angular.module('starter.services', [])
         var _anfangszeit = undefined;
         var _endzeit = undefined;
         var _leistungsId = undefined;
+        var _active = false;
         
         //7.1 arbeitsId_definitionen
         this.setId = function(arbeitsId) {
@@ -910,6 +979,14 @@ angular.module('starter.services', [])
         }
         this.getLeistungsId = function() {
             return _leistungsId;
+        }
+        
+        //7.6 active
+        this.setActive = function(active) {
+            _active = active;
+        }
+        this.getActive = function() {
+            return _active;
         }
         
         this.setId(id);

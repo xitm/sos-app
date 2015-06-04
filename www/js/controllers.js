@@ -190,20 +190,92 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessiondetailCtrl', function($scope, $state) {
-    console.log(model.dataModel.getActiveSession().toJson());
-    $scope.callSessionuebersicht = function() {
+.controller('SessiondetailCtrl', function($scope, TimeCalculatorService, $state) {
+    //console.log(model.dataModel.getActiveSession().toJson());
+    $scope.activeSession = model.dataModel.getActiveSession(); //speichert aktive Session in den Scope
+    //console.log($scope.activeSession.getArbeiten()[0].toJson());
+    $scope.fahrten = $scope.activeSession.toJson().fahrten; //speichert die Fahrten extra ab, für den ng-repeat
+    $scope.arbeiten = $scope.activeSession.toJson().arbeiten;//speichert die Arbeiten extra ab, für den ng-repeat
+    //Zeit, die zwischen Anfang und Ende vergangen ist für jede Fahrt/Arbeit
+    $scope.totalDiff = 0;
+    for(var i=0,anz=$scope.fahrten.length;i<anz;i++){
+        var _fa = $scope.fahrten[i];
+        _fa.differenz = TimeCalculatorService.time(_fa.anfangszeit, _fa.endzeit);
+        //PLAZT FÜR GESAMTUNERSCHIED LASSEN!!!!
+        _fa.differenz = _fa.differenz['hours'] + " Stunden " + _fa.differenz['minutes'] + " Minuten";
+    }
+    for(var i=0,anz=$scope.arbeiten.length;i<anz;i++){
+        var _ar = $scope.arbeiten[i];
+        _ar.differenz = TimeCalculatorService.time(_ar.anfangszeit, _ar.endzeit);
+        //PLAZT FÜR GESAMTUNERSCHIED LASSEN!!!!
+        _ar.differenz = _ar.differenz['hours'] + " Stunden " + _ar.differenz['minutes'] + " Minuten";
+    }
+    
+    $scope.callSessionuebersicht = function(sessionId){
+        model.dataModel.getActiveSession().setActive(false);
         $state.go('sessionuebersicht');
     }
     
-    //$scope.items = [
-    // { id: 0, name:'Max Mustermann', ort:'Völs', session: "Fahrt", leistung: "Hinfahrt"},
-    // { id: 1, name:'Peter Oberhuber', ort:'Wörgl', session: "Arbeit", leistung: "Sauna"},
-    // { id: 2, name:'Julia Sargnagel', ort:'Innsbruck', session:  "Fahrt", leistung: "Rückfahrt"},
-    // { id: 3, name:'Anna Fenninger', ort:'Telfs', session: "Arbeit", leistung: "Schwimmen"}
-    // ]
+    $scope.callSessionbearbeitungFahrt = function(fahrtId){
+        $scope.activeSession.getFahrtById(fahrtId).setActive(true);
+        $state.go('sessionbearbeitungFahrt');
+    }
     
+    $scope.callSessionbearbeitungArbeit = function(arbeitsId){
+        $scope.activeSession.getArbeitById(arbeitsId).setActive(true);
+        $state.go('sessionbearbeitungArbeit');
+    }
 })
+
+.controller('ArbeitCtrl', function($scope, DataModel, $state) {
+    $scope.activeArbeitObj = model.dataModel.getActiveArbeit(model.dataModel.getActiveSession());//aktive Arbeit der aktiven Session
+    $scope.activeArbeit = $scope.activeArbeitObj.toJson();//aktive Arbeit der aktiven Session als JSON-Notation
+    $scope.activeArbeit.date = new Date($scope.activeArbeitObj.getDatum());
+    $scope.leistungen = model.dataModel.getLeistungList("arbeit");
+    $scope.selected = {value : 0}
+    
+    
+    //ausgewählte Leistung vordefinieren:
+    for(var i=0,anz=$scope.leistungen.length;i<anz;i++){
+        var _ls = $scope.leistungen[i];
+        if (_ls.id === $scope.activeArbeit.leistungsId || _ls.id === parseInt($scope.activeArbeit.leistungsId)) {
+            $scope.selected = {value : i};
+        }
+    }
+    
+    $scope.callSessiondetail = function(saveChanges) {
+        if (saveChanges===true) {
+            //Routinen, um die einzelen Änderungen zu erfassen!
+            //Leistung
+            var _ls = document.getElementById('leistungSelect');
+            var _lsId = _ls.options[_ls.selectedIndex].getAttribute('data-leistung-id');
+            //Datum
+            var _date = new Date(document.getElementById('inputDate').value);
+            //Zeiten
+            var _timeA = document.getElementById('timeA').value;//Anfangszeit
+            var _timeE = document.getElementById('timeE').value;//Endzeit
+            
+            //routinen, um Model zu aktualisieren
+            var _aktArb = $scope.activeArbeitObj;
+            _aktArb.setLeistungsId(_lsId);
+            _aktArb.setDatum(_date);
+            _aktArb.setAnfangszeit(_timeA);
+            _aktArb.setEndzeit(_timeE);
+            DataModel.update(model.dataModel, true);
+        }
+        
+        $scope.activeArbeitObj.setActive(false);
+        $state.go('sessiondetail')
+    }
+})
+ 
+.controller('FahrtCtrl', function($scope, $state) {
+    $scope.callSessiondetail = function() {
+        model.dataModel.getActiveFahrt(model.dataModel.getActiveSession()).setActive(false);
+        $state.go('sessiondetail')
+    }
+})
+
 
 .controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, $ionicPopup, FormvalidationService, TimeCalculatorService) {
     //aktuelle Session des Modells
@@ -370,7 +442,6 @@ angular.module('starter.controllers', [])
             confirmPopup.then(function(res) {
                 if(res) {
                   /*fahrtssession freigeben und in sessionmanager wechseln*/
-                  
                   model.letzteFahrt = document.getElementById('endort').value;
                   
                   var fahrt = new Fahrt.create({
@@ -410,25 +481,7 @@ angular.module('starter.controllers', [])
    
     for(var i=0,anz=$scope.sessions.length;i<anz;i++){
         //jeweils für die aktuelle session.client (welcher als ID angegeben ist) wird durch den vollen Namen des Clienten ersetzt
-        $scope.sessions[i].client = model.dataModel.getClientById($scope.sessions[i].client).getFullName();
+        $scope.sessions[i].client = model.dataModel.getClientById($scope.sessions[i].clientId).getFullName();
     }
    
 })
-
-.controller('ArbeitCtrl', function($scope, $state) {
- $scope.callSessiondetail = function() {
-    $state.go('sessiondetail')
- }
-})
- 
- .controller('FahrtCtrl', function($scope, $state) {
- $scope.callSessiondetail = function() {
-    $state.go('sessiondetail')
- }
- })
-
- 
- /*testanfang*/
-
- /*testende*/
-

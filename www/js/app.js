@@ -71,14 +71,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       templateUrl: 'templates/sessiondetail.html',
       controller: 'SessiondetailCtrl',
   })
-    .state('sessionbearbeitung_Fahrt', {
-    url: '/sessionbearbeitung_Fahrt',
+    .state('sessionbearbeitungFahrt', {
+    url: '/sessionbearbeitungFahrt',
     templateUrl: 'templates/sessionbearbeitungfahrt.html',
     controller: 'FahrtCtrl'    
   })
   
-  .state('sessionbearbeitung_Arbeit', {
-    url: '/sessionbearbeitung_Arbeit',
+  .state('sessionbearbeitungArbeit', {
+    url: '/sessionbearbeitungArbeit',
     templateUrl: 'templates/sessionbearbeitungarbeit.html',
     controller: 'ArbeitCtrl'
 });

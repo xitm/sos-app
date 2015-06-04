@@ -1,6 +1,6 @@
 
 
-<ion-view view-title="Fahrt">
+<ion-view view-title="Arbeit">
   
   <ion-header-bar class="bar-positive">
     <div class="buttons">
@@ -14,7 +14,7 @@
     <div class="padding">
             <!--placeholder-->
     </div>
-    
+    <h1>noch irgenda ueberschrift</h1>
     <div class="padding row">
              <div class="col col-50">
                 <img src="img/arbeitsmanager.png" style="width: 70%;"/>
@@ -27,10 +27,8 @@
                 <div class="input-label">
                   Leistung
                 </div>
-                <select>
-                    <option>Schwimmen</option>
-                    <option selected>Laufen</option>
-                    <option>Sauna</option>
+                <select id="leistungSelect">
+                    <option ng-repeat="leistung in leistungen" ng-selected="{{selected.value}}" data-leistung-id="{{leistung.id}}">{{leistung.name}}</option>
                 </select>
             </label>
       </div>
@@ -40,14 +38,14 @@
         <div class="padding row">
              <div class="col ">
                 <label class="item item-input">
-                    <span class="input-label" ng-if="!datum" style="font-size: smaller; color: #aaa; padding:0; margin: 0;">Anfangsdatum</span> 
-                    <input type="date" ng-model="datum" />
+                    <span class="input-label" ng-if="!activeArbeit.date" style="font-size: smaller; color: #aaa; padding:0; margin: 0;">Anfangsdatum</span> 
+                    <input type="date" id="inputDate" ng-model="activeArbeit.date"/>
                 </label>
             </div>
             <div class="col">
                 <label class="item item-input">
-                    <span class="input-label" ng-if="!datum" style="font-size: smaller; color: #aaa;">Enddatum</span> 
-                    <input type="date" ng-model="datum" />
+                    <span class="input-label" ng-if="!datumE" style="font-size: smaller; color: #aaa;">Enddatum</span> 
+                    <input type="date"  ng-model="date" />
                 </label>
             </div>
         </div>
@@ -56,13 +54,13 @@
         <div class="padding row">
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Anfangszeit" class="textbox-n" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                    <input placeholder="Anfangszeit" id="timeA" value="{{activeArbeit.anfangszeit}}" class="textbox-n" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" />
                 </label>
             </div>
             
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Endzeit" class="textbox-n" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                    <input placeholder="Endzeit" id="timeE" value='{{activeArbeit.endzeit}}' class="textbox-n" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" />
                 </label>
             </div>
         </div>
@@ -74,7 +72,7 @@
   </ion-content>
   
   <ion-footer-bar class="bar-positive">
-      <button class="button button-full button-clear" ng-click="" style="font-size: xx-large;"><b>OK</b></button>
+      <button class="button button-full button-clear" ng-click="callSessiondetail(true)" style="font-size: xx-large;"><b>OK</b></button>
   </ion-footer-bar>
 
 

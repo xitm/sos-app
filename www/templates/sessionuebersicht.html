@@ -18,10 +18,10 @@
         </div>
       <ion-list show-delete="data.showDelete">
         
-        <ion-item ng-repeat="item in items" item="item" href="#/sessiondetail" class="item-icon-right item-remove-animate">
+        <ion-item ng-repeat="session in sessions" item="item" ng-click='callSessiondetail({{session.id}})' class="item-icon-right item-remove-animate">
           
-          <h2>{{ item.name }}</h2>
-          <p>{{ item.ort }}</p>
+          <h2>{{ session.client }}</h2>
+          <p>{{ session.datum}}{{session.id}}</p>
           <i class="icon icon-right ion-chevron-right"></i>
           <ion-delete-button class="ion-minus-circled" ng-click="onItemDelete(item)"> </ion-delete-button>
         </ion-item>
