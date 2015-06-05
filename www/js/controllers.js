@@ -203,9 +203,9 @@ angular.module('starter.controllers', [])
         var _fa = $scope.fahrten[i];
         _fa.differenz = TimeCalculatorService.time(_fa.anfangszeit, _fa.endzeit);
         
-        addToTotalTime(_fa.differenz);
-        $scope.totalDiffRoute += parseFloat(_fa.endkilometer)-parseFloat(_fa.anfangskilometer);
-        _fa.differenz = _fa.differenz.hours + " Stunden " + _fa.differenz.minutes + " Minuten";
+        addToTotalTime(_fa.differenz); //differenz dazuzaehlen
+        $scope.totalDiffRoute += parseFloat(_fa.endkilometer)-parseFloat(_fa.anfangskilometer); //zur gesamten Streckendifferenz dazuzaehlen
+        _fa.differenz = _fa.differenz.hours + " Stunden " + _fa.differenz.minutes + " Minuten"; //ausgabe zurechtschneiden
     }
     
     for(var i=0,anz=$scope.arbeiten.length;i<anz;i++){
@@ -214,10 +214,10 @@ angular.module('starter.controllers', [])
        
         addToTotalTime(_ar.differenz); //zur gesamten Dauer hinzufuegen
         
-        _ar.differenz = _ar.differenz.hours + " Stunden " + _ar.differenz.minutes + " Minuten";
+        _ar.differenz = _ar.differenz.hours + " Stunden " + _ar.differenz.minutes + " Minuten"; //ausgabe zurechtstueckeln
     }
     
-    function addToTotalTime(time){
+    function addToTotalTime(time){ //funktion erstellt, da sie 2 mal gebraucht wird!
         var _hours = parseInt(time.hours);
         var _mins = parseInt(time.minutes);
         
@@ -225,7 +225,7 @@ angular.module('starter.controllers', [])
         $scope.totalDiffTime.hours += _hours;
         $scope.totalDiffTime.minutes += _mins;
         
-        if ($scope.totalDiffTime.minutes>60) {
+        if ($scope.totalDiffTime.minutes>60) { //wenn ueber 60 minuten, wieder anpassen!
             $scope.totalDiffTime.minutes=$scope.totalDiffTime.minutes - 60;
             $scope.totalDiffTime.hours++;
         }
@@ -251,11 +251,11 @@ angular.module('starter.controllers', [])
     $scope.activeArbeitObj = model.dataModel.getActiveArbeit(model.dataModel.getActiveSession());//aktive Arbeit der aktiven Session
     $scope.activeArbeit = $scope.activeArbeitObj.toJson();//aktive Arbeit der aktiven Session als JSON-Notation
     $scope.activeArbeit.date = new Date($scope.activeArbeitObj.getDatum());
-    $scope.leistungen = model.dataModel.getLeistungList("arbeit");
-    $scope.selected = {value : 0}
+    $scope.leistungen = model.dataModel.getLeistungList("arbeit"); //leistungen der arbeiten werden geladen (fuer select)
+    $scope.selected = {value : 0} //var fuer die vorselectierte leistung
     
     
-    //ausgewählte Leistung vordefinieren:
+    //ausgewählte Leistung pre-selecten:
     for(var i=0,anz=$scope.leistungen.length;i<anz;i++){
         var _ls = $scope.leistungen[i];
         if (_ls.id === $scope.activeArbeit.leistungsId || _ls.id === parseInt($scope.activeArbeit.leistungsId)) {
@@ -263,7 +263,7 @@ angular.module('starter.controllers', [])
         }
     }
     
-    $scope.callSessiondetail = function(saveChanges) {
+    $scope.callSessiondetail = function(saveChanges) {//eine funktion -> wurde auf speichern geklickt oder auf zurueck?
         if (saveChanges===true) {
             //Routinen, um die einzelen Änderungen zu erfassen!
             //Leistung
@@ -293,19 +293,19 @@ angular.module('starter.controllers', [])
     $scope.activeFahrtObj = model.dataModel.getActiveFahrt(model.dataModel.getActiveSession());//aktive Arbeit der aktiven Session
     $scope.activeFahrt = $scope.activeFahrtObj.toJson();//aktive Arbeit der aktiven Session als JSON-Notation
     $scope.activeFahrt.date = new Date($scope.activeFahrtObj.getDatum().substr(0,10));
-    $scope.leistungen = model.dataModel.getLeistungList("fahrt");
-    $scope.selected = {value : 0}
+    $scope.leistungen = model.dataModel.getLeistungList("fahrt"); //leistungen der fahrten laden
+    $scope.selected = {value : 0} //value fuer die ausgewaehlte leistung
     $scope.kfz = model.dataModel.getMitarbeiter().getStandKfz();//Standard-Kfz des Mitarbeiters erhalten!
     //ausgewählte Leistung vordefinieren:
-    for(var i=0,anz=$scope.leistungen.length;i<anz;i++){
+    for(var i=0,anz=$scope.leistungen.length;i<anz;i++){//die leistung der fahrt wird pre-selected!
         var _ls = $scope.leistungen[i];
         if (_ls.id === $scope.activeFahrt.leistungsId || _ls.id === parseInt($scope.activeFahrt.leistungsId)) {
             $scope.selected = {value : i};
         }
     }
     
-    $scope.callSessiondetail = function(save) {
-        if (save===true) {
+    $scope.callSessiondetail = function(save) {//aufteilen, damit nicht 2 idente funktionen erstellt werden muessen
+        if (save===true) {//dies wird nur durchlaufen, wenn true mitgegeben wurde - also wenn gespeichert wird (OK-Button)!
             //Routinen, um Aenderungen zu speichern
             var _ls = document.getElementById('leistungSelect');
             $scope.activeFahrtObj.setDatum(new Date(document.getElementById('inDate').value));
@@ -319,7 +319,7 @@ angular.module('starter.controllers', [])
             DataModel.update(model.dataModel, true);
         }
 
-        model.dataModel.getActiveFahrt(model.dataModel.getActiveSession()).setActive(false);
+        model.dataModel.getActiveFahrt(model.dataModel.getActiveSession()).setActive(false); //aktive Session abwaehlen
         
         $state.go('sessiondetail');
     }
@@ -524,14 +524,14 @@ angular.module('starter.controllers', [])
     }
      
     $scope.sessions = model.dataModel.getSessionList(); //setzt die Sessions
-    
+    //datum auf angemessenes format zuschneiden
     for(var i=0,anz=$scope.sessions.length;i<anz;i++){
         var _ses = $scope.sessions[i];
         _ses.date = _ses.datum.substr(0,10);
     }
     
     $scope.onItemDelete = function(sessionId) {
-        var deleteIndex = undefined;
+        var deleteIndex = undefined; //geklickter index finden
         for(var i=0,anz=$scope.sessions.length;i<anz;i++){
             var _ses = $scope.sessions[i];
             if (sessionId === _ses.id) {
@@ -539,9 +539,9 @@ angular.module('starter.controllers', [])
                 break;
             }
         }
-        $scope.sessions.splice(deleteIndex, 1);
-        model.dataModel.getSessionById(sessionId).setDeleted(true);
-        DataModel.update(model.dataModel, true);
+        $scope.sessions.splice(deleteIndex, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
+        model.dataModel.getSessionById(sessionId).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
+        DataModel.update(model.dataModel, true); //speichern
     };
     
     
