@@ -282,7 +282,10 @@ angular.module('starter.services', [])
         var _sessions = this.getMitarbeiter().getSessions();
         var _sesList = [];
         for(var i=0,anz=_sessions.length;i<anz;i++){
-            _sesList.push(_sessions[i].toJson());
+            var _ses = _sessions[i];
+            if (_ses.getDeleted()===false) {
+                _sesList.push(_sessions[i].toJson());
+            }
         }
         return _sesList;
     }
@@ -663,7 +666,7 @@ angular.module('starter.services', [])
 //----------- 5. - Session_Class_Definition------//
 .factory('Session', function(Arbeit, Fahrt){
     
-    function Session(id, datum, clientId){
+    function Session(id, datum, clientId, deleted){
         var _id = undefined;
         var _datum = undefined;
         var _clientId = undefined;
@@ -721,10 +724,17 @@ angular.module('starter.services', [])
             return _active;
         }
         
+        this.setDeleted = function(deleted) {
+            _deleted = deleted;
+        }
+        this.getDeleted = function() {
+            return _deleted;
+        }
+        
         this.setId(id); //Errorhandling!
         this.setDatum(datum);
         this.setClientId(clientId); //change from this.setClient(client); to this.setClientId(clientId);
-        
+        if(deleted){this.setDeleted(deleted)};
     }
     
     Session.prototype.getFahrtById=function(id){
@@ -767,7 +777,8 @@ angular.module('starter.services', [])
             datum : this.getDatum(),
             clientId : this.getClientId(),
             fahrten : _faRes,
-            arbeiten : _arRes
+            arbeiten : _arRes,
+            deleted : this.getDeleted()
         }
     }
     
@@ -775,7 +786,7 @@ angular.module('starter.services', [])
         //Varbiablendeklarationen
         var _fahrten = JSONstructure.fahrten;//fahrconsole.log(JSONstructure.fahrten);
         var _arbeiten = JSONstructure.arbeiten;//arbeiten gesondert ausweisen
-        var ses = new Session(JSONstructure.id, JSONstructure.datum, JSONstructure.clientId);
+        var ses = new Session(JSONstructure.id, JSONstructure.datum, JSONstructure.clientId, JSONstructure.deleted);
         //zusätzliche Fahrten adden
         if (_fahrten) {//wenn keine Fahrten vorhanden sind -> undefined!
             for(var i = 0, anz=_fahrten.length; i<anz; i++){
@@ -914,7 +925,7 @@ angular.module('starter.services', [])
             anfangszeit : this.getAnfangszeit(),
             endzeit : this.getEndzeit(),
             anfangskilometer : this.getAnfangskilometer(),
-            endkilomenter : this.getEndkilometer(),
+            endkilometer : this.getEndkilometer(),
             anfangsort : this.getAnfangsort(),
             endort : this.getEndort(),
             leistungsId : this.getLeistungsId()
@@ -1019,7 +1030,7 @@ angular.module('starter.services', [])
 //Zusammenführen aller Model-Funktionen in einem Service
 .service('DataModel', function(BusinessObject){
     this.create = function(){
-        return BusinessObject.create(JSON.parse(localStorage.getItem('mle_model')));
+        return BusinessObject.create(JSON.parse(localStorage.getItem('mle_model2')));
     };
     this.update = function(objectBusinessObject, save){
         var res = objectBusinessObject.toJson();
