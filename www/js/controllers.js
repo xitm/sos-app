@@ -119,6 +119,7 @@ angular.module('starter.controllers', [])
         if (!(currentsession.getFahrten()[0]) && !(currentsession.getArbeiten()[0])) {
             //Akutelle Session noch löschen!!
             model.dataModel.deleteActiveSession();//löscht aktive Session - keine offenen Sessions mehr
+            DataModel.update(model.dataModel, true); //model im local storage updaten
             $state.go('arbeitsoberflaeche');
         }
         else {
@@ -129,6 +130,7 @@ angular.module('starter.controllers', [])
             confirmPopup.then(function(res) {
                 if(res) {
                     model.dataModel.deleteActiveSession();//löscht aktive Session - keine offenen Sessions mehr
+                    DataModel.update(model.dataModel, true); //model im local storage updaten
                     /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
                     $state.go('arbeitsoberflaeche');
                 } else {
@@ -147,13 +149,13 @@ angular.module('starter.controllers', [])
     }
     $scope.finishSession = function() {
         /*Routine um Daten zu checken und im model aktualisieren, danach werden Daten für Datenübersicht freigegeben*/
-        DataModel.update(model.dataModel, true);
+        DataModel.update(model.dataModel, true);//model im local storage aktualisieren
         
         //Wenn noch keine Session eingetragen ist, kann nichts abgeschlossen werden.
         if ((!currentsession.getFahrten()[0]) && !(currentsession.getArbeiten()[0])) {
             var alertPopup = $ionicPopup.alert({
                 title: "Fehler",
-                template: "Es wurde noch keine Session eingetragen"
+                template: "Es wurden noch keine Fahrt- oder Arbeitseinheiten eingetragen"
             })
             return;
         }
@@ -167,7 +169,7 @@ angular.module('starter.controllers', [])
         confirmPopup.then(function(res) {
           if(res) {
             model.dataModel.getActiveSession().setActive(false);
-            //Muss noch in localstorage geschrieben wreden!!
+            DataModel.update(model.dataModel, true); //model im local storage aktualisieren
             $state.go('arbeitsoberflaeche');
           } else {
             /*Alles bleibt so wie es ist!*/
@@ -177,9 +179,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('SessionuebersichtCtrl', function($scope, $state) {
-    $scope.items = model.dataModel.toJson().mitarbeiter.sessions
-    
-    //console.log($scope.items);
+
     
     $scope.callSessiondetail=function(sessionId){
         model.dataModel.getSessionById(sessionId).setActive(true);
@@ -191,24 +191,44 @@ angular.module('starter.controllers', [])
 })
 
 .controller('SessiondetailCtrl', function($scope, TimeCalculatorService, $state) {
-    //console.log(model.dataModel.getActiveSession().toJson());
     $scope.activeSession = model.dataModel.getActiveSession(); //speichert aktive Session in den Scope
-    //console.log($scope.activeSession.getArbeiten()[0].toJson());
     $scope.fahrten = $scope.activeSession.toJson().fahrten; //speichert die Fahrten extra ab, für den ng-repeat
     $scope.arbeiten = $scope.activeSession.toJson().arbeiten;//speichert die Arbeiten extra ab, für den ng-repeat
     //Zeit, die zwischen Anfang und Ende vergangen ist für jede Fahrt/Arbeit
-    $scope.totalDiff = 0;
+    $scope.date = $scope.activeSession.toJson().datum.substr(0,10);
+    $scope.totalDiffTime = {hours : 0, minutes : 0};
+    $scope.totalDiffRoute = 0;
+    
     for(var i=0,anz=$scope.fahrten.length;i<anz;i++){
         var _fa = $scope.fahrten[i];
         _fa.differenz = TimeCalculatorService.time(_fa.anfangszeit, _fa.endzeit);
-        //PLAZT FÜR GESAMTUNERSCHIED LASSEN!!!!
-        _fa.differenz = _fa.differenz['hours'] + " Stunden " + _fa.differenz['minutes'] + " Minuten";
+        
+        addToTotalTime(_fa.differenz);
+        $scope.totalDiffRoute += parseFloat(_fa.endkilometer)-parseFloat(_fa.anfangskilometer);
+        _fa.differenz = _fa.differenz.hours + " Stunden " + _fa.differenz.minutes + " Minuten";
     }
+    
     for(var i=0,anz=$scope.arbeiten.length;i<anz;i++){
         var _ar = $scope.arbeiten[i];
         _ar.differenz = TimeCalculatorService.time(_ar.anfangszeit, _ar.endzeit);
-        //PLAZT FÜR GESAMTUNERSCHIED LASSEN!!!!
-        _ar.differenz = _ar.differenz['hours'] + " Stunden " + _ar.differenz['minutes'] + " Minuten";
+       
+        addToTotalTime(_ar.differenz); //zur gesamten Dauer hinzufuegen
+        
+        _ar.differenz = _ar.differenz.hours + " Stunden " + _ar.differenz.minutes + " Minuten";
+    }
+    
+    function addToTotalTime(time){
+        var _hours = parseInt(time.hours);
+        var _mins = parseInt(time.minutes);
+        
+        
+        $scope.totalDiffTime.hours += _hours;
+        $scope.totalDiffTime.minutes += _mins;
+        
+        if ($scope.totalDiffTime.minutes>60) {
+            $scope.totalDiffTime.minutes=$scope.totalDiffTime.minutes - 60;
+            $scope.totalDiffTime.hours++;
+        }
     }
     
     $scope.callSessionuebersicht = function(sessionId){
@@ -265,19 +285,47 @@ angular.module('starter.controllers', [])
         }
         
         $scope.activeArbeitObj.setActive(false);
-        $state.go('sessiondetail')
+        $state.go('sessiondetail');
     }
 })
  
-.controller('FahrtCtrl', function($scope, $state) {
-    $scope.callSessiondetail = function() {
+.controller('FahrtCtrl', function($scope, DataModel, $state) {
+    $scope.activeFahrtObj = model.dataModel.getActiveFahrt(model.dataModel.getActiveSession());//aktive Arbeit der aktiven Session
+    $scope.activeFahrt = $scope.activeFahrtObj.toJson();//aktive Arbeit der aktiven Session als JSON-Notation
+    $scope.activeFahrt.date = new Date($scope.activeFahrtObj.getDatum().substr(0,10));
+    $scope.leistungen = model.dataModel.getLeistungList("fahrt");
+    $scope.selected = {value : 0}
+    $scope.kfz = model.dataModel.getMitarbeiter().getStandKfz();//Standard-Kfz des Mitarbeiters erhalten!
+    //ausgewählte Leistung vordefinieren:
+    for(var i=0,anz=$scope.leistungen.length;i<anz;i++){
+        var _ls = $scope.leistungen[i];
+        if (_ls.id === $scope.activeFahrt.leistungsId || _ls.id === parseInt($scope.activeFahrt.leistungsId)) {
+            $scope.selected = {value : i};
+        }
+    }
+    
+    $scope.callSessiondetail = function(save) {
+        if (save===true) {
+            //Routinen, um Aenderungen zu speichern
+            var _ls = document.getElementById('leistungSelect');
+            $scope.activeFahrtObj.setDatum(new Date(document.getElementById('inDate').value));
+            $scope.activeFahrtObj.setAnfangszeit(document.getElementById('inAnfangszeit').value);
+            $scope.activeFahrtObj.setEndzeit(document.getElementById('inEndzeit').value);
+            $scope.activeFahrtObj.setAnfangskilometer(document.getElementById('inAnfangskilometer').value);
+            $scope.activeFahrtObj.setEndkilometer(document.getElementById('inEndkilometer').value);
+            $scope.activeFahrtObj.setAnfangsort(document.getElementById('inAnfangsort').value);
+            $scope.activeFahrtObj.setEndort(document.getElementById('inEndort').value)
+            $scope.activeFahrtObj.setLeistungsId(_ls.options[_ls.selectedIndex].getAttribute('data-leistung-id'));
+            DataModel.update(model.dataModel, true);
+        }
+
         model.dataModel.getActiveFahrt(model.dataModel.getActiveSession()).setActive(false);
-        $state.go('sessiondetail')
+        
+        $state.go('sessiondetail');
     }
 })
 
-
-.controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, $ionicPopup, FormvalidationService, TimeCalculatorService) {
+.controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, DataModel, $ionicPopup, FormvalidationService, TimeCalculatorService) {
     //aktuelle Session des Modells
     var currentsession = model.dataModel.getActiveSession();
     
@@ -346,6 +394,7 @@ angular.module('starter.controllers', [])
                         leistungsId : leisId
                     })
                   currentsession.addArbeit(arbeit); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
+                  DataModel.update(model.dataModel, true);//model im local storage aktualisieren
                   $state.go('sessionmanager');
                 } else {
                   
@@ -456,7 +505,7 @@ angular.module('starter.controllers', [])
                         leistungsId: leisId
                     })
                   currentsession.addFahrt(fahrt); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
-                 
+                 DataModel.update(model.dataModel, true); //model im localstorage aktualisieren
                   $state.go('sessionmanager');
                 } else {
                   /*Alles bleibt so wie es ist!*/
@@ -468,16 +517,34 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('ListCtrl', function($scope) {
+.controller('ListCtrl', function($scope, DataModel) {
     $scope.shouldShowDelete = false;
     $scope.data = {
-      showDelete: false
-     }
-    $scope.onItemDelete = function(item) {
-      $scope.items.splice($scope.items.indexOf(item), 1);
-     };
-    
+        showDelete: false
+    }
+     
     $scope.sessions = model.dataModel.getSessionList(); //setzt die Sessions
+    
+    for(var i=0,anz=$scope.sessions.length;i<anz;i++){
+        var _ses = $scope.sessions[i];
+        _ses.date = _ses.datum.substr(0,10);
+    }
+    
+    $scope.onItemDelete = function(sessionId) {
+        var deleteIndex = undefined;
+        for(var i=0,anz=$scope.sessions.length;i<anz;i++){
+            var _ses = $scope.sessions[i];
+            if (sessionId === _ses.id) {
+                deleteIndex = i;
+                break;
+            }
+        }
+        $scope.sessions.splice(deleteIndex, 1);
+        model.dataModel.getSessionById(sessionId).setDeleted(true);
+        DataModel.update(model.dataModel, true);
+    };
+    
+    
    
     for(var i=0,anz=$scope.sessions.length;i<anz;i++){
         //jeweils für die aktuelle session.client (welcher als ID angegeben ist) wird durch den vollen Namen des Clienten ersetzt

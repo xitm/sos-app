@@ -30,17 +30,17 @@
     
     <label class="padding item item-input">
       <span class="input-label"><b>Zeitraum</b></span>
-      <input type="text" class="textbox-n" value="27.05.2015" style="text-align: right; color: #aaa;">
+      <input type="text" class="textbox-n" value="{{date}}" style="text-align: right; color: #aaa;">
     </label>
     
     <label class="padding item item-input">
       <span class="input-label"><b>Gesamtkilometer</b></span>
-      <input type="text" class="textbox-n" value="215 km" style="text-align: right; color: #aaa;">
+      <input type="text" class="textbox-n" value="{{totalDiffRoute}} Kilometer" style="text-align: right; color: #aaa;">
     </label>
     
     <label class="padding item item-input">
       <span class="input-label"><b>Arbeitsstunden</b></span>
-      <input type="text" class="textbox-n" value="13h" style="text-align: right; color: #aaa;">
+      <input type="text" class="textbox-n" value="{{totalDiffTime.hours}} Stunden {{totalDiffTime.minutes}} Minuten" style="text-align: right; color: #aaa;">
     </label>
     
     <div class="padding">
@@ -58,7 +58,7 @@
         <ion-list>
             <ion-item ng-repeat="fahrt in fahrten" item="item" ng-click="callSessionbearbeitungFahrt({{fahrt.id}})" class="item-icon-right">
               <h2>{{ fahrt.id }}</h2>
-              <p>{{ arbeit.anfangszeit}}</p>
+              <p>{{ fahrt.differenz}}</p>
               <i class="icon icon-right ion-chevron-right"></i>
             </ion-item>
         </ion-list>

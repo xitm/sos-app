@@ -21,9 +21,9 @@
         <ion-item ng-repeat="session in sessions" item="item" ng-click='callSessiondetail({{session.id}})' class="item-icon-right item-remove-animate">
           
           <h2>{{ session.client }}</h2>
-          <p>{{ session.datum}}{{session.id}}</p>
+          <p>{{ session.date}}</p>
           <i class="icon icon-right ion-chevron-right"></i>
-          <ion-delete-button class="ion-minus-circled" ng-click="onItemDelete(item)"> </ion-delete-button>
+          <ion-delete-button class="ion-minus-circled" ng-click="onItemDelete({{session.id}})"> </ion-delete-button>
         </ion-item>
         
       </ion-list>
