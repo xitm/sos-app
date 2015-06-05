@@ -164,7 +164,7 @@ angular.module('starter.controllers', [])
         /*Sessiondetails hier drin wären nett*/
         var confirmPopup = $ionicPopup.confirm({
           title: 'Session Abschließen?',
-          template: 'Möchtest du die Arbeits -und Fahrtzeiten zum hochladen freigeben?'
+          template: 'Möchtest du die Arbeits -ugend Fahrtzeiten zum hochladen freigeben?'
         });
         confirmPopup.then(function(res) {
           if(res) {
