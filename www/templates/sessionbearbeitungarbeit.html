@@ -3,77 +3,91 @@
 <ion-view view-title="Arbeit">
   
   <ion-header-bar class="bar-positive">
-    <div class="buttons">
-      <button class="button" ng-click="callSessiondetail()">Zurück</button>
-    </div>
-    <h1 class="title">Sessionbearbeitung</h1>
+    <div class="buttons paddingtop">
+       <button class="button icon-left ion-chevron-left button-clear" ng-click="callSessiondetail(true)"></button>
+      </div>
+      <h1 class="title paddingtop">Sessionbearbeitung</h1>
+      <div class="buttons paddingtop" style="padding-top: 8px;">
+        <button class="button button-clear" ng-click="" ><h4 style="color: rgb(255,255,255)">OK</h4></button>
+      </div>
   </ion-header-bar>
     
   <ion-content class="padding has-header">
     
-    <div class="padding">
+        <div class="padding">
             <!--placeholder-->
     </div>
-    <h1>noch irgenda ueberschrift</h1>
-    <div class="padding row">
-             <div class="col col-50">
-                <img src="img/arbeitsmanager.png" style="width: 70%;"/>
-            </div>
+        <div class="padding" style="text-align: center;">
+            <img src="img/notizenbild.png" />
         </div>
-    
-    
-    <div class="padding list">
-            <label class="item item-input item-select">
-                <div class="input-label">
-                  Leistung
+        
+       <div class="list">
+            <label class="item item-input item-select" id="beschriftung">
+                <div class="input-label" >
+                  <span >Leistung</span>
                 </div>
-                <select id="leistungSelect">
-                    <option ng-repeat="leistung in leistungen" ng-selected="{{selected.value}}" data-leistung-id="{{leistung.id}}">{{leistung.name}}</option>
+                <select id='leistung' data-id=0 ng-model="updateId" ng-change='updateDataId(leistung)'>
+                    <option ng-repeat='leistung in leistungen' ng-selected="{{selected.value}}" data-leistung-id="{{leistung.id}}">{{leistung.name}}</option>
                 </select>
             </label>
       </div>
-        
-        <!--Zeiten und Buttons-->
-        
-        <div class="padding row">
-             <div class="col ">
-                <label class="item item-input">
-                    <span class="input-label" ng-if="!activeArbeit.date" style="font-size: smaller; color: #aaa; padding:0; margin: 0;">Anfangsdatum</span> 
-                    <input type="date" id="inputDate" ng-model="activeArbeit.date"/>
+       
+       <div class="padding">
+            <!--placeholder-->
+        </div>
+       
+       
+        <!-- Uhre und Datum -->
+        <div class="row">
+          <div class="col" style="text-align: center;">
+                  <img src="img/uhr_gruen.png"/>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label class="item item-input" id="styledatum">
+                    <span>Datum</span>
+                    <input class="textbox-n" type="date" id="inputDate" ng-model="activeArbeit.date"" style="text-align: right"/>
                 </label>
             </div>
             <div class="col">
-                <label class="item item-input">
+                <label class="item item-input" id=styledatumE">
                     <span class="input-label" ng-if="!datumE" style="font-size: smaller; color: #aaa;">Enddatum</span> 
                     <input type="date"  ng-model="date" />
                 </label>
             </div>
         </div>
         
+        <!--Zeiten und Buttons-->
         
-        <div class="padding row">
+        <div class="row">
             <div class="col col-50">
-                <label class="item item-input">
-                    <input placeholder="Anfangszeit" id="timeA" value="{{activeArbeit.anfangszeit}}" class="textbox-n" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                <label class="item item-input" id="styleA" ng-click="hideSpanA = !hideSpanA">
+                    <span ng-hide="hideSpanA" ng-if="!uhranfang" >Anfangszeit</span>
+                    <input class="textbox-n" id="timeA" type="text" ng-model="uhranfang" value="{{activeArbeit.anfangszeit}}" onfocus="(this.type='time')"/>
+                    <span class="input-label" ng-if="uhranfang" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>
             
+            
+            
             <div class="col col-50">
-                <label class="item item-input">
-                    <input placeholder="Endzeit" id="timeE" value='{{activeArbeit.endzeit}}' class="textbox-n" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                <label class="item item-input" id="styleE" ng-click="hideSpanE = !hideSpanE">
+                    <span ng-hide="hideSpanE" ng-if="!uhrende" >Endzeit</span>
+                    <input class="textbox-n" id="timeE" type="text" ng-model="uhrende" value='{{activeArbeit.endzeit}}' onfocus="(this.type='time')" />
+                    <span class="input-label" ng-if="uhrende" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>
         </div>
-    
-      <div class="padding">
+        
+       
+       <div class="padding">
             <!--placeholder-->
-      </div>
+        </div>
+       
+    
+  
        
   </ion-content>
-  
-  <ion-footer-bar class="bar-positive">
-      <button class="button button-full button-clear" ng-click="callSessiondetail(true)" style="font-size: xx-large;"><b>OK</b></button>
-  </ion-footer-bar>
-
 
 </ion-view>

@@ -3,10 +3,13 @@
 <ion-view view-title="Fahrt">
   
   <ion-header-bar class="bar-positive">
-    <div class="buttons">
-      <button class="button" ng-click="callSessiondetail()">Zurück</button>
-    </div>
-    <h1 class="title">Sessionbearbeitung</h1>
+    <div class="buttons paddingtop">
+       <button class="button icon-left ion-chevron-left button-clear" ng-click="callSessiondetail(true)"></button>
+      </div>
+      <h1 class="title paddingtop">Sessionbearbeitung</h1>
+      <div class="buttons paddingtop" style="padding-top: 8px;">
+        <button class="button button-clear" ng-click="" ><h4 style="color: rgb(255,255,255)">OK</h4></button>
+      </div>
   </ion-header-bar>
     
   <ion-content class="padding has-header">
@@ -82,14 +85,14 @@
         <div class="row">
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Anfangszeit" id="inAnfangszeit" class="textbox-n" type="text" value="{{activeFahrt.anfangszeit}}" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                    <input placeholder="Anfangszeit" id="inAnfangszeit" class="textbox-n" type="text" value="{{activeFahrt.anfangszeit}}" onfocus="(this.type='time')"/>
                     <span class="input-label" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>
             
             <div class="col col-50">
                 <label class="item item-input">
-                    <input placeholder="Endzeit" id="inEndzeit" class="textbox-n" type="text" value="{{activeFahrt.endzeit}}" onfocus="(this.type='time')" onblur="(this.type='text')" />
+                    <input placeholder="Endzeit" id="inEndzeit" class="textbox-n" type="text" value="{{activeFahrt.endzeit}}" onfocus="(this.type='time')" />
                     <span class="input-label" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>

@@ -199,6 +199,18 @@ angular.module('starter.controllers', [])
     $scope.totalDiffTime = {hours : 0, minutes : 0};
     $scope.totalDiffRoute = 0;
     
+    
+    
+    //Falls keine Arbeits -oder Zeiteinheiten vorhanden sind. Textmeldung auf true setzen
+    $scope.emptywork = false;
+    $scope.emptytrip = false;
+    if ($scope.arbeiten.length==0) {
+        $scope.emptywork = true;
+    }
+    if ($scope.fahrten.length == 0) {
+        $scope.emptytrip = true;
+    }
+    
     for(var i=0,anz=$scope.fahrten.length;i<anz;i++){
         var _fa = $scope.fahrten[i];
         _fa.differenz = TimeCalculatorService.time(_fa.anfangszeit, _fa.endzeit);
@@ -211,10 +223,10 @@ angular.module('starter.controllers', [])
     for(var i=0,anz=$scope.arbeiten.length;i<anz;i++){
         var _ar = $scope.arbeiten[i];
         _ar.differenz = TimeCalculatorService.time(_ar.anfangszeit, _ar.endzeit);
-       
         addToTotalTime(_ar.differenz); //zur gesamten Dauer hinzufuegen
-        
         _ar.differenz = _ar.differenz.hours + " Stunden " + _ar.differenz.minutes + " Minuten"; //ausgabe zurechtstueckeln
+        var leistungsId= parseInt(_ar.leistungsId);
+        $scope.arbeiten[i].leistung=model.dataModel.getLeistungById(leistungsId).getName();
     }
     
     function addToTotalTime(time){ //funktion erstellt, da sie 2 mal gebraucht wird!
@@ -250,6 +262,8 @@ angular.module('starter.controllers', [])
 .controller('ArbeitCtrl', function($scope, DataModel, $state) {
     $scope.activeArbeitObj = model.dataModel.getActiveArbeit(model.dataModel.getActiveSession());//aktive Arbeit der aktiven Session
     $scope.activeArbeit = $scope.activeArbeitObj.toJson();//aktive Arbeit der aktiven Session als JSON-Notation
+    $scope.uhranfang = $scope.activeArbeit.anfangszeit;
+    $scope.uhrende = $scope.activeArbeit.endzeit;
     $scope.activeArbeit.date = new Date($scope.activeArbeitObj.getDatum());
     $scope.leistungen = model.dataModel.getLeistungList("arbeit"); //leistungen der arbeiten werden geladen (fuer select)
     $scope.selected = {value : 0} //var fuer die vorselectierte leistung

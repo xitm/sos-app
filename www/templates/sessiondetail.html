@@ -18,54 +18,56 @@
             <!--placeholder-->
       </div>
     
-    <div class="padding">
-      <h1>Übersicht</h1>
-    </div>
-    
-    
-    <label class="padding item item-input">
-      <span class="input-label"><b>Name</b></span>
-      <input type="Kunde" class="textbox-n" value="Alex Monz" style="text-align: right; color: #aaa;">
-    </label>
-    
-    <label class="padding item item-input">
-      <span class="input-label"><b>Zeitraum</b></span>
-      <input type="text" class="textbox-n" value="{{date}}" style="text-align: right; color: #aaa;">
-    </label>
-    
-    <label class="padding item item-input">
-      <span class="input-label"><b>Gesamtkilometer</b></span>
-      <input type="text" class="textbox-n" value="{{totalDiffRoute}} Kilometer" style="text-align: right; color: #aaa;">
-    </label>
-    
-    <label class="padding item item-input">
-      <span class="input-label"><b>Arbeitsstunden</b></span>
-      <input type="text" class="textbox-n" value="{{totalDiffTime.hours}} Stunden {{totalDiffTime.minutes}} Minuten" style="text-align: right; color: #aaa;">
-    </label>
-    
-    <div class="padding">
-        <h1>Arbeitseinheiten</h1>
-        <ion-list>
-            <ion-item ng-repeat="arbeit in arbeiten" item="item" ng-click="callSessionbearbeitungArbeit({{arbeit.id}})" class="item-icon-right">
-              <h2>{{ arbeit.id }}</h2>
-              <p>{{ arbeit.differenz}}</p>
-              <i class="icon icon-right ion-chevron-right"></i>
-            </ion-item>
-        </ion-list>
-    </div>
-    <div class="padding">
-    <h1>Fahrteinheiten</h1>
-        <ion-list>
-            <ion-item ng-repeat="fahrt in fahrten" item="item" ng-click="callSessionbearbeitungFahrt({{fahrt.id}})" class="item-icon-right">
-              <h2>{{ fahrt.id }}</h2>
-              <p>{{ fahrt.differenz}}</p>
-              <i class="icon icon-right ion-chevron-right"></i>
-            </ion-item>
-        </ion-list>
-    </div>
-    <div class="padding">
-            <!--placeholder-->
+
+    <div class="card padding">
+      <div class="item item-divider">
+        Übersicht
       </div>
+      <div class="item item-text-wrap">
+        <span class="input-label"><b>Kunde</b></span>
+        <span style="color: #aaa;">Alex Monz</span>
+      </div>
+      <div class="item item-text-wrap">
+        <span class="input-label"><b>Zeitraum</b></span>
+        <span style="color: #aaa;">{{date}}</span>
+      </div>
+      <div class="item item-text-wrap">
+        <span class="input-label"><b>Gesamtkilometer</b></span>
+        <span style="color: #aaa;">{{totalDiffRoute}} Kilometer</span>
+      </div>
+      <div class="item item-text-wrap">
+        <span class="input-label"><b>Arbeitsstunden</b></span>
+        <span style="color: #aaa;">{{totalDiffTime.hours}} Stunden {{totalDiffTime.minutes}} Minuten</span>
+      </div>
+    </div>
+    
+    <div class="card padding" style="background-color: rgba(61,150,25, 0.2)">
+      <div class="item item-divider">
+        Arbeitseinheiten
+      </div>
+      <div class="item item-text-wrap" ng-if="emptywork">
+        <span style="text-align: center">Keine Arbeitseinheiten gefunden :-(</span>
+      </div>
+      <div class="item item-icon-right item-text-wrap" ng-repeat="arbeit in arbeiten" item="item" ng-click="callSessionbearbeitungArbeit({{arbeit.id}})" >
+        <span class="input-label"><b>{{ arbeit.leistung }}</b></span>
+        <span style="color: #aaa;">{{ arbeit.differenz}}</span>
+        <i class="icon icon-right ion-chevron-right"></i>
+      </div>
+    </div>
+    
+    <div class="card padding" style="background-color: rgba(204,58,8, 0.2)">
+      <div class="item item-divider">
+        Fahrteinheiten
+      </div>
+      <div class="item item-text-wrap" ng-if="emptytrip">
+        <span style="text-align: center">Keine Fahrteinheiten gefunden :-(</span>
+      </div>
+      <div class="item item-icon-right item-text-wrap" ng-repeat="fahrt in fahrten" item="item" ng-click="callSessionbearbeitungFahrt({{fahrt.id}})" >
+        <span class="input-label"><b>{{ fahrt.id }}</b></span>
+        <span style="color: #aaa;">{{ fahrt.differenz}}</span>
+        <i class="icon icon-right ion-chevron-right"></i>
+      </div>
+    </div>
     
   </ion-content>
 

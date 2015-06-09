@@ -326,7 +326,7 @@ angular.module('starter.services', [])
     
     BusinessObject.prototype.getLeistungById=function(id){
         var _leistungen = this.getLeistungen();
-        for(var i=0, anz=_leistung.length;i<anz;i++){
+        for(var i=0, anz=_leistungen.length;i<anz;i++){
             if (_leistungen[i].getId()===id) {
                 return _leistungen[i];
             }
