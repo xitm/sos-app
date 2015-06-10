@@ -190,7 +190,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessiondetailCtrl', function($scope, TimeCalculatorService, $state) {
+.controller('SessiondetailCtrl', function($scope, TimeCalculatorService, $state, DataModel) {
     $scope.activeSession = model.dataModel.getActiveSession(); //speichert aktive Session in den Scope
     $scope.fahrten = $scope.activeSession.toJson().fahrten; //speichert die Fahrten extra ab, für den ng-repeat
     $scope.arbeiten = $scope.activeSession.toJson().arbeiten;//speichert die Arbeiten extra ab, für den ng-repeat
@@ -257,24 +257,67 @@ angular.module('starter.controllers', [])
     }
     
     $scope.data = {
-        showDelete: false
+        showArbeit: false,
+        showFahrt: false
     };
   
     $scope.checkDelete= function (change, $event) {
-
-        console.log($scope.data);
-        if ($scope.data.showDelete==true) {
-            $scope.data = {showDelete:false};
-        }else if (change==true) {
-            $scope.data = {showDelete:true};
+        if ($scope.data.showArbeit==true && change=="hideArbeit") {
+            $scope.data.showArbeit=false;
+        }else if ($scope.data.showFahrt==true && change=="hideFahrt"){
+            $scope.data.showFahrt= false;
+        }else if (change=="fahrt" || change=="arbeit") {
+            if (change == "arbeit") {
+                $scope.data = {showArbeit:true,
+                               showFahrt:false};
+            } else {
+                $scope.data = {showFahrt:true,
+                               showArbeit:false};
+            }
             if ($event.stopPropagation) $event.stopPropagation();
             if ($event.preventDefault) $event.preventDefault();
             $event.cancelBubble = true;
             $event.returnValue = false;
         }
-        
     }
     
+    $scope.onItemDelete = function(id, typ) {
+        var deleteIndex = undefined; //geklickter index finden
+        if (typ == "arbeit") {
+            for(var i=0,anz=$scope.arbeiten.length;i<anz;i++){
+                var _ar = $scope.arbeiten[i];
+                if (id === _ar.id) {
+                    deleteIndex = i;
+                    break;
+                }
+            }
+            $scope.arbeiten.splice(deleteIndex, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
+            //model.dataModel.getSessionById(sessionId).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
+            DataModel.update(model.dataModel, true); //speichern//Geht noch nichT!!!!
+            
+             if (!($scope.arbeiten[0])) {
+                $scope.emptywork=true;
+            }
+            
+        } else if (typ == "fahrt") {
+            for(var i=0,anz=$scope.fahrten.length;i<anz;i++){
+                var _fa = $scope.fahrten[i];
+                if (id === _fa.id) {
+                    deleteIndex = i;
+                    break;
+                }
+            }
+            $scope.fahrten.splice(deleteIndex, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
+            //model.dataModel.getSessionById(sessionId).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
+            DataModel.update(model.dataModel, true); //speichern //Geht noch nichT!!!!
+            
+            if (!($scope.fahrten[0])) {
+                $scope.emptytrip=true;
+            }
+            
+        
+        }
+    }    
     
     $scope.callFahrtenmanager = function() {
         $state.go('fahrtenmanager', {sessionmanager: false});
