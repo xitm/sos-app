@@ -38,7 +38,31 @@
       </div>
     </div>
     
-    <div class="card padding" style="background-color: rgba(61,150,25, 0.2)">
+    <ion-list show-delete="data.showDelete" ng-click="checkDelete(false, $event)" style="background-color: rgba(204,58,8, 0.2)">
+        <ion-item class="item-divider">
+        Arbeitseinheiten
+        </ion-item>
+        
+        <ion-item class="item-divider" ng-if="emptywork">
+          <span style="text-align: center">Keine Arbeitseinheiten gefunden :-(</span>
+        </ion-item>
+        <div ng-click="checkDelete(false)">
+        <ion-item  ng-repeat="arbeit in arbeiten" item="item" ng-click="callSessionbearbeitungArbeit({{arbeit.id}})" class="item-icon-right item-remove-animate">
+          
+          <span class="input-label" style="width: 100%;"><b>{{ arbeit.leistung }}</b></span>
+          <span style="color: #aaa;">{{ arbeit.differenz}}</span>
+          <i class="icon icon-right ion-chevron-right"></i>
+          <ion-delete-button class="ion-minus-circled" ng-click="onItemDelete({{arbeit.id}})"> </ion-delete-button>
+        </ion-item>
+        </div>
+
+          <div class="button-bar bar-light">
+            <a class="button icon-right ion-minus-circled " ng-click="checkDelete(true, $event);">Entfernen</a>
+            <a class="button icon-right ion-chevron-right " ng-click="callArbeitsmanager()">Hinzufügen</a>
+          </div>
+        
+    </ion-list>
+    <!--<div class="card padding" style="background-color: rgba(61,150,25, 0.2)">
       <div class="item icon-left item-divider">
         Arbeitseinheiten
       </div>
@@ -86,7 +110,7 @@
         
     </ion-list>
     
-    <div class="list padding" style="background-color: rgba(204,58,8, 0.2)">
+    <!--<div class="list padding" style="background-color: rgba(204,58,8, 0.2)">
       <div class="item item-divider">
         Fahrteinheiten
       </div>

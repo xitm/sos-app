@@ -195,6 +195,15 @@ angular.module('starter.controllers', [])
     $scope.fahrten = $scope.activeSession.toJson().fahrten; //speichert die Fahrten extra ab, für den ng-repeat
     $scope.arbeiten = $scope.activeSession.toJson().arbeiten;//speichert die Arbeiten extra ab, für den ng-repeat
     //Zeit, die zwischen Anfang und Ende vergangen ist für jede Fahrt/Arbeit
+    //$scope.arbeiten.leistung =
+    for (var i=0,anz=model.dataModel.getLeistungen().length;i<anz;i++) {
+        var _ls = model.dataModel.getLeistungen()[i];
+        if ($scope.arbeiten.leistungsid === _ls.getId()) {
+           $scope.arbeiten.leistung = _ls.getName();
+           return;
+        }
+    }
+    
     $scope.date = $scope.activeSession.toJson().datum;
     $scope.totalDiffTime = {hours : 0, minutes : 0};
     $scope.totalDiffRoute = 0;
@@ -207,6 +216,7 @@ angular.module('starter.controllers', [])
     $scope.emptywork = false;
     $scope.emptytrip = false;
     if ($scope.arbeiten.length==0) {
+        console.log($scope.arbeiten.length);
         $scope.emptywork = true;
     }
     if ($scope.fahrten.length == 0) {
@@ -247,7 +257,7 @@ angular.module('starter.controllers', [])
     }
     
     $scope.data = {
-    showDelete: false
+        showDelete: false
     };
   
     $scope.checkDelete= function (change, $event) {
