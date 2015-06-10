@@ -306,7 +306,7 @@ angular.module('starter.controllers', [])
 .controller('FahrtCtrl', function($scope, DataModel, $state) {
     $scope.activeFahrtObj = model.dataModel.getActiveFahrt(model.dataModel.getActiveSession());//aktive Arbeit der aktiven Session
     $scope.activeFahrt = $scope.activeFahrtObj.toJson();//aktive Arbeit der aktiven Session als JSON-Notation
-    $scope.activeFahrt.date = new Date($scope.activeFahrtObj.getDatum().substr(0,10));
+    $scope.activeFahrt.date = new Date($scope.activeFahrtObj.getDatum());
     $scope.leistungen = model.dataModel.getLeistungList("fahrt"); //leistungen der fahrten laden
     $scope.selected = {value : 0} //value fuer die ausgewaehlte leistung
     $scope.kfz = model.dataModel.getMitarbeiter().getStandKfz();//Standard-Kfz des Mitarbeiters erhalten!
@@ -333,8 +333,8 @@ angular.module('starter.controllers', [])
             DataModel.update(model.dataModel, true);
         }
 
-        model.dataModel.getActiveFahrt(model.dataModel.getActiveSession()).setActive(false); //aktive Session abwaehlen
-        
+        //model.dataModel.getActiveFahrt(model.dataModel.getActiveSession()).setActive(false); //aktive Session abwaehlen
+        $scope.activeFahrtObj.setActive(false);
         $state.go('sessiondetail');
     }
 })
