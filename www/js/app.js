@@ -55,19 +55,20 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     
     .state('arbeitsmanager', {
       url: '/arbeitsmanager',
+      params: {sessionmanager: null},
       templateUrl: 'templates/arbeitsmanager.html',
       controller: 'ArbeitsmanagerCtrl'
   })
     
     .state('fahrtenmanager', {
       url: '/fahrtenmanager',
+      params: {sessionmanager: null},
       templateUrl: 'templates/fahrtenmanager.html',
       controller: 'FahrtenmanagerCtrl'
   })
     
     .state('sessiondetail', {
       url: '/sessiondetail',
-      //abstract: true,
       templateUrl: 'templates/sessiondetail.html',
       controller: 'SessiondetailCtrl',
   })

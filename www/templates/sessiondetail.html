@@ -6,9 +6,6 @@
        <button class="button icon-left ion-chevron-left button-clear" ng-click="callSessionuebersicht()"></button>
       </div>
       <h1 class="title paddingtop">Sessiondetails</h1>
-      <div class="buttons paddingtop" style="padding-top: 8px;">
-        <button class="button button-clear" ng-click="" ><h4 style="color: rgb(255,255,255)">OK</h4></button>
-      </div>
     </ion-header-bar>
 
   
@@ -24,8 +21,8 @@
         Übersicht
       </div>
       <div class="item item-text-wrap">
-        <span class="input-label"><b>Kunde</b></span>
-        <span style="color: #aaa;">Alex Monz</span>
+        <span class="input-label"><b>Klient</b></span>
+        <span style="color: #aaa;">{{client}}</span>
       </div>
       <div class="item item-text-wrap">
         <span class="input-label"><b>Zeitraum</b></span>
@@ -42,7 +39,7 @@
     </div>
     
     <div class="card padding" style="background-color: rgba(61,150,25, 0.2)">
-      <div class="item item-divider">
+      <div class="item icon-left item-divider">
         Arbeitseinheiten
       </div>
       <div class="item item-text-wrap" ng-if="emptywork">
@@ -53,19 +50,63 @@
         <span style="color: #aaa;">{{ arbeit.differenz}}</span>
         <i class="icon icon-right ion-chevron-right"></i>
       </div>
+      <div class="item-text-wrap">
+        <div class="button-bar bar-light">
+          <a class="button icon-right ion-minus-circled ">Entfernen</a>
+          <a class="button icon-right ion-chevron-right " ng-click="callArbeitsmanager()">Hinzufügen</a>
+        </div>
+        <!--<span style="text-align: center; opacity: 0.5;"><b>Arbeit hinzufügen</b></span>
+        <i class="icon icon-right ion-chevron-right" style="opacity: 0.5;"></i>-->
+      </div>
     </div>
     
-    <div class="card padding" style="background-color: rgba(204,58,8, 0.2)">
+    
+    <ion-list show-delete="data.showDelete" ng-click="checkDelete(false, $event)" style="background-color: rgba(204,58,8, 0.2)">
+        <ion-item class="item-divider">
+        Fahrteinheiten
+        </ion-item>
+        
+        <ion-item class="item-divider" ng-if="emptytrip">
+          <span style="text-align: center">Keine Fahrteinheiten gefunden :-(</span>
+        </ion-item>
+        <div ng-click="checkDelete(false)">
+        <ion-item  ng-repeat="fahrt in fahrten" item="item" ng-click="callSessionbearbeitungFahrt({{fahrt.id}})" class="item-icon-right item-remove-animate">
+          
+          <span class="input-label" style="width: 100%;"><b>{{ fahrt.anfangsort }} - {{fahrt.endort}}</b></span>
+          <span style="color: #aaa;">{{ fahrt.differenz}}</span>
+          <i class="icon icon-right ion-chevron-right"></i>
+          <ion-delete-button class="ion-minus-circled" ng-click="onItemDelete({{fahrt.id}})"> </ion-delete-button>
+        </ion-item>
+        </div>
+
+          <div class="button-bar bar-light">
+            <a class="button icon-right ion-minus-circled " ng-click="checkDelete(true, $event);">Entfernen</a>
+            <a class="button icon-right ion-chevron-right " ng-click="callFahrtenmanager()">Hinzufügen</a>
+          </div>
+        
+    </ion-list>
+    
+    <div class="list padding" style="background-color: rgba(204,58,8, 0.2)">
       <div class="item item-divider">
         Fahrteinheiten
       </div>
       <div class="item item-text-wrap" ng-if="emptytrip">
         <span style="text-align: center">Keine Fahrteinheiten gefunden :-(</span>
       </div>
+      
       <div class="item item-icon-right item-text-wrap" ng-repeat="fahrt in fahrten" item="item" ng-click="callSessionbearbeitungFahrt({{fahrt.id}})" >
-        <span class="input-label"><b>{{ fahrt.id }}</b></span>
+        <span class="input-label" style="width: 100%;"><b>{{ fahrt.anfangsort }} - {{fahrt.endort}}</b></span>
         <span style="color: #aaa;">{{ fahrt.differenz}}</span>
         <i class="icon icon-right ion-chevron-right"></i>
+      </div>
+      
+      <div class="item-text-wrap" >
+        <div class="button-bar bar-light">
+          <a class="button icon-right ion-minus-circled ">Entfernen</a>
+          <a class="button icon-right ion-chevron-right " ng-click="callFahrtenmanager()">Hinzufügen</a>
+        </div>
+        <!--<span style="text-align: center; opacity: 0.5;"><b>Fahrt hinzufügen</b></span>
+        <i class="icon icon-right ion-chevron-right" style="opacity: 0.5;"></i>-->
       </div>
     </div>
     

@@ -141,11 +141,11 @@ angular.module('starter.controllers', [])
         }
     }
     $scope.callArbeitsmanager = function() {
-        $state.go('arbeitsmanager');
+        $state.go('arbeitsmanager', {sessionmanager: true});
         
     }
     $scope.callFahrtenmanager = function() {
-        $state.go('fahrtenmanager');
+        $state.go('fahrtenmanager', {sessionmanager: true});
     }
     $scope.finishSession = function() {
         /*Routine um Daten zu checken und im model aktualisieren, danach werden Daten für Datenübersicht freigegeben*/
@@ -195,9 +195,11 @@ angular.module('starter.controllers', [])
     $scope.fahrten = $scope.activeSession.toJson().fahrten; //speichert die Fahrten extra ab, für den ng-repeat
     $scope.arbeiten = $scope.activeSession.toJson().arbeiten;//speichert die Arbeiten extra ab, für den ng-repeat
     //Zeit, die zwischen Anfang und Ende vergangen ist für jede Fahrt/Arbeit
-    $scope.date = $scope.activeSession.toJson().datum.substr(0,10);
+    $scope.date = $scope.activeSession.toJson().datum;
     $scope.totalDiffTime = {hours : 0, minutes : 0};
     $scope.totalDiffRoute = 0;
+    
+    $scope.client = model.dataModel.getClientById($scope.activeSession.getClientId()).getFullName();
     
     
     
@@ -225,6 +227,7 @@ angular.module('starter.controllers', [])
         _ar.differenz = TimeCalculatorService.time(_ar.anfangszeit, _ar.endzeit);
         addToTotalTime(_ar.differenz); //zur gesamten Dauer hinzufuegen
         _ar.differenz = _ar.differenz.hours + " Stunden " + _ar.differenz.minutes + " Minuten"; //ausgabe zurechtstueckeln
+        
         var leistungsId= parseInt(_ar.leistungsId);
         $scope.arbeiten[i].leistung=model.dataModel.getLeistungById(leistungsId).getName();
     }
@@ -241,6 +244,33 @@ angular.module('starter.controllers', [])
             $scope.totalDiffTime.minutes=$scope.totalDiffTime.minutes - 60;
             $scope.totalDiffTime.hours++;
         }
+    }
+    
+    $scope.data = {
+    showDelete: false
+    };
+  
+    $scope.checkDelete= function (change, $event) {
+
+        console.log($scope.data);
+        if ($scope.data.showDelete==true) {
+            $scope.data = {showDelete:false};
+        }else if (change==true) {
+            $scope.data = {showDelete:true};
+            if ($event.stopPropagation) $event.stopPropagation();
+            if ($event.preventDefault) $event.preventDefault();
+            $event.cancelBubble = true;
+            $event.returnValue = false;
+        }
+        
+    }
+    
+    
+    $scope.callFahrtenmanager = function() {
+        $state.go('fahrtenmanager', {sessionmanager: false});
+    }
+    $scope.callArbeitsmanager = function() {
+        $state.go('arbeitsmanager', {sessionmanager: false});
     }
     
     $scope.callSessionuebersicht = function(sessionId){
@@ -307,9 +337,14 @@ angular.module('starter.controllers', [])
     $scope.activeFahrtObj = model.dataModel.getActiveFahrt(model.dataModel.getActiveSession());//aktive Arbeit der aktiven Session
     $scope.activeFahrt = $scope.activeFahrtObj.toJson();//aktive Arbeit der aktiven Session als JSON-Notation
     $scope.activeFahrt.date = new Date($scope.activeFahrtObj.getDatum());
+    
+    $scope.uhranfang = $scope.activeFahrt.anfangszeit;
+    $scope.uhrende = $scope.activeFahrt.endzeit;
+    
     $scope.leistungen = model.dataModel.getLeistungList("fahrt"); //leistungen der fahrten laden
     $scope.selected = {value : 0} //value fuer die ausgewaehlte leistung
     $scope.kfz = model.dataModel.getMitarbeiter().getStandKfz();//Standard-Kfz des Mitarbeiters erhalten!
+
     //ausgewählte Leistung vordefinieren:
     for(var i=0,anz=$scope.leistungen.length;i<anz;i++){//die leistung der fahrt wird pre-selected!
         var _ls = $scope.leistungen[i];
@@ -317,6 +352,8 @@ angular.module('starter.controllers', [])
             $scope.selected = {value : i};
         }
     }
+    
+    
     
     $scope.callSessiondetail = function(save) {//aufteilen, damit nicht 2 idente funktionen erstellt werden muessen
         if (save===true) {//dies wird nur durchlaufen, wenn true mitgegeben wurde - also wenn gespeichert wird (OK-Button)!
@@ -339,16 +376,20 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, DataModel, $ionicPopup, FormvalidationService, TimeCalculatorService) {
+.controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, DataModel, $ionicPopup, FormvalidationService, TimeCalculatorService, $stateParams) {
     //aktuelle Session des Modells
     var currentsession = model.dataModel.getActiveSession();
     
     //Sessionmanager Aufrufen
-    $scope.callSessionmanager = function() {
-        $state.go('sessionmanager')
+    $scope.back = function() {
+        if ($stateParams.sessionmanager == true) {
+            $state.go('sessionmanager');
+         } else {
+            $state.go('sessiondetail');
+         }
     }
     //Gespeichertes Datum voreintragen
-    $scope.date = currentsession.getDatum(); //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
+    $scope.date = new Date(currentsession.getDatum()); //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
 
     $scope.leistungen = model.dataModel.getLeistungList('arbeit');
     //ANMERKUNG: eine function, anderes ELEMENT mitgeben!
@@ -364,7 +405,7 @@ angular.module('starter.controllers', [])
         var start = document.getElementById("timeA").value;
         var ende = document.getElementById("timeE").value;
         var dauer = TimeCalculatorService.time(start, ende);
-        var stunden = dauer[0];
+        var stunden = dauer.hours;
         if (parseInt(stunden)<0) {
             var alertPopup = $ionicPopup.alert({
                 title:"Fehler",
@@ -372,7 +413,7 @@ angular.module('starter.controllers', [])
             })
             return
         }
-        var minuten = dauer[1];
+        var minuten = dauer.minutes;
         
         //Fehlerbehandlung, zuerst CSS wieder normal machen
         passt = FormvalidationService.validateArbeit(passt);
@@ -409,7 +450,12 @@ angular.module('starter.controllers', [])
                     })
                   currentsession.addArbeit(arbeit); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
                   DataModel.update(model.dataModel, true);//model im local storage aktualisieren
-                  $state.go('sessionmanager');
+                  
+                  if ($stateParams.sessionmanager == true) {
+                    $state.go('sessionmanager');
+                  } else {
+                    $state.go('sessiondetail');
+                  }
                 } else {
                   
                   /*Alles bleibt so wie es ist!*/
@@ -422,17 +468,23 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('FahrtenmanagerCtrl', function($scope, DataModel, Fahrt, $state, $ionicPopup, FormvalidationService, TimeCalculatorService) {
+.controller('FahrtenmanagerCtrl', function($scope, DataModel, Fahrt, $state, $ionicPopup, FormvalidationService, TimeCalculatorService, $stateParams) {
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
     }
     //aktuelle Session
     var currentsession = model.dataModel.getActiveSession();
     
-
+    $scope.back = function() {
+        if ($stateParams.sessionmanager == true) {
+            $state.go('sessionmanager');
+         } else {
+            $state.go('sessiondetail');
+         }
+    }
 
     //Datum eintragen
-    $scope.datum = currentsession.getDatum();
+    $scope.datum = new Date(currentsession.getDatum());
     //Anfangsort eintragen
     if (model.dataModel.getMitarbeiter().getLetzteFahrt()) {
         document.getElementById('anfangsort').value = model.dataModel.getMitarbeiter().getLetzteFahrt();
@@ -484,7 +536,7 @@ angular.module('starter.controllers', [])
         var endzeit = document.getElementById("timeE").value;
         
         var dauer = TimeCalculatorService.time(anfangszeit, endzeit);
-        var stunden = dauer[0];
+        var stunden = dauer.hours;
         if (parseInt(stunden)<0) {
             var alertPopup = $ionicPopup.alert({
                 title:"Fehler",
@@ -492,7 +544,7 @@ angular.module('starter.controllers', [])
             })
             return
         }
-        var minuten = dauer[1];
+        var minuten = dauer.minutes;
         
         if (passt) {
             var confirmPopup = $ionicPopup.confirm({
@@ -520,7 +572,17 @@ angular.module('starter.controllers', [])
                     })
                   currentsession.addFahrt(fahrt); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
                  DataModel.update(model.dataModel, true); //model im localstorage aktualisieren
-                  $state.go('sessionmanager');
+                 
+                 //Routine zu prüfen ob Sessionmanager oder Sessiondetail
+                 
+                 console.log($stateParams)
+                 console.log($stateParams.sessionmanager)
+                 
+                 if ($stateParams.sessionmanager == true) {
+                    $state.go('sessionmanager');
+                 } else {
+                    $state.go('sessiondetail');
+                 }
                 } else {
                   /*Alles bleibt so wie es ist!*/
                 }

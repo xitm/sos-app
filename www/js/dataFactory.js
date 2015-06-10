@@ -750,7 +750,7 @@ angular.module('starter.services', [])
     Session.prototype.getArbeitById=function(id){
         var _arbeiten = this.getArbeiten();
         for(var i=0,anz=_arbeiten.length;i<anz;i++){
-            var _fa = _arbeiten[i];
+            var _ar = _arbeiten[i];
             if (_ar.getId()===id || _ar.getId===parseInt(id)) {
                 return _ar;
             }

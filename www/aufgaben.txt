@@ -5,3 +5,8 @@
 - FM: Fehlerbehandlung
 - Sessionmanager grafishe Überarbeitung
 - Klientsuchfeld - fullName!
+
+
+---------BUGFIXES----------
+-_ls.options bei Sessionbearbeitung
+- Enddatum bei Arbeit und Fahrtbearbeitung
