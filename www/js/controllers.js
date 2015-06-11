@@ -82,7 +82,7 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('LoginCtrl', function($scope, LoginService, $state) {
+.controller('LoginCtrl', function($scope, LoginService, $state, $ionicPopup) {
     $scope.init = function() {
       $scope.passcode = "";
     }
@@ -93,10 +93,11 @@ angular.module('starter.controllers', [])
             LoginService.loginUser($scope.passcode).success(function(data) {
                 $state.go('arbeitsoberflaeche')
             }).error(function(data) {
-              var alertPopup = alert({
+              var alertPopup = $ionicPopup.alert({
                   title: 'Login failed!',
-                  template: 'Please check your credentials!'
+                  template: 'Bitte den Pin überprüfen'
                 });
+              $scope.passcode = "";
             });
         }
       }
@@ -190,7 +191,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessiondetailCtrl', function($scope, TimeCalculatorService, $state, DataModel) {
+.controller('SessiondetailCtrl', function($scope, TimeCalculatorService, $state, DataModel, $ionicPopup) {
     $scope.activeSession = model.dataModel.getActiveSession(); //speichert aktive Session in den Scope
     $scope.fahrten = $scope.activeSession.toJson().fahrten; //speichert die Fahrten extra ab, für den ng-repeat
     $scope.arbeiten = $scope.activeSession.toJson().arbeiten;//speichert die Arbeiten extra ab, für den ng-repeat
@@ -309,7 +310,8 @@ angular.module('starter.controllers', [])
                     break;
                 }
             }
-            $scope.fahrten.splice(deleteIndex, 1); //aus der Ansicht im Fenster loeschen - Grund: JSON zu loeschen hat auf Model keine direkte Auswirkung! umgekehrt aktualisiert sich die Ansicht nicht sofort (erst bei neuem Laden), wenn aus dem Model etwas geloescht wird
+            $scope.fahrten.splice(deleteIndex, 1);  //aus der Ansicht im Fenster loeschen - Grund: JSON zu loeschen hat auf Model keine direkte Auswirkung!
+                                                    //umgekehrt aktualisiert sich die Ansicht nicht sofort (erst bei neuem Laden), wenn aus dem Model etwas geloescht wird
             model.dataModel.getActiveSession().getFahrten().splice(deleteIndex, 1);//aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
             //model.dataModel.getSessionById(sessionId).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
             DataModel.update(model.dataModel, true); //speichern //Geht noch nichT!!!!
@@ -330,8 +332,27 @@ angular.module('starter.controllers', [])
     }
     
     $scope.callSessionuebersicht = function(sessionId){
-        model.dataModel.getActiveSession().setActive(false);
-        $state.go('sessionuebersicht');
+        if (!(model.dataModel.getActiveSession().getFahrten()[0]) && !(model.dataModel.getActiveSession().getArbeiten()[0])) {
+            var confirmPopup = $ionicPopup.confirm({
+                title: "Keine Einheiten vorhanden",
+                template: "In dieser Session sind keine Arbeits -und Fahrteinheiten mehr vorhanden, bei OK wird diese Session gelöscht"
+            })
+            confirmPopup.then(function(res) {
+                    if(res) {
+                        var id= model.dataModel.getActiveSession().toJson().id; //SessionId
+                        model.dataModel.getSessionList().splice(id, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
+                        model.dataModel.getSessionById(id).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
+                        DataModel.update(model.dataModel, true); //speichern
+                        $state.go('sessionuebersicht');
+                    } else {
+                      /*Alles bleibt so wie es ist!*/
+                    }
+                });
+        } else {
+            model.dataModel.getActiveSession().setActive(false);
+            $state.go('sessionuebersicht');
+        }
+        
     }
     
     $scope.callSessionbearbeitungFahrt = function(fahrtId){
