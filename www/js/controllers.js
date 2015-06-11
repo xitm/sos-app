@@ -473,33 +473,37 @@ angular.module('starter.controllers', [])
                                 + ' (' + gesamtkilometer + ' Kilometer, ' + dauer.hours + "h " + dauer.minutes+ "min)" 
                 });
                 confirmPopup.then(function(res) {
-                if(res) {
-                    /*fahrtssession freigeben und in sessionmanager wechseln*/
-                    model.letzteFahrt = document.getElementById('endort').value;
-                    
-                    //Routinen, um Aenderungen zu speichern
-                    var _ls = document.getElementById('leistung');
-                    $scope.activeFahrtObj.setDatum(new Date(document.getElementById('datum').value));
-                    $scope.activeFahrtObj.setAnfangszeit(document.getElementById('timeA').value);
-                    $scope.activeFahrtObj.setEndzeit(document.getElementById('timeE').value);
-                    $scope.activeFahrtObj.setAnfangskilometer(document.getElementById('kanfang').value);
-                    $scope.activeFahrtObj.setEndkilometer(document.getElementById('kmende').value);
-                    $scope.activeFahrtObj.setAnfangsort(document.getElementById('anfangsort').value);
-                    $scope.activeFahrtObj.setEndort(document.getElementById('endort').value)
-                    $scope.activeFahrtObj.setLeistungsId(_ls.options[_ls.selectedIndex].getAttribute('data-leistung-id'));
-                    DataModel.update(model.dataModel, true);
-                    DataModel.update(model.dataModel, true); //model im localstorage aktualisieren
-                    $scope.activeFahrtObj.setActive(false);
-                    $state.go('sessiondetail');
-                } else {
-                  /*Alles bleibt so wie es ist!*/
-                }
-            });
+                    if(res) {
+                        /*fahrtssession freigeben und in sessionmanager wechseln*/
+                        model.letzteFahrt = document.getElementById('endort').value;
+                        
+                        //Routinen, um Aenderungen zu speichern
+                        var _ls = document.getElementById('leistung');
+                        $scope.activeFahrtObj.setDatum(new Date(document.getElementById('datum').value));
+                        $scope.activeFahrtObj.setAnfangszeit(document.getElementById('timeA').value);
+                        $scope.activeFahrtObj.setEndzeit(document.getElementById('timeE').value);
+                        $scope.activeFahrtObj.setAnfangskilometer(document.getElementById('kanfang').value);
+                        $scope.activeFahrtObj.setEndkilometer(document.getElementById('kmende').value);
+                        $scope.activeFahrtObj.setAnfangsort(document.getElementById('anfangsort').value);
+                        $scope.activeFahrtObj.setEndort(document.getElementById('endort').value)
+                        $scope.activeFahrtObj.setLeistungsId(_ls.options[_ls.selectedIndex].getAttribute('data-leistung-id'));
+                        model.dataModel.getMitarbeiter().setLetzteStandort(document.getElementById('endort').value);
+                        model.dataModel.getMitarbeiter().setLetzteKilometer(document.getElementById('kmende').value);
+                        DataModel.update(model.dataModel, true);
+                        DataModel.update(model.dataModel, true); //model im localstorage aktualisieren
+                        $scope.activeFahrtObj.setActive(false);
+                        $state.go('sessiondetail');
+                    } else {
+                      /*Alles bleibt so wie es ist!*/
+                    }
+                });
+            } else {
+                //Passiert hier was?
+            }
         } else {
             $scope.activeFahrtObj.setActive(false);
             $state.go('sessiondetail');
         }
-    }
     }
 })
 
@@ -596,6 +600,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('FahrtenmanagerCtrl', function($scope, DataModel, Fahrt, $state, $ionicPopup, FormvalidationService, TimeCalculatorService, $stateParams) {
+    
     $scope.callSessionmanager = function() {
         $state.go('sessionmanager')
     }
@@ -613,8 +618,11 @@ angular.module('starter.controllers', [])
     //Datum eintragen
     $scope.datum = new Date(currentsession.getDatum());
     //Anfangsort eintragen
-    if (model.dataModel.getMitarbeiter().getLetzteFahrt()) {
-        document.getElementById('anfangsort').value = model.dataModel.getMitarbeiter().getLetzteFahrt();
+    if (model.dataModel.getMitarbeiter().getLetzteStandort()) {
+        document.getElementById('anfangsort').value = model.dataModel.getMitarbeiter().getLetzteStandort();
+    }
+    if (model.dataModel.getMitarbeiter().getLetzteKilometer()) {
+        $scope.kanfang = parseInt(model.dataModel.getMitarbeiter().getLetzteKilometer());
     }
     
     
@@ -684,7 +692,6 @@ angular.module('starter.controllers', [])
             confirmPopup.then(function(res) {
                 if(res) {
                   /*fahrtssession freigeben und in sessionmanager wechseln*/
-                  model.letzteFahrt = document.getElementById('endort').value;
                   
                   var fahrt = new Fahrt.create({
                         id: fahrtId,
@@ -693,13 +700,16 @@ angular.module('starter.controllers', [])
                         endzeit: endzeit,
                         anfangskilometer: document.getElementById('kanfang').value,
                         endkilometer: document.getElementById('kmende').value,
-                        anfangsort: endort,
-                        endort:  anfangsort,
+                        anfangsort: anfangsort,
+                        endort: endort,
                         leistungsId: leisId
                     })
+                  
                   currentsession.addFahrt(fahrt); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
+                  
+                 model.dataModel.getMitarbeiter().setLetzteStandort(endort);
+                 model.dataModel.getMitarbeiter().setLetzteKilometer(document.getElementById('kmende').value);
                  DataModel.update(model.dataModel, true); //model im localstorage aktualisieren
-                 
                  //Routine zu prüfen ob Sessionmanager oder Sessiondetail
                  
                  console.log($stateParams)

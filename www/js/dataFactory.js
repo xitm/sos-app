@@ -406,7 +406,7 @@ angular.module('starter.services', [])
 //----------- 2. - Mitarbeiter_Class_Definition------//
 .factory('Mitarbeiter', function(Session){
     
-    function Mitarbeiter(id, vorname, nachname, adresse, kfz, letzteFahrt){
+    function Mitarbeiter(id, vorname, nachname, adresse, kfz, letzteKilometer, letzteStandort){
         var ERR_MSG ={
             TYPE_ERR_VN : "Typenfehler: string für Vornamen erwartet!",
             TYPE_ERR_NN : "Typenfehler: string für Nachnamen erwartet!",
@@ -419,6 +419,8 @@ angular.module('starter.services', [])
         var _adresse = undefined;
         var _standKfz = undefined;
         var _sessions = new Array();
+        var _letzteKilometer=undefined;
+        var _letzteStandort=undefined;
         
         //2.1 personId_definitionen
         this.setId = function(id) {
@@ -478,11 +480,18 @@ angular.module('starter.services', [])
         }
         
         //2.7 letzteFahrt_definitionen
-        this.setLetzteFahrt = function(letzteFahrt) {
-            _letzteFahrt = letzteFahrt;
+        this.setLetzteKilometer = function(letzteKilometer) {
+            _letzteKilometer = letzteKilometer;
         }
-        this.getLetzteFahrt = function() {
-            return _letzteFahrt;
+        this.getLetzteKilometer = function() {
+            return _letzteKilometer;
+        }
+        
+        this.setLetzteStandort = function(letzteStandort) {
+            _letzteStandort = letzteStandort;
+        }
+        this.getLetzteStandort = function() {
+            return _letzteStandort;
         }
         
         this.setId(id);
@@ -490,7 +499,8 @@ angular.module('starter.services', [])
         this.setNachname(nachname);
         this.setAdresse(adresse);
         this.setStandKfz(kfz);
-        this.setLetzteFahrt(letzteFahrt);
+        this.setLetzteKilometer(letzteKilometer);
+        this.setLetzteStandort(letzteStandort);
     }
     
     Mitarbeiter.prototype.toJson = function(){
@@ -507,7 +517,9 @@ angular.module('starter.services', [])
             nachname : this.getNachname(),
             adresse : this.getAdresse(),
             kfz : this.getStandKfz(),
-            sessions : _sesRes
+            sessions : _sesRes,
+            letzteKilometer: this.getLetzteKilometer(),
+            letzteStandort: this.getLetzteStandort()
         }
     }
     
@@ -516,7 +528,7 @@ angular.module('starter.services', [])
         //Methoden zur Aufbereitung des JSON-Strings
         var _sessions = JSONstructure.sessions; //sessions werden gesondert ausgewiesen
         //Ausgabe des fertigen Mitarbeiters
-        var ma = new Mitarbeiter(JSONstructure.id, JSONstructure.vorname, JSONstructure.nachname, JSONstructure.adresse, JSONstructure.kfz, JSONstructure.letzteFahrt);
+        var ma = new Mitarbeiter(JSONstructure.id, JSONstructure.vorname, JSONstructure.nachname, JSONstructure.adresse, JSONstructure.kfz, JSONstructure.letzteKilometer, JSONstructure.letzteStandort);
         //zusätzliche Sessions usw adden!
         for(var i = 0, anz=_sessions.length; i<anz; i++){
             var ses = new Session.create(_sessions[i]);
@@ -832,7 +844,6 @@ angular.module('starter.services', [])
         var _anfangsort = undefined;
         var _endort = undefined;
         var _leistungsId = undefined;
-        var _letzteFahrt = undefined;
         var _active = false;
         
         //6.1 fahrtId_definition
