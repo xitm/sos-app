@@ -39,7 +39,7 @@
     </div>
     
     <ion-list show-delete="data.showArbeit" ng-click="checkDelete('hideArbeit', $event)" style="background-color: rgba(204,58,8, 0.2)">
-        <ion-item class="item-divider">
+        <ion-item class="item-divider" style="background-color: rgba(61,150,25,0.2)">
         Arbeitseinheiten
         </ion-item>
         
@@ -55,15 +55,17 @@
           <ion-delete-button class="ion-minus-circled" ng-click="onItemDelete({{arbeit.id}}, 'arbeit')"> </ion-delete-button>
         </ion-item>
 
-          <div class="button-bar bar-light">
+          <div class="button-bar">
             <a class="button icon-right ion-minus-circled" ng-click="checkDelete('arbeit', $event);">Entfernen</a>
             <a class="button icon-right ion-chevron-right " ng-click="callArbeitsmanager()">Hinzufügen</a>
           </div>
         
     </ion-list>
-
+    <div class="padding">
+      <!--Platzhalter-->
+    </div>
     <ion-list show-delete="data.showFahrt" ng-click="checkDelete('hideFahrt', $event)" style="background-color: rgba(204,58,8, 0.2)">
-        <ion-item class="item-divider">
+        <ion-item class="item-divider" style="background-color: rgba(204,58,8,0.2)">
         Fahrteinheiten
         </ion-item>
         
@@ -79,7 +81,7 @@
           <ion-delete-button class="ion-minus-circled" ng-click="onItemDelete({{fahrt.id}},'fahrt')"> </ion-delete-button>
         </ion-item>
 
-          <div class="button-bar bar-light">
+          <div class="button-bar">
             <a class="button icon-right ion-minus-circled " ng-click="checkDelete('fahrt', $event);">Entfernen</a>
             <a class="button icon-right ion-chevron-right " ng-click="callFahrtenmanager()">Hinzufügen</a>
           </div>

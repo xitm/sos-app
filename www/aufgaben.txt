@@ -8,5 +8,6 @@
 
 
 ---------BUGFIXES----------
--_ls.options bei Sessionbearbeitung
+-_ls.options bei Sessionbearbeitung (check?!)
 - Enddatum bei Arbeit und Fahrtbearbeitung
+- Wenn Aufgabe über mehrere Tage: Stundenberechnung
