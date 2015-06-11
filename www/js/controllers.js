@@ -1,9 +1,15 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, DataModel, Session, $state, $filter, $ionicPopup) {
+.controller('DashCtrl', function($scope, DataModel, Session, $state, $filter, $ionicPopup, $ionicPlatform) {
     $scope.clicked = false;
     model.dataModel = DataModel.create(); //Anpassung an neue Service-Gestaltung
     $scope.date = new Date();
+    
+    //$ionicPlatform.onHardwareBackButton(function() {
+    // event.preventDefault();
+    // event.stopPropagation();
+    // console.log('going back now yall');
+    //});
     
     $scope.callSessionmanager = function() {
         //clients für Auswahllisten
@@ -179,7 +185,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessionuebersichtCtrl', function($scope, $state) {
+.controller('SessionuebersichtCtrl', function($scope, $state, $ionicPopup, DataModel) {
 
     
     $scope.callSessiondetail=function(sessionId){
@@ -188,6 +194,43 @@ angular.module('starter.controllers', [])
     }
     $scope.callArbeitsoberflaeche = function() {
         $state.go('arbeitsoberflaeche');
+    }
+    
+    $scope.updateDatabase = function() {
+        //Anzahl der Session
+        var sessions = model.dataModel.getMitarbeiter().getSessions();
+        var sessionCount = 0
+        for (var i=0, anz=sessions.length; i<anz;i++) {
+            if (sessions[i].getDeleted()===false) {
+                sessionCount++;
+            }
+        }
+        
+        
+        //popup  vor hochladen
+        var confirmPopup = $ionicPopup.confirm({
+            title: "Sessions Hochladen",
+            template: sessionCount + " Session werden hochgeladen. Bitte um Bestätigung"
+        });
+        confirmPopup.then(function(res) {
+            if (res) {
+                //Session hochladen
+                
+                //Sessions aus model löschen
+                //noch überlegen wie man das mit deleted macht
+                //localstorage reinigen!
+                for (var i=0; i<sessionCount;i++) {
+                    if (sessions[i].getDeleted()===false) {
+                        var id= model.dataModel.getMitarbeiter().toJson().sessions[i].id; //SessionId
+                        model.dataModel.getSessionList().splice(id, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
+                        //model.dataModel.getSessionById(id).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
+                        DataModel.update(model.dataModel, true); //speichern
+                    }
+                }
+            }else {
+                //nichts machen
+            }
+        });
     }
 })
 
