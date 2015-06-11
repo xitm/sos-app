@@ -26,7 +26,7 @@
                 <div class="input-label" >
                   <span >Leistung</span>
                 </div>
-                <select id='leistungSelect' data-id=0>
+                <select id='leistung' data-id=0>
                     <option ng-repeat='leistung in leistungen' ng-selected="{{selected.value}}" data-leistung-id="{{leistung.id}}">{{leistung.name}}</option>
                 </select>
             </label>
@@ -47,7 +47,7 @@
             <div class="col">
                 <label class="item item-input" id="styledatum">
                     <span>Anfangsdatum</span>
-                    <input class="textbox-n" type="date" id="inputDate" ng-model="activeArbeit.date" style="text-align: right"/>
+                    <input class="textbox-n" type="date" id="datum" ng-model="activeArbeit.date" style="text-align: right"/>
                 </label>
             </div>
         </div>

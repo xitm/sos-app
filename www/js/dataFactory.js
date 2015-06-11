@@ -757,6 +757,15 @@ angular.module('starter.services', [])
         }
     }
     
+    //Session.prototype.deleteFahrtById(id){
+    //    var _fa = this.getFahrtById(id);
+    //    
+    //}
+    //
+    //Session.prototype.deleteArbeitById=function(id){
+    //    var _ar = 
+    //}
+    
     Session.prototype.toJson = function(){
         var _arbeiten = this.getArbeiten(); //arbeiten werden ausgelesen
         var _arRes = []; //leerer Arbeitenarray

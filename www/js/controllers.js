@@ -291,7 +291,9 @@ angular.module('starter.controllers', [])
                     break;
                 }
             }
-            $scope.arbeiten.splice(deleteIndex, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
+            
+            $scope.arbeiten.splice(deleteIndex,1); //aus der Ansicht im Fenster loeschen - Grund: JSON zu loeschen hat auf Model keine direkte Auswirkung! umgekehrt aktualisiert sich die Ansicht nicht sofort (erst bei neuem Laden), wenn aus dem Model etwas geloescht wird
+            model.dataModel.getActiveSession().getArbeiten().splice(deleteIndex, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
             //model.dataModel.getSessionById(sessionId).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
             DataModel.update(model.dataModel, true); //speichern//Geht noch nichT!!!!
             
@@ -307,7 +309,8 @@ angular.module('starter.controllers', [])
                     break;
                 }
             }
-            $scope.fahrten.splice(deleteIndex, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
+            $scope.fahrten.splice(deleteIndex, 1); //aus der Ansicht im Fenster loeschen - Grund: JSON zu loeschen hat auf Model keine direkte Auswirkung! umgekehrt aktualisiert sich die Ansicht nicht sofort (erst bei neuem Laden), wenn aus dem Model etwas geloescht wird
+            model.dataModel.getActiveSession().getFahrten().splice(deleteIndex, 1);//aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
             //model.dataModel.getSessionById(sessionId).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
             DataModel.update(model.dataModel, true); //speichern //Geht noch nichT!!!!
             
@@ -342,7 +345,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('ArbeitCtrl', function($scope, DataModel, $state) {
+.controller('ArbeitCtrl', function($scope, DataModel, $state, $ionicPopup, FormvalidationService, TimeCalculatorService) {
     $scope.activeArbeitObj = model.dataModel.getActiveArbeit(model.dataModel.getActiveSession());//aktive Arbeit der aktiven Session
     $scope.activeArbeit = $scope.activeArbeitObj.toJson();//aktive Arbeit der aktiven Session als JSON-Notation
     $scope.uhranfang = $scope.activeArbeit.anfangszeit;
@@ -364,29 +367,55 @@ angular.module('starter.controllers', [])
         if (saveChanges===true) {
             //Routinen, um die einzelen Änderungen zu erfassen!
             //Leistung
-            var _ls = document.getElementById('leistungSelect');
+            var _ls = document.getElementById('leistung');
             var _lsId = _ls.options[_ls.selectedIndex].getAttribute('data-leistung-id');
             //Datum
-            var _date = new Date(document.getElementById('inputDate').value);
+            var _date = new Date(document.getElementById('datum').value);
             //Zeiten
             var _timeA = document.getElementById('timeA').value;//Anfangszeit
             var _timeE = document.getElementById('timeE').value;//Endzeit
             
-            //routinen, um Model zu aktualisieren
-            var _aktArb = $scope.activeArbeitObj;
-            _aktArb.setLeistungsId(_lsId);
-            _aktArb.setDatum(_date);
-            _aktArb.setAnfangszeit(_timeA);
-            _aktArb.setEndzeit(_timeE);
-            DataModel.update(model.dataModel, true);
-        }
+            var currentsession = model.dataModel.getActiveSession(); //active Session speichern
+            
+            var passt = FormvalidationService.validateArbeit(true);
         
-        $scope.activeArbeitObj.setActive(false);
-        $state.go('sessiondetail');
+            //Testvariable abfragen
+            if (passt) {
+                var dauer = TimeCalculatorService.time(_timeA, _timeE);
+                console.log(dauer);
+                var confirmPopup = $ionicPopup.confirm({
+                    title: 'Arbeitszeit ändern',
+                    template: 'Folgende Arbeitsdaten werden erfasst: <br/>'
+                            + _ls.options[_ls.selectedIndex].text + " am " + _date
+                            + ' von ' + _timeA +  '  bis '  + _timeE
+                            + ' (' + dauer.hours + 'h ' + dauer.minutes+ 'min)' 
+                });
+                confirmPopup.then(function(res) {
+                    if(res) {
+                        //setzer der neuen Eigenschaften
+                        var _aktArb = $scope.activeArbeitObj;
+                        _aktArb.setLeistungsId(_lsId);
+                        _aktArb.setDatum(_date);
+                        _aktArb.setAnfangszeit(_timeA);
+                        _aktArb.setEndzeit(_timeE);
+
+                        DataModel.update(model.dataModel, true);//model im local storage aktualisieren
+                    } else {
+                      
+                      /*Alles bleibt so wie es ist!*/
+                    }
+                });
+            } else {
+                /*Alles bleibt so wie es ist!*/
+            };
+        } else {
+            $scope.activeArbeitObj.setActive(false);//aktive Arbeit abwählen
+            $state.go('sessiondetail'); //zum Sessiondetail navigieren
+        }
     }
 })
  
-.controller('FahrtCtrl', function($scope, DataModel, $state) {
+.controller('FahrtCtrl', function($scope, DataModel, $state, $ionicPopup, FormvalidationService, TimeCalculatorService) {
     $scope.activeFahrtObj = model.dataModel.getActiveFahrt(model.dataModel.getActiveSession());//aktive Arbeit der aktiven Session
     $scope.activeFahrt = $scope.activeFahrtObj.toJson();//aktive Arbeit der aktiven Session als JSON-Notation
     $scope.activeFahrt.date = new Date($scope.activeFahrtObj.getDatum());
@@ -410,22 +439,46 @@ angular.module('starter.controllers', [])
     
     $scope.callSessiondetail = function(save) {//aufteilen, damit nicht 2 idente funktionen erstellt werden muessen
         if (save===true) {//dies wird nur durchlaufen, wenn true mitgegeben wurde - also wenn gespeichert wird (OK-Button)!
-            //Routinen, um Aenderungen zu speichern
-            var _ls = document.getElementById('leistungSelect');
-            $scope.activeFahrtObj.setDatum(new Date(document.getElementById('inDate').value));
-            $scope.activeFahrtObj.setAnfangszeit(document.getElementById('inAnfangszeit').value);
-            $scope.activeFahrtObj.setEndzeit(document.getElementById('inEndzeit').value);
-            $scope.activeFahrtObj.setAnfangskilometer(document.getElementById('inAnfangskilometer').value);
-            $scope.activeFahrtObj.setEndkilometer(document.getElementById('inEndkilometer').value);
-            $scope.activeFahrtObj.setAnfangsort(document.getElementById('inAnfangsort').value);
-            $scope.activeFahrtObj.setEndort(document.getElementById('inEndort').value)
-            $scope.activeFahrtObj.setLeistungsId(_ls.options[_ls.selectedIndex].getAttribute('data-leistung-id'));
-            DataModel.update(model.dataModel, true);
+            var passt = FormvalidationService.validateFahrt(true);
+            if (passt) {
+                var _ls = document.getElementById('leistung');
+                var gesamtkilometer = document.getElementById('kmende').value - document.getElementById('kanfang').value;
+                var dauer = TimeCalculatorService.time(document.getElementById('timeA').value, document.getElementById('timeE').value);
+                var confirmPopup = $ionicPopup.confirm({
+                    title: 'Fahrtzeit hinzufügen',
+                    template: 'Folgende Fahrtzeiten werden erfasst: <br />' 
+                                + _ls.options[_ls.selectedIndex].text + " von " + document.getElementById('anfangsort').value + " bis " + document.getElementById('endort').value
+                                + ' am ' + document.getElementById('datum').value + ' von ' + document.getElementById('timeA').value +  ' bis '  + document.getElementById('timeE').value
+                                + ' (' + gesamtkilometer + ' Kilometer, ' + dauer.hours + "h " + dauer.minutes+ "min)" 
+                });
+                confirmPopup.then(function(res) {
+                if(res) {
+                    /*fahrtssession freigeben und in sessionmanager wechseln*/
+                    model.letzteFahrt = document.getElementById('endort').value;
+                    
+                    //Routinen, um Aenderungen zu speichern
+                    var _ls = document.getElementById('leistung');
+                    $scope.activeFahrtObj.setDatum(new Date(document.getElementById('datum').value));
+                    $scope.activeFahrtObj.setAnfangszeit(document.getElementById('timeA').value);
+                    $scope.activeFahrtObj.setEndzeit(document.getElementById('timeE').value);
+                    $scope.activeFahrtObj.setAnfangskilometer(document.getElementById('kanfang').value);
+                    $scope.activeFahrtObj.setEndkilometer(document.getElementById('kmende').value);
+                    $scope.activeFahrtObj.setAnfangsort(document.getElementById('anfangsort').value);
+                    $scope.activeFahrtObj.setEndort(document.getElementById('endort').value)
+                    $scope.activeFahrtObj.setLeistungsId(_ls.options[_ls.selectedIndex].getAttribute('data-leistung-id'));
+                    DataModel.update(model.dataModel, true);
+                    DataModel.update(model.dataModel, true); //model im localstorage aktualisieren
+                    $scope.activeFahrtObj.setActive(false);
+                    $state.go('sessiondetail');
+                } else {
+                  /*Alles bleibt so wie es ist!*/
+                }
+            });
+        } else {
+            $scope.activeFahrtObj.setActive(false);
+            $state.go('sessiondetail');
         }
-
-        //model.dataModel.getActiveFahrt(model.dataModel.getActiveSession()).setActive(false); //aktive Session abwaehlen
-        $scope.activeFahrtObj.setActive(false);
-        $state.go('sessiondetail');
+    }
     }
 })
 
