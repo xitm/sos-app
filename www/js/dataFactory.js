@@ -52,7 +52,7 @@ angular.module('starter.services', [])
         document.getElementById('beschriftung').style.backgroundColor =  "rgb(255,255,255)"
         if (leistung.options[leistung.selectedIndex].text == "") {
             document.getElementById('beschriftung').style.backgroundColor = "rgba(255,0,0,0.3)"
-            passt = false
+            passt = false;
         }
         
         //Testvariable zurückgeben
@@ -194,6 +194,10 @@ angular.module('starter.services', [])
             return _leistungen;
         }
         
+        this.resetLeistungen = function(){
+            _leistungen = [];
+        }
+        
         //1.3 client_definitionen
         this.addClient = function(client) {
             if (!(client instanceof Client)) {
@@ -203,6 +207,9 @@ angular.module('starter.services', [])
         }
         this.getClienten = function() {
             return _clienten;
+        }
+        this.resetClienten = function(){
+            _clienten = [];
         }
         
         //1.4 pin_definitionen
@@ -530,10 +537,15 @@ angular.module('starter.services', [])
         //Ausgabe des fertigen Mitarbeiters
         var ma = new Mitarbeiter(JSONstructure.id, JSONstructure.vorname, JSONstructure.nachname, JSONstructure.adresse, JSONstructure.kfz, JSONstructure.letzteKilometer, JSONstructure.letzteStandort);
         //zusätzliche Sessions usw adden!
-        for(var i = 0, anz=_sessions.length; i<anz; i++){
+        if (_sessions === undefined) {//vor allem beim Aufbauen des neuen Objektbaums bei Aktualisierung der Fall!
+            //nix machen
+        }else {
+            for(var i = 0, anz=_sessions.length; i<anz; i++){
             var ses = new Session.create(_sessions[i]);
             ma.addSession(ses);
         }
+        }
+
         return(
             ma
         )
@@ -768,15 +780,7 @@ angular.module('starter.services', [])
             }
         }
     }
-    
-    //Session.prototype.deleteFahrtById(id){
-    //    var _fa = this.getFahrtById(id);
-    //    
-    //}
-    //
-    //Session.prototype.deleteArbeitById=function(id){
-    //    var _ar = 
-    //}
+
     
     Session.prototype.toJson = function(){
         var _arbeiten = this.getArbeiten(); //arbeiten werden ausgelesen
@@ -1048,10 +1052,12 @@ angular.module('starter.services', [])
 })
 
 //Zusammenführen aller Model-Funktionen in einem Service
-.service('DataModel', function(BusinessObject){
-    this.create = function(){
-        return BusinessObject.create(JSON.parse(localStorage.getItem('mle_model2')));
+.service('DataModel', function(BusinessObject, $http, $q, Client, Leistung){
+    
+    this.create = function(JSONstring){
+        return BusinessObject.create(JSON.parse(JSONstring));
     };
+    
     this.update = function(objectBusinessObject, save){
         var res = objectBusinessObject.toJson();
         if (save) {
@@ -1059,4 +1065,89 @@ angular.module('starter.services', [])
         }
         return res;
     }
-})
+    
+    //synchonisiert alle relevanten Daten mit der Quelle, also dem Webservice
+    this.syncWithSource = function(objectBusinessObject){
+        var mainScope = this; //caching des aktuellen Kontexts fuer die spaetere Verwendung
+        return $q(function(resolve, reject){
+            //Optionen fuer die Abfrage von Clienten
+            var checkFinishClients = false;
+            var checkFinishLeistungen = false;
+            var checkFinishMitarbeiter = false;
+            
+            var _model = {
+                mitarbeiter : undefined,
+                leistungen : undefined,
+                clienten : undefined
+            };
+            var httpClientOptions = {
+                method: 'GET',
+                url: 'http://rest.learncode.academy/api/mciapp/testdata_clienten'
+            };
+            //Clienten werden abgefragt
+            $http(httpClientOptions).success(function(data){
+                _model.clienten = data;
+                checkFinishClients = true;
+            });
+            
+            //Optionen fuer die Abfrage von Leistungen
+            var httpLeistungsOptions = {
+                method: 'GET',
+                url: 'http://rest.learncode.academy/api/mciapp/testdata_leistungen'
+            };
+            //Leistungen werden abgefragt
+            $http(httpLeistungsOptions).success(function(data){
+                _model.leistungen = data;
+                checkFinishLeistungen = true;
+            });
+            
+            //Optionen fuer die Abfrage des Mitarbeiters
+            var httpMitarbeiterOptions = {
+                method : 'GET',
+                url : 'http://rest.learncode.academy/api/mciapp/testdata_mitarbeiter'
+            }
+            //Mitarbeiter wird abgefragt
+            $http(httpMitarbeiterOptions).success(function(data){
+                _model.mitarbeiter = data[0];
+                checkFinishMitarbeiter = true;
+            });
+            
+            var counter = 0;
+            var timeout = undefined;
+            function checkFinish(){
+                //nur wenn alle drei responses bereits ankamen!
+                if (checkFinishClients===true && checkFinishLeistungen===true && checkFinishMitarbeiter===true) {
+                    objectBusinessObject.resetClienten();
+                    //clienten aktualisieren und jeweils einzeln hinzufuegen
+                    for (var i=0,anz=_model.clienten.length;i<anz;i++) {
+                        var _cl = _model.clienten[i];
+                        objectBusinessObject.addClient(new Client.create(_cl));
+                    }
+                    
+                    objectBusinessObject.resetLeistungen();
+                    for (var i=0,anz=_model.leistungen.length;i<anz;i++) {
+                        var _ls = _model.leistungen[i];
+                        objectBusinessObject.addLeistung(new Leistung.create(_ls));
+                    }
+                    //einzelne Attribute vom Mitarbeiter aktualisieren, damit Sessions nicht gelöscht werden!
+                    objectBusinessObject.getMitarbeiter().setVorname(_model.mitarbeiter.vorname);
+                    objectBusinessObject.getMitarbeiter().setNachname(_model.mitarbeiter.nachname);
+                    objectBusinessObject.getMitarbeiter().setStandKfz(_model.mitarbeiter.kfz);
+                    //mainScope.create(JSON.stringify(_model));//wird gebraucht, da "this" hier den Kontext der function checkFinish waere und deshalb nicht die .create() aufrufen wuerde -> Versuch braechte "function of undefined"    
+                        
+                    resolve(objectBusinessObject);
+                }else{
+                    //wenn mehr als 5 Fehlversuche gezaehlt wurden, wird abgebrochen!
+                    if (counter > 5) {
+                        alert("keine Verbindung vorhanden!");
+                        reject();
+                    }else{
+                        counter += 1; //counter um 1 erhoehen
+                        timeout = setTimeout(checkFinish, 3000);//naechster versuch in x milisekunden!  
+                    }
+                }
+            }
+            checkFinish(); 
+        });
+    }
+});

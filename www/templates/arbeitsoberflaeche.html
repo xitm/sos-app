@@ -51,7 +51,7 @@
       <ion-list>
         <div class="list" ng-hide="clicked">
           <a ng-repeat="contact in contacts | filter:search" class="item" ng-if="search" data-id=null ng-model="change" ng-click="updateInput(contact)">
-            <h2>{{contact.vorname}} {{contact.nachname}}</h2>
+            <h2>{{contact.fullName}}</h2>
           </a>
         </div>
       </ion-list>

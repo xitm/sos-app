@@ -2,14 +2,13 @@ angular.module('starter.controllers', [])
 
 .controller('DashCtrl', function($scope, DataModel, Session, $state, $filter, $ionicPopup, $ionicPlatform) {
     $scope.clicked = false;
-    model.dataModel = DataModel.create(); //Anpassung an neue Service-Gestaltung
     $scope.date = new Date();
     
     //$ionicPlatform.onHardwareBackButton(function() {
     // event.preventDefault();
     // event.stopPropagation();
     // console.log('going back now yall');
-    //});
+    //);
     
     $scope.callSessionmanager = function() {
         //clients für Auswahllisten
@@ -73,9 +72,14 @@ angular.module('starter.controllers', [])
         $state.go('sessionuebersicht')
     }
     
+    $scope.contacts = model.dataModel.getClientList();
+    
+    for(var i=0,anz=$scope.contacts.length;i<anz;i++){
+        $scope.contacts[i].fullName = $scope.contacts[i].vorname + " " + $scope.contacts[i].nachname;
+    }
+    
     $scope.searchContacts = function(query) {
         $scope.clicked = false
-        $scope.contacts = model.dataModel.getClientList();
         $scope.queryData = $filter('filter')($scope.contacts, query);
     }
     
@@ -88,7 +92,23 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('LoginCtrl', function($scope, LoginService, $state, $ionicPopup) {
+.controller('LoginCtrl', function($scope, LoginService, DataModel, $http, $state, $ionicPopup) {
+        model.dataModel = DataModel.create(localStorage.getItem("mle_model2")); //Anpassung an neue Service-Gestaltung
+        //console.log(model.dataModel.toJson());
+        model.dataModel = DataModel.syncWithSource(model.dataModel);
+        model.dataModel.then(function(data){
+            model.dataModel = data;
+            console.log(model.dataModel.toJson());
+            },
+            function(error){console.log(error);
+            });
+        //model.dataModel = DataModel.syncWithSource();
+    if (true) {
+        //Update der zu aktualisierenden Daten
+
+    }else {
+        //Weiterleitung auf Registrierungsseite
+    }
     $scope.init = function() {
       $scope.passcode = "";
     }
@@ -248,7 +268,7 @@ angular.module('starter.controllers', [])
         }
     }
     
-    $scope.date = $scope.activeSession.toJson().datum;
+    $scope.date = ($scope.activeSession.toJson().datum);
     $scope.totalDiffTime = {hours : 0, minutes : 0};
     $scope.totalDiffRoute = 0;
     
@@ -272,7 +292,9 @@ angular.module('starter.controllers', [])
         _fa.differenz = TimeCalculatorService.time(_fa.anfangszeit, _fa.endzeit);
         
         addToTotalTime(_fa.differenz); //differenz dazuzaehlen
-        $scope.totalDiffRoute += parseFloat(_fa.endkilometer)-parseFloat(_fa.anfangskilometer); //zur gesamten Streckendifferenz dazuzaehlen
+        _fa.diffRoute = parseFloat(_fa.endkilometer)-parseFloat(_fa.anfangskilometer);
+        //$scope.totalDiffRoute += parseFloat(_fa.endkilometer)-parseFloat(_fa.anfangskilometer); //zur gesamten Streckendifferenz dazuzaehlen
+        $scope.totalDiffRoute += _fa.diffRoute;
         _fa.differenz = _fa.differenz.hours + " Stunden " + _fa.differenz.minutes + " Minuten"; //ausgabe zurechtschneiden
     }
     
@@ -282,7 +304,7 @@ angular.module('starter.controllers', [])
         addToTotalTime(_ar.differenz); //zur gesamten Dauer hinzufuegen
         _ar.differenz = _ar.differenz.hours + " Stunden " + _ar.differenz.minutes + " Minuten"; //ausgabe zurechtstueckeln
         
-        var leistungsId= parseInt(_ar.leistungsId);
+        var leistungsId= _ar.leistungsId;
         $scope.arbeiten[i].leistung=model.dataModel.getLeistungById(leistungsId).getName();
     }
     
@@ -464,6 +486,7 @@ angular.module('starter.controllers', [])
                         _aktArb.setEndzeit(_timeE);
 
                         DataModel.update(model.dataModel, true);//model im local storage aktualisieren
+                        $state.go('sessiondetail');
                     } else {
                       
                       /*Alles bleibt so wie es ist!*/
@@ -783,7 +806,7 @@ angular.module('starter.controllers', [])
     //datum auf angemessenes format zuschneiden
     for(var i=0,anz=$scope.sessions.length;i<anz;i++){
         var _ses = $scope.sessions[i];
-        _ses.date = _ses.datum.substr(0,10);
+        _ses.date = _ses.datum;
     }
     
     $scope.onItemDelete = function(sessionId) {
