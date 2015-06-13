@@ -4,8 +4,8 @@ angular.module('starter.services', [])
         loginUser: function(pw) {
             var deferred = $q.defer();
             var promise = deferred.promise;
- 
-            if ( pw == '1234') {
+            var _pin = model.dataModel.getPin();
+            if ( pw == _pin) {
                 deferred.resolve('Welcome ' + ' Alex' + '!');
             } else {
                 deferred.reject('Wrong credentials.');
@@ -1149,5 +1149,24 @@ angular.module('starter.services', [])
             }
             checkFinish(); 
         });
+    }
+    
+    this.uploadData = function(objectBusinessObject){
+        var _sessions = objectBusinessObject.getMitarbeiter().getSessions();
+        //console.log(_sessions);
+        for(var i=0,anz=_sessions.length;i<anz;i++){
+            var _ses = _sessions[0];
+            console.log(_ses.toJson());
+            var uploadOptions = {
+                method : 'POST',
+                url : 'http://rest.learncode.academy/api/mciapp/testdata_sessionsTest',
+                data : _ses.toJson()
+            }
+            _sessions.splice(0,1);
+            $http(uploadOptions).success(function(data){
+                console.log(data);
+            })
+        }
+        this.update(model.dataModel, true);
     }
 });

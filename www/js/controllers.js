@@ -206,8 +206,6 @@ angular.module('starter.controllers', [])
 })
 
 .controller('SessionuebersichtCtrl', function($scope, $state, $ionicPopup, DataModel) {
-
-    
     $scope.callSessiondetail=function(sessionId){
         model.dataModel.getSessionById(sessionId).setActive(true);
         $state.go('sessiondetail');
@@ -235,18 +233,8 @@ angular.module('starter.controllers', [])
         confirmPopup.then(function(res) {
             if (res) {
                 //Session hochladen
-                
-                //Sessions aus model löschen
-                //noch überlegen wie man das mit deleted macht
-                //localstorage reinigen!
-                for (var i=0; i<sessionCount;i++) {
-                    if (sessions[i].getDeleted()===false) {
-                        var id= model.dataModel.getMitarbeiter().toJson().sessions[i].id; //SessionId
-                        model.dataModel.getSessionList().splice(id, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
-                        //model.dataModel.getSessionById(id).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
-                        DataModel.update(model.dataModel, true); //speichern
-                    }
-                }
+                DataModel.uploadData(model.dataModel);
+                $state.go('arbeitsoberflaeche');
             }else {
                 //nichts machen
             }
@@ -268,7 +256,7 @@ angular.module('starter.controllers', [])
         }
     }
     
-    $scope.date = ($scope.activeSession.toJson().datum);
+    $scope.date = ($scope.activeSession.toJson().datum).substr(0,10);
     $scope.totalDiffTime = {hours : 0, minutes : 0};
     $scope.totalDiffRoute = 0;
     
@@ -376,10 +364,9 @@ angular.module('starter.controllers', [])
                 }
             }
             $scope.fahrten.splice(deleteIndex, 1);  //aus der Ansicht im Fenster loeschen - Grund: JSON zu loeschen hat auf Model keine direkte Auswirkung!
-                                                    //umgekehrt aktualisiert sich die Ansicht nicht sofort (erst bei neuem Laden), wenn aus dem Model etwas geloescht wird
             model.dataModel.getActiveSession().getFahrten().splice(deleteIndex, 1);//aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
             //model.dataModel.getSessionById(sessionId).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
-            DataModel.update(model.dataModel, true); //speichern //Geht noch nichT!!!!
+            DataModel.update(model.dataModel, true); //speichern
             
             if (!($scope.fahrten[0])) {
                 $scope.emptytrip=true;
@@ -629,8 +616,8 @@ angular.module('starter.controllers', [])
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Arbeitszeit hinzufügen',
                 template: 'Folgende Arbeitsdaten werden erfasst: <br/>'
-                        + leis.options[leis.selectedIndex].text + " am " + document.getElementById("datum").value 
-                        + ' von ' + start +  '  bis '  + ende
+                        + leis.options[leis.selectedIndex].text + ", am " + document.getElementById("datum").value 
+                        + '<br /> von ' + start +  '  bis '  + ende
                         + ' (' + stunden + 'h ' + minuten + 'min)'  //Arbeitsdaten!!! Geht das noch schöner?
                         
             });
@@ -751,9 +738,9 @@ angular.module('starter.controllers', [])
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Fahrtzeit hinzufügen',
                 template: 'Folgende Fahrtzeiten werden erfasst: <br />' 
-                            + leis.options[leistung.selectedIndex].text + " von " + anfangsort + " bis " + endort
-                            + ' am ' + datum + ' von ' + anfangszeit +  ' bis '  + endzeit
-                            + ' (' + gesamtkilometer + ' Kilometer, ' + stunden + "h " + minuten + "min)" 
+                            + leis.options[leistung.selectedIndex].text + ", von " + anfangsort + " bis " + endort
+                            + '<br />am ' + datum + ' von ' + anfangszeit +  ' bis '  + endzeit
+                            + '<br />(' + gesamtkilometer + ' Kilometer, ' + stunden + "h " + minuten + "min)" 
             });
             confirmPopup.then(function(res) {
                 if(res) {
@@ -806,7 +793,7 @@ angular.module('starter.controllers', [])
     //datum auf angemessenes format zuschneiden
     for(var i=0,anz=$scope.sessions.length;i<anz;i++){
         var _ses = $scope.sessions[i];
-        _ses.date = _ses.datum;
+        _ses.date = (_ses.datum).substr(0,10);
     }
     
     $scope.onItemDelete = function(sessionId) {
