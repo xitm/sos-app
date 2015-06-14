@@ -76,7 +76,7 @@
         <ion-item  ng-repeat="fahrt in fahrten" item="item" ng-click="callSessionbearbeitungFahrt({{fahrt.id}})" class="item-icon-right item-remove-animate">
           
           <span class="input-label" style="width: 100%;"><b>{{ fahrt.anfangsort }} - {{fahrt.endort}}</b></span>
-          <span style="color: #aaa;">{{ fahrt.differenz}}</span>
+          <span style="color: #aaa;">{{ fahrt.differenz}}, {{fahrt.diffRoute}} km</span>
           <i class="icon icon-right ion-chevron-right"></i>
           <ion-delete-button class="ion-minus-circled" ng-click="onItemDelete({{fahrt.id}},'fahrt')"> </ion-delete-button>
         </ion-item>
