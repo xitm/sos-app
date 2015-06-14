@@ -1067,10 +1067,9 @@ angular.module('starter.services', [])
     }
     
     //synchonisiert alle relevanten Daten mit der Quelle, also dem Webservice
-    this.syncWithSource = function(objectBusinessObject){
+    this.syncWithSource = function(objectBusinessObject, FirstTimeCreate){//FirstTimeCreate, um die Funktion zu modifizieren, da sie den selben Funktionsumfang liefert!
         var mainScope = this; //caching des aktuellen Kontexts fuer die spaetere Verwendung
         return $q(function(resolve, reject){
-            //Optionen fuer die Abfrage von Clienten
             var checkFinishClients = false;
             var checkFinishLeistungen = false;
             var checkFinishMitarbeiter = false;
@@ -1080,6 +1079,8 @@ angular.module('starter.services', [])
                 leistungen : undefined,
                 clienten : undefined
             };
+            
+            //Optionen fuer die Abfrage von Clienten
             var httpClientOptions = {
                 method: 'GET',
                 url: 'http://rest.learncode.academy/api/mciapp/testdata_clienten'
@@ -1108,7 +1109,7 @@ angular.module('starter.services', [])
             }
             //Mitarbeiter wird abgefragt
             $http(httpMitarbeiterOptions).success(function(data){
-                _model.mitarbeiter = data[0];
+                _model.mitarbeiter = data[0];                   
                 checkFinishMitarbeiter = true;
             });
             
@@ -1117,29 +1118,34 @@ angular.module('starter.services', [])
             function checkFinish(){
                 //nur wenn alle drei responses bereits ankamen!
                 if (checkFinishClients===true && checkFinishLeistungen===true && checkFinishMitarbeiter===true) {
-                    objectBusinessObject.resetClienten();
-                    //clienten aktualisieren und jeweils einzeln hinzufuegen
-                    for (var i=0,anz=_model.clienten.length;i<anz;i++) {
-                        var _cl = _model.clienten[i];
-                        objectBusinessObject.addClient(new Client.create(_cl));
+                    if (FirstTimeCreate) {
+                        objectBusinessObject = mainScope.create(JSON.stringify(_model)); //nur fuer den laufenden Gebrauch, nicht wenn zum ersten Mal gestartet wird
+                    }
+                    else{
+                        //clienten aktualisieren und jeweils einzeln hinzufuegen
+                        for (var i=0,anz=_model.clienten.length;i<anz;i++) {
+                            var _cl = _model.clienten[i];
+                            objectBusinessObject.addClient(new Client.create(_cl));
+                        }
+                        
+                        objectBusinessObject.resetLeistungen();
+                        for (var i=0,anz=_model.leistungen.length;i<anz;i++) {
+                            var _ls = _model.leistungen[i];
+                            objectBusinessObject.addLeistung(new Leistung.create(_ls));
+                        }
+                        
+                        //einzelne Attribute vom Mitarbeiter aktualisieren, damit Sessions nicht gelöscht werden!
+                        objectBusinessObject.getMitarbeiter().setVorname(_model.mitarbeiter.vorname);
+                        objectBusinessObject.getMitarbeiter().setNachname(_model.mitarbeiter.nachname);
+                        objectBusinessObject.getMitarbeiter().setStandKfz(_model.mitarbeiter.kfz);
+                        //mainScope.create(JSON.stringify(_model));//wird gebraucht, da "this" hier den Kontext der function checkFinish waere und deshalb nicht die .create() aufrufen wuerde -> Versuch braechte "function of undefined"    
                     }
                     
-                    objectBusinessObject.resetLeistungen();
-                    for (var i=0,anz=_model.leistungen.length;i<anz;i++) {
-                        var _ls = _model.leistungen[i];
-                        objectBusinessObject.addLeistung(new Leistung.create(_ls));
-                    }
-                    //einzelne Attribute vom Mitarbeiter aktualisieren, damit Sessions nicht gelöscht werden!
-                    objectBusinessObject.getMitarbeiter().setVorname(_model.mitarbeiter.vorname);
-                    objectBusinessObject.getMitarbeiter().setNachname(_model.mitarbeiter.nachname);
-                    objectBusinessObject.getMitarbeiter().setStandKfz(_model.mitarbeiter.kfz);
-                    //mainScope.create(JSON.stringify(_model));//wird gebraucht, da "this" hier den Kontext der function checkFinish waere und deshalb nicht die .create() aufrufen wuerde -> Versuch braechte "function of undefined"    
-                        
                     resolve(objectBusinessObject);
                 }else{
                     //wenn mehr als 5 Fehlversuche gezaehlt wurden, wird abgebrochen!
                     if (counter > 5) {
-                        alert("keine Verbindung vorhanden!");
+                        alert("keine Verbindung vorhanden!" + checkFinishClients + checkFinishLeistungen + CheckFinishMitarbeiter);
                         reject();
                     }else{
                         counter += 1; //counter um 1 erhoehen

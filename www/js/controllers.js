@@ -93,22 +93,22 @@ angular.module('starter.controllers', [])
 
 
 .controller('LoginCtrl', function($scope, LoginService, DataModel, $http, $state, $ionicPopup) {
-        model.dataModel = DataModel.create(localStorage.getItem("mle_model2")); //Anpassung an neue Service-Gestaltung
-        //console.log(model.dataModel.toJson());
-        model.dataModel = DataModel.syncWithSource(model.dataModel);
+        if (null===null) {
+            model.dataModel = DataModel.syncWithSource(model.dataModel, true)
+        }else{
+            model.dataModel = DataModel.create(localStorage.getItem("mle_model2")); //Anpassung an neue Service-Gestaltung
+            model.dataModel = DataModel.syncWithSource(model.dataModel);
+        }
+        
+        
         model.dataModel.then(function(data){
             model.dataModel = data;
-            console.log(model.dataModel.toJson());
+            DataModel.update(model.dataModel, true);
             },
             function(error){console.log(error);
             });
         //model.dataModel = DataModel.syncWithSource();
-    if (true) {
-        //Update der zu aktualisierenden Daten
 
-    }else {
-        //Weiterleitung auf Registrierungsseite
-    }
     $scope.init = function() {
       $scope.passcode = "";
     }
