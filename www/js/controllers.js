@@ -10,7 +10,7 @@ angular.module('starter.controllers', [])
     // console.log('going back now yall');
     //);
     
-    $scope.callSessionmanager = function() {
+    $scope.callSessiondetail = function() {
         //clients für Auswahllisten
         var clients = model.dataModel.getClienten();
         
@@ -43,8 +43,7 @@ angular.module('starter.controllers', [])
             return;
         }
         
-        //Sessionmanager aufrufen
-        $state.go('sessionmanager')
+        
         
         //SessionId vergeben
         if (!model.dataModel.getMitarbeiter().getSessions()){
@@ -67,6 +66,9 @@ angular.module('starter.controllers', [])
         
         //Session hinzufügen
         model.dataModel.getMitarbeiter().addSession(session)
+        
+        //Sessionmanager aufrufen
+        $state.go('sessiondetail')
     }
     $scope.callSessionuebersicht = function() {
         $state.go('sessionuebersicht')
@@ -123,7 +125,7 @@ angular.module('starter.controllers', [])
         $scope.passcode = $scope.passcode + value;
         if($scope.passcode.length == 4) {
             LoginService.loginUser($scope.passcode).success(function(data) {
-                $state.go('arbeitsoberflaeche')
+                $state.go('sessionuebersicht');
             }).error(function(data) {
               var alertPopup = $ionicPopup.alert({
                   title: 'Login failed!',
@@ -240,7 +242,7 @@ angular.module('starter.controllers', [])
             if (res) {
                 //Session hochladen
                 DataModel.uploadData(model.dataModel);
-                $state.go('arbeitsoberflaeche');
+                $state.reload();
             }else {
                 //nichts machen
             }

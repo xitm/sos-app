@@ -3,9 +3,9 @@
 <ion-view view-title="Sessionübersicht" ng-controller="ListCtrl">
   
   <ion-header-bar class="bar-positive">
-    <div class="buttons paddingtop">
+    <!--<div class="buttons paddingtop">
       <button class="button icon-left ion-chevron-left button-clear" ng-click="callArbeitsoberflaeche()"></button>
-    </div>
+    </div>-->
     <h1 class="title paddingtop">Sessionübersicht</h1>
     <div class="buttons paddingtop">
      <button class="button button-icon icon ion-minus-circled" ng-click="data.showDelete = !data.showDelete;"></button>
@@ -24,6 +24,11 @@
           <p>{{ session.date}}</p>
           <i class="icon icon-right ion-chevron-right"></i>
           <ion-delete-button class="ion-minus-circled" ng-click="onItemDelete({{session.id}})"> </ion-delete-button>
+        </ion-item>
+        
+        <ion-item class="item-icon-right item-remove-animate" ng-click="callArbeitsoberflaeche()">
+          Session hinzufügen
+          <i class="icon icon-right ion-chevron-right"></i>
         </ion-item>
         
       </ion-list>
