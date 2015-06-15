@@ -67,7 +67,7 @@ angular.module('starter.services', [])
             document.getElementById('kmende'), //Kilometer Ende
             document.getElementById('anfangsort'), //Standort Anfang
             document.getElementById('endort'), //Standort Ende
-            document.getElementById('datum'), //Datum 
+            document.getElementById('anfangsdatum'), //Datum 
             document.getElementById('timeA'), //Zeit Anfang
             document.getElementById('timeE'), //Zeit Ende
             

@@ -408,7 +408,7 @@ angular.module('starter.controllers', [])
             model.dataModel.getActiveSession().setActive(false);
             $ionicViewSwitcher.nextDirection('back')
             $state.go('sessionuebersicht');
-            model.dataModel.update(model.dataModel, true);
+            DataModel.update(model.dataModel, true);
         }
         
     }
