@@ -93,21 +93,27 @@ angular.module('starter.controllers', [])
 
 
 .controller('LoginCtrl', function($scope, LoginService, DataModel, $http, $state, $ionicPopup) {
-        if (null===null) {
-            model.dataModel = DataModel.syncWithSource(model.dataModel, true)
+        if (localStorage.getItem("mle_model2")===null) {
+            model.dataModel = DataModel.syncWithSource(model.dataModel, true);
+
         }else{
             model.dataModel = DataModel.create(localStorage.getItem("mle_model2")); //Anpassung an neue Service-Gestaltung
-            model.dataModel = DataModel.syncWithSource(model.dataModel);
+            model.dataModel = DataModel.syncWithSource(model.dataModel); //sync mit Webservice
         }
-        
         
         model.dataModel.then(function(data){
             model.dataModel = data;
             DataModel.update(model.dataModel, true);
             },
             function(error){console.log(error);
-            });
-        //model.dataModel = DataModel.syncWithSource();
+        });
+        
+        //model.dataModel.then(function(data){
+        //    model.dataModel = data;
+        //    DataModel.update(model.dataModel, true);
+        //    },
+        //    function(error){console.log(error);
+        //    });
 
     $scope.init = function() {
       $scope.passcode = "";
@@ -256,7 +262,7 @@ angular.module('starter.controllers', [])
         }
     }
     
-    $scope.date = ($scope.activeSession.toJson().datum).substr(0,10);
+    $scope.date = ($scope.activeSession.toJson().datum).toString().substring(0,10);
     $scope.totalDiffTime = {hours : 0, minutes : 0};
     $scope.totalDiffRoute = 0;
     
@@ -293,6 +299,8 @@ angular.module('starter.controllers', [])
         _ar.differenz = _ar.differenz.hours + " Stunden " + _ar.differenz.minutes + " Minuten"; //ausgabe zurechtstueckeln
         
         var leistungsId= _ar.leistungsId;
+        console.log(model.dataModel.getLeistungById(leistungsId));
+        console.log(leistungsId);
         $scope.arbeiten[i].leistung=model.dataModel.getLeistungById(leistungsId).getName();
     }
     
@@ -793,7 +801,7 @@ angular.module('starter.controllers', [])
     //datum auf angemessenes format zuschneiden
     for(var i=0,anz=$scope.sessions.length;i<anz;i++){
         var _ses = $scope.sessions[i];
-        _ses.date = (_ses.datum).substr(0,10);
+        _ses.date = (_ses.datum).toString().substring(0,10);
     }
     
     $scope.onItemDelete = function(sessionId) {
