@@ -71,18 +71,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       url: '/sessiondetail',
       templateUrl: 'templates/sessiondetail.html',
       controller: 'SessiondetailCtrl',
-  })
-    .state('sessionbearbeitungFahrt', {
-    url: '/sessionbearbeitungFahrt',
-    templateUrl: 'templates/sessionbearbeitungfahrt.html',
-    controller: 'FahrtCtrl'    
-  })
-  
-  .state('sessionbearbeitungArbeit', {
-    url: '/sessionbearbeitungArbeit',
-    templateUrl: 'templates/sessionbearbeitungarbeit.html',
-    controller: 'ArbeitCtrl'
-});
+  });
 
   
   // if none of the above states are matched, use this as the fallback

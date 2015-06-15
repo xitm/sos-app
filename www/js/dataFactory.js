@@ -24,11 +24,11 @@ angular.module('starter.services', [])
 })
 
 .service('FormvalidationService', function() {
-    this.validateArbeit = function (passt) {
-        
+    this.validateArbeit = function () {
+        var passt = true;
         //Errorfelder
         var errors = [
-            document.getElementById('datum'),
+            document.getElementById('anfangsdatum'),
             document.getElementById('timeA'),
             document.getElementById('timeE'),
         ]
@@ -58,8 +58,8 @@ angular.module('starter.services', [])
         //Testvariable zurückgeben
         return passt;
     }
-    this.validateFahrt = function (passt) {
-        
+    this.validateFahrt = function () {
+        var passt = true;
         //Zu überprüfende Felder
         var errors = [
             document.getElementById('kfz'), //KFZ
