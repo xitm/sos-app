@@ -37,13 +37,13 @@
         <div class="row">
             <div class="col col-50">
                 <label class="item item-input" id="stylekanfang">
-                    <input placeholder="Kilometer Anfang" class="textbox-n" type="number" id="kanfang" value="{{activeFahrt.anfangskilometer}}"/>
+                    <input placeholder="Kilometer Anfang" class="textbox-n" type="number" id="kanfang" ng-model="kanfang"/>
                     <span class="input-label" style="font-size: smaller; color: #aaa;">km</span> 
                 </label>
             </div>
             <div class="col col-50">
                 <label class="item item-input" id="stylekmende">
-                    <input placeholder="Kilometer Ende" class="textbox-n" type="number" id="kmende" value="{{activeFahrt.endkilometer}}"/>
+                    <input placeholder="Kilometer Ende" class="textbox-n" type="number" id="kmende" ng-model="kmende"/>
                     <span class="input-label" style="font-size: smaller; color: #aaa;">km</span>
                 </label>
             </div>
@@ -73,7 +73,7 @@
             <div class="col">
                 <label class="item item-input" id="styledatum">
                     <span class="input-label">Anfangsdatum</span> 
-                    <input type="date" ng-model="activeFahrt.date" id="datum" style="text-align: right;"/>
+                    <input type="date" ng-model="activeFahrt.anfangsdatum" id="datum" style="text-align: right;"/>
                 </label>
             </div>
         </div>
@@ -82,7 +82,7 @@
             <div class="col">
                 <label class="item item-input" id="styledatum">
                     <span class="input-label">Enddatum</span> 
-                    <input type="date" ng-model="activeFahrt.date" id="inDate" style="text-align: right;"/>
+                    <input type="date" ng-model="activeFahrt.enddatum" id="inDate" style="text-align: right;"/>
                 </label>
             </div>
         </div>
@@ -119,7 +119,7 @@
                 <div class="input-label">
                   Fahrtyp
                 </div>
-                <select id="leistung">
+                <select id="leistung" >
                     <option ng-repeat="leistung in leistungen" ng-selected="{{selected.value}}" data-leistung-id="{{leistung.id}}">{{leistung.name}}</option>
                 </select>
             </label>

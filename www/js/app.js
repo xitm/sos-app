@@ -56,14 +56,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     .state('arbeitsmanager', {
       url: '/arbeitsmanager',
       params: {sessionmanager: null},
-      templateUrl: 'templates/arbeitsmanager.html',
+      templateUrl: 'templates/sessionbearbeitungarbeit.html',
       controller: 'ArbeitsmanagerCtrl'
   })
     
     .state('fahrtenmanager', {
       url: '/fahrtenmanager',
       params: {sessionmanager: null},
-      templateUrl: 'templates/fahrtenmanager.html',
+      templateUrl: 'templates/sessionbearbeitungfahrt.html',
       controller: 'FahrtenmanagerCtrl'
   })
     

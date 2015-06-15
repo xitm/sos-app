@@ -57,7 +57,7 @@ angular.module('starter.controllers', [])
         //Session erstellen
         var session = new Session.create(
             {id: sessionid,
-            datum: new Date(document.getElementById("datum").value), //Datum vom Auswahlfeld
+            anfangsdatum: new Date(document.getElementById("datum").value), //Datum vom Auswahlfeld
             clientId: client.getAttribute('data-id')//clientId
             }
         )
@@ -213,9 +213,10 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessionuebersichtCtrl', function($scope, $state, $ionicPopup, DataModel) {
+.controller('SessionuebersichtCtrl', function($scope, $state, $ionicPopup, DataModel, $ionicViewSwitcher) {
     $scope.callSessiondetail=function(sessionId){
         model.dataModel.getSessionById(sessionId).setActive(true);
+        $ionicViewSwitcher.nextDirection('forward');
         $state.go('sessiondetail');
     }
     $scope.callArbeitsoberflaeche = function() {
@@ -250,7 +251,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessiondetailCtrl', function($scope, TimeCalculatorService, $state, DataModel, $ionicPopup) {
+.controller('SessiondetailCtrl', function($scope, TimeCalculatorService, $state, DataModel, $ionicPopup, $ionicViewSwitcher) {
     $scope.activeSession = model.dataModel.getActiveSession(); //speichert aktive Session in den Scope
     $scope.fahrten = $scope.activeSession.toJson().fahrten; //speichert die Fahrten extra ab, für den ng-repeat
     $scope.arbeiten = $scope.activeSession.toJson().arbeiten;//speichert die Arbeiten extra ab, für den ng-repeat
@@ -264,7 +265,7 @@ angular.module('starter.controllers', [])
         }
     }
     
-    $scope.date = ($scope.activeSession.toJson().datum).toString().substring(0,10);
+    $scope.date = ($scope.activeSession.toJson().anfangsdatum).toString().substring(0,10);
     $scope.totalDiffTime = {hours : 0, minutes : 0};
     $scope.totalDiffRoute = 0;
     
@@ -394,6 +395,9 @@ angular.module('starter.controllers', [])
     }
     
     $scope.callSessionuebersicht = function(sessionId){
+        
+        
+        
         if (!(model.dataModel.getActiveSession().getFahrten()[0]) && !(model.dataModel.getActiveSession().getArbeiten()[0])) {
             var confirmPopup = $ionicPopup.confirm({
                 title: "Keine Einheiten vorhanden",
@@ -405,6 +409,7 @@ angular.module('starter.controllers', [])
                         model.dataModel.getSessionList().splice(id, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
                         model.dataModel.getSessionById(id).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
                         DataModel.update(model.dataModel, true); //speichern
+                        $ionicViewSwitcher.nextDirection('back');
                         $state.go('sessionuebersicht');
                     } else {
                       /*Alles bleibt so wie es ist!*/
@@ -412,6 +417,7 @@ angular.module('starter.controllers', [])
                 });
         } else {
             model.dataModel.getActiveSession().setActive(false);
+            $ionicViewSwitcher.nextDirection('back')
             $state.go('sessionuebersicht');
         }
         
@@ -433,7 +439,7 @@ angular.module('starter.controllers', [])
     $scope.activeArbeit = $scope.activeArbeitObj.toJson();//aktive Arbeit der aktiven Session als JSON-Notation
     $scope.uhranfang = $scope.activeArbeit.anfangszeit;
     $scope.uhrende = $scope.activeArbeit.endzeit;
-    $scope.activeArbeit.date = new Date($scope.activeArbeitObj.getDatum());
+    $scope.activeArbeit.date = new Date($scope.activeArbeitObj.getAnfangsdatum());
     $scope.leistungen = model.dataModel.getLeistungList("arbeit"); //leistungen der arbeiten werden geladen (fuer select)
     $scope.selected = {value : 0} //var fuer die vorselectierte leistung
     
@@ -478,7 +484,7 @@ angular.module('starter.controllers', [])
                         //setzer der neuen Eigenschaften
                         var _aktArb = $scope.activeArbeitObj;
                         _aktArb.setLeistungsId(_lsId);
-                        _aktArb.setDatum(_date);
+                        _aktArb.setAnfangsdatum(_date);
                         _aktArb.setAnfangszeit(_timeA);
                         _aktArb.setEndzeit(_timeE);
 
@@ -502,7 +508,9 @@ angular.module('starter.controllers', [])
 .controller('FahrtCtrl', function($scope, DataModel, $state, $ionicPopup, FormvalidationService, TimeCalculatorService) {
     $scope.activeFahrtObj = model.dataModel.getActiveFahrt(model.dataModel.getActiveSession());//aktive Arbeit der aktiven Session
     $scope.activeFahrt = $scope.activeFahrtObj.toJson();//aktive Arbeit der aktiven Session als JSON-Notation
-    $scope.activeFahrt.date = new Date($scope.activeFahrtObj.getDatum());
+    $scope.activeFahrt.anfangsdatum = new Date($scope.activeFahrtObj.getAnfangsdatum());
+    //$scope.activeFahrt.enddatum = new Date($scope.activeFahrtObj.getEnddatum());
+    $scope.activeFahrt.enddatum = new Date($scope.activeFahrtObj.getAnfangsdatum());
     
     $scope.uhranfang = $scope.activeFahrt.anfangszeit;
     $scope.uhrende = $scope.activeFahrt.endzeit;
@@ -510,7 +518,8 @@ angular.module('starter.controllers', [])
     $scope.leistungen = model.dataModel.getLeistungList("fahrt"); //leistungen der fahrten laden
     $scope.selected = {value : 0} //value fuer die ausgewaehlte leistung
     $scope.kfz = model.dataModel.getMitarbeiter().getStandKfz();//Standard-Kfz des Mitarbeiters erhalten!
-
+    $scope.kanfang = parseFloat($scope.activeFahrt.anfangskilometer);
+    $scope.kmende = parseFloat($scope.activeFahrt.endkilometer);
     //ausgewählte Leistung vordefinieren:
     for(var i=0,anz=$scope.leistungen.length;i<anz;i++){//die leistung der fahrt wird pre-selected!
         var _ls = $scope.leistungen[i];
@@ -542,7 +551,7 @@ angular.module('starter.controllers', [])
                         
                         //Routinen, um Aenderungen zu speichern
                         var _ls = document.getElementById('leistung');
-                        $scope.activeFahrtObj.setDatum(new Date(document.getElementById('datum').value));
+                        $scope.activeFahrtObj.setAnfangsdatum(new Date(document.getElementById('datum').value));
                         $scope.activeFahrtObj.setAnfangszeit(document.getElementById('timeA').value);
                         $scope.activeFahrtObj.setEndzeit(document.getElementById('timeE').value);
                         $scope.activeFahrtObj.setAnfangskilometer(document.getElementById('kanfang').value);
@@ -574,23 +583,26 @@ angular.module('starter.controllers', [])
     //aktuelle Session des Modells
     var currentsession = model.dataModel.getActiveSession();
     
-    //Sessionmanager Aufrufen
-    $scope.back = function() {
-        if ($stateParams.sessionmanager == true) {
-            $state.go('sessionmanager');
-         } else {
-            $state.go('sessiondetail');
-         }
-    }
+
+
     //Gespeichertes Datum voreintragen
-    $scope.date = new Date(currentsession.getDatum()); //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
+    $scope.activeArbeit = {
+        anfangsdatum: new Date(currentsession.getAnfangsdatum()), //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
+        enddatum:  new Date(currentsession.getAnfangsdatum()) //ENDDATUM!!!
+    }
 
     $scope.leistungen = model.dataModel.getLeistungList('arbeit');
     //ANMERKUNG: eine function, anderes ELEMENT mitgeben!
     
-    $scope.finishArbeit = function() {
+    $scope.callSessiondetail = function(save) {
         /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
         /*Wenn Alles Passt*/
+        
+        if (save===false) {
+            $state.go('sessiondetail');
+            return;
+        }
+        
         var passt=true; //testvariable
         
         var leis = document.getElementById("leistung");
@@ -664,9 +676,7 @@ angular.module('starter.controllers', [])
 
 .controller('FahrtenmanagerCtrl', function($scope, DataModel, Fahrt, $state, $ionicPopup, FormvalidationService, TimeCalculatorService, $stateParams) {
     
-    $scope.callSessionmanager = function() {
-        $state.go('sessionmanager')
-    }
+
     //aktuelle Session
     var currentsession = model.dataModel.getActiveSession();
     
@@ -679,7 +689,11 @@ angular.module('starter.controllers', [])
     }
 
     //Datum eintragen
-    $scope.datum = new Date(currentsession.getDatum());
+    $scope.activeFahrt = {
+        anfangsdatum: new Date(currentsession.getAnfangsdatum()),
+        enddatum: new Date(currentsession.getAnfangsdatum())
+    }
+    
     //Anfangsort eintragen
     if (model.dataModel.getMitarbeiter().getLetzteStandort()) {
         document.getElementById('anfangsort').value = model.dataModel.getMitarbeiter().getLetzteStandort();
@@ -698,9 +712,16 @@ angular.module('starter.controllers', [])
     //Letzt eingetragenen Standort holen. Könnte man als Variable im Model speichern und dann in
     //localstorage schreiben, oder überhaupt glleich in localstorage schreiben
    
-    $scope.finishFahrt = function() {
+    $scope.callSessiondetail = function(save) {
         /*Routinen um Dateneingaben zu überprüfen hier rein, oder mit Verlinkung auf Service (<- besser)!*/
         /*Wenn Alles Passt*/
+        
+        if (save===false) {
+            $state.go('sessiondetail');
+            return;
+        }
+        
+        
         var passt=true //testvariable
         
         var leis = document.getElementById("leistung");
@@ -758,7 +779,7 @@ angular.module('starter.controllers', [])
                   
                   var fahrt = new Fahrt.create({
                         id: fahrtId,
-                        datum: new Date(datum),
+                        anfangsdatum: new Date(datum),
                         anfangszeit: anfangszeit,
                         endzeit: endzeit,
                         anfangskilometer: document.getElementById('kanfang').value,
@@ -803,7 +824,7 @@ angular.module('starter.controllers', [])
     //datum auf angemessenes format zuschneiden
     for(var i=0,anz=$scope.sessions.length;i<anz;i++){
         var _ses = $scope.sessions[i];
-        _ses.date = (_ses.datum).toString().substring(0,10);
+        _ses.date = (_ses.anfangsdatum).toString().substring(0,10);
     }
     
     $scope.onItemDelete = function(sessionId) {

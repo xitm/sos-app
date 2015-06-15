@@ -690,9 +690,9 @@ angular.module('starter.services', [])
 //----------- 5. - Session_Class_Definition------//
 .factory('Session', function(Arbeit, Fahrt){
     
-    function Session(id, datum, clientId, deleted){
+    function Session(id, anfangsdatum, clientId, deleted){
         var _id = undefined;
-        var _datum = undefined;
+        var _anfangsdatum = undefined;
         var _clientId = undefined;
         var _fahrten= [];
         var _arbeiten = [];
@@ -710,11 +710,11 @@ angular.module('starter.services', [])
         
         
         //5.2 sessionDatum_definitionen
-        this.setDatum = function(sessionDatum) {
-            _datum = sessionDatum;
+        this.setAnfangsdatum = function(sessionDatum) {
+            _anfangsdatum = sessionDatum;
         }
-        this.getDatum = function() {
-            return _datum;
+        this.getAnfangsdatum = function() {
+            return _anfangsdatum;
         }
         
         //5.3 client_definitionen
@@ -756,7 +756,7 @@ angular.module('starter.services', [])
         }
         
         this.setId(id); //Errorhandling!
-        this.setDatum(datum);
+        this.setAnfangsdatum(anfangsdatum);
         this.setClientId(clientId); //change from this.setClient(client); to this.setClientId(clientId);
         if(deleted){this.setDeleted(deleted)};
     }
@@ -799,7 +799,7 @@ angular.module('starter.services', [])
         
         return {
             id : this.getId(),
-            datum : this.getDatum(),
+            anfangsdatum : this.getAnfangsdatum(),
             clientId : this.getClientId(),
             fahrten : _faRes,
             arbeiten : _arRes,
@@ -811,7 +811,7 @@ angular.module('starter.services', [])
         //Varbiablendeklarationen
         var _fahrten = JSONstructure.fahrten;//fahrconsole.log(JSONstructure.fahrten);
         var _arbeiten = JSONstructure.arbeiten;//arbeiten gesondert ausweisen
-        var ses = new Session(JSONstructure.id, JSONstructure.datum, JSONstructure.clientId, JSONstructure.deleted);
+        var ses = new Session(JSONstructure.id, JSONstructure.anfangsdatum, JSONstructure.clientId, JSONstructure.deleted);
         //zusätzliche Fahrten adden
         if (_fahrten) {//wenn keine Fahrten vorhanden sind -> undefined!
             for(var i = 0, anz=_fahrten.length; i<anz; i++){
@@ -838,9 +838,9 @@ angular.module('starter.services', [])
 
 //----------- 6. - Fahrt_Class_Definition------//
 .factory('Fahrt', function(){
-    function Fahrt(id,datum,anfangszeit,endzeit,anfangskilometer,endkilometer,anfangsort,endort,leistungsId) {
+    function Fahrt(id,anfangsdatum,anfangszeit,endzeit,anfangskilometer,endkilometer,anfangsort,endort,leistungsId) {
         var _id = undefined;
-        var _datum = undefined;
+        var _anfangsdatum = undefined;
         var _anfangszeit = undefined;
         var _endzeit = undefined;
         var _anfangskilometer = undefined;
@@ -859,10 +859,10 @@ angular.module('starter.services', [])
         }
         
         //6.2 datum_definitionen
-        this.setDatum = function(datum) {
+        this.setAnfangsdatum = function(datum) {
             _datum = datum;
         }
-        this.getDatum = function() {
+        this.getAnfangsdatum = function() {
             return _datum;
         }
         
@@ -932,7 +932,7 @@ angular.module('starter.services', [])
         
 
         this.setId(id);
-        this.setDatum(datum);
+        this.setAnfangsdatum(anfangsdatum);
         this.setAnfangszeit(anfangszeit);
         this.setEndzeit(endzeit);
         this.setAnfangskilometer(anfangskilometer);
@@ -945,7 +945,7 @@ angular.module('starter.services', [])
     Fahrt.prototype.toJson = function(){
         return {
             id : this.getId(),
-            datum : this.getDatum(),
+            anfangsdatum : this.getAnfangsdatum(),
             anfangszeit : this.getAnfangszeit(),
             endzeit : this.getEndzeit(),
             anfangskilometer : this.getAnfangskilometer(),
@@ -958,7 +958,7 @@ angular.module('starter.services', [])
     
     Fahrt.create = function(JSONstructure){
 
-        var fa = new Fahrt(JSONstructure.id,JSONstructure.datum,JSONstructure.anfangszeit,JSONstructure.endzeit,JSONstructure.anfangskilometer,JSONstructure.endkilometer,JSONstructure.anfangsort,JSONstructure.endort,JSONstructure.leistungsId);
+        var fa = new Fahrt(JSONstructure.id,JSONstructure.anfangsdatum,JSONstructure.anfangszeit,JSONstructure.endzeit,JSONstructure.anfangskilometer,JSONstructure.endkilometer,JSONstructure.anfangsort,JSONstructure.endort,JSONstructure.leistungsId);
         return(
             fa
         )
@@ -968,9 +968,9 @@ angular.module('starter.services', [])
 })
 //----------- 7. - Arbeit_Class_Definition------//
 .factory('Arbeit', function(){
-    function Arbeit(id, datum, anfangszeit, endzeit, leistungsId) {
+    function Arbeit(id, anfangsdatum, anfangszeit, endzeit, leistungsId) {
         var _id = undefined;
-        var _datum = undefined;
+        var _anfangsdatum = undefined;
         var _anfangszeit = undefined;
         var _endzeit = undefined;
         var _leistungsId = undefined;
@@ -985,11 +985,11 @@ angular.module('starter.services', [])
         }
         
         //7.2 datum_definitionen
-        this.setDatum = function(datum) {
-            _datum = datum;
+        this.setAnfangsdatum = function(anfangsdatum) {
+            _anfangsdatum = anfangsdatum;
         }
-        this.getDatum = function() {
-            return _datum;
+        this.getAnfangsdatum = function() {
+            return _anfangsdatum;
         }
         
         //7.3 anfangszeit_definitionen
@@ -1025,7 +1025,7 @@ angular.module('starter.services', [])
         }
         
         this.setId(id);
-        this.setDatum(datum);
+        this.setAnfangsdatum(anfangsdatum);
         this.setAnfangszeit(anfangszeit);
         this.setEndzeit(endzeit);
         this.setLeistungsId(leistungsId);
@@ -1034,7 +1034,7 @@ angular.module('starter.services', [])
     Arbeit.prototype.toJson = function(){
         return {
             id : this.getId(),
-            datum : this.getDatum(),
+            anfangsdatum : this.getAnfangsdatum(),
             anfangszeit : this.getAnfangszeit(),
             endzeit : this.getEndzeit(),
             leistungsId : this.getLeistungsId()
@@ -1043,7 +1043,7 @@ angular.module('starter.services', [])
     
     Arbeit.create = function(JSONstructure){
         
-        var ar = new Arbeit(JSONstructure.id, JSONstructure.datum, JSONstructure.anfangszeit,JSONstructure.endzeit, JSONstructure.leistungsId);
+        var ar = new Arbeit(JSONstructure.id, JSONstructure.anfangsdatum, JSONstructure.anfangszeit,JSONstructure.endzeit, JSONstructure.leistungsId);
         return(
             ar
         )
