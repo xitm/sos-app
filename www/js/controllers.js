@@ -95,19 +95,18 @@ angular.module('starter.controllers', [])
 .controller('LoginCtrl', function($scope, LoginService, DataModel, $http, $state, $ionicPopup) {
         if (localStorage.getItem("mle_model2")===null) {
             model.dataModel = DataModel.syncWithSource(model.dataModel, true);
-            /*temporaer*/
+
+        }else{
+            model.dataModel = DataModel.create(localStorage.getItem("mle_model2")); //Anpassung an neue Service-Gestaltung
+            model.dataModel = DataModel.syncWithSource(model.dataModel); //sync mit Webservice
+        }
+        
         model.dataModel.then(function(data){
             model.dataModel = data;
             DataModel.update(model.dataModel, true);
             },
             function(error){console.log(error);
-            });
-        /*temporaer*/
-        }else{
-            model.dataModel = DataModel.create(localStorage.getItem("mle_model2")); //Anpassung an neue Service-Gestaltung
-            //model.dataModel = DataModel.syncWithSource(model.dataModel);
-        }
-        
+        });
         
         //model.dataModel.then(function(data){
         //    model.dataModel = data;

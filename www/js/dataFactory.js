@@ -324,7 +324,7 @@ angular.module('starter.services', [])
     BusinessObject.prototype.getClientById=function(id){
         var _clients = this.getClienten();
         for(var i=0, anz=_clients.length;i<anz;i++){
-            if (_clients[i].getId()===id || _clients[i].getId() ===parseInt(id)) {
+            if (_clients[i].getId()===id || _clients[i].getId() === parseInt(id)) {
                 return _clients[i];
             }
         }
@@ -334,7 +334,7 @@ angular.module('starter.services', [])
     BusinessObject.prototype.getLeistungById=function(id){
         var _leistungen = this.getLeistungen();
         for(var i=0, anz=_leistungen.length;i<anz;i++){
-            if (_leistungen[i].getId()===id || _leistungen[i].getId()===parseInt(id)) {
+            if (_leistungen[i].getId()===id || _leistungen[i].getId()=== parseInt(id)) {
                 return _leistungen[i];
             }
         }
@@ -1122,6 +1122,7 @@ angular.module('starter.services', [])
                         objectBusinessObject = mainScope.create(JSON.stringify(_model)); //nur fuer den laufenden Gebrauch, nicht wenn zum ersten Mal gestartet wird
                     }
                     else{
+                        objectBusinessObject.resetClienten();
                         //clienten aktualisieren und jeweils einzeln hinzufuegen
                         for (var i=0,anz=_model.clienten.length;i<anz;i++) {
                             var _cl = _model.clienten[i];
