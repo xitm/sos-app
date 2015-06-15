@@ -334,7 +334,7 @@ angular.module('starter.services', [])
     BusinessObject.prototype.getLeistungById=function(id){
         var _leistungen = this.getLeistungen();
         for(var i=0, anz=_leistungen.length;i<anz;i++){
-            if (_leistungen[i].getId()===id) {
+            if (_leistungen[i].getId()===id || _leistungen[i].getId()===parseInt(id)) {
                 return _leistungen[i];
             }
         }
@@ -1145,7 +1145,7 @@ angular.module('starter.services', [])
                 }else{
                     //wenn mehr als 5 Fehlversuche gezaehlt wurden, wird abgebrochen!
                     if (counter > 5) {
-                        alert("keine Verbindung vorhanden!" + checkFinishClients + checkFinishLeistungen + CheckFinishMitarbeiter);
+                        alert("keine Verbindung vorhanden!" + checkFinishClients + checkFinishLeistungen + checkFinishMitarbeiter);
                         reject();
                     }else{
                         counter += 1; //counter um 1 erhoehen
