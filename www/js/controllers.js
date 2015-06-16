@@ -55,6 +55,7 @@ angular.module('starter.controllers', [])
         var session = new Session.create(
             {id: sessionid,
             anfangsdatum: new Date(document.getElementById("datum").value), //Datum vom Auswahlfeld
+            enddatum: new Date(document.getElementById("datum").value),
             clientId: client.getAttribute('data-id')//clientId
             }
         )
@@ -91,7 +92,10 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('LoginCtrl', function($scope, LoginService, DataModel, $http, $state, $ionicPopup) {
+.controller('LoginCtrl', function($scope, LoginService, DataModel, $http, $state, $ionicLoading, $ionicPopup) {
+        $ionicLoading.show({
+            template : "<div my-temp-template></div>"
+        });
         if (localStorage.getItem("mle_model2")===null) { //wenn kein lokaler Speicher besteht -> nur beim ersten Mal der Fall!
             model.dataModel = DataModel.syncWithSource(model.dataModel, true); //sync mit Webservice
 
@@ -103,8 +107,11 @@ angular.module('starter.controllers', [])
         model.dataModel.then(function(data){ //ergebnis des Promises, also was passiert nunt?
             model.dataModel = data;
             DataModel.update(model.dataModel, true);
+            $ionicLoading.hide();
             },
-            function(error){console.log(error);
+            function(error){
+                $ionicLoading.hide();
+                alert(error);
         });
 
     $scope.init = function() {
@@ -252,20 +259,24 @@ angular.module('starter.controllers', [])
     }
     
     //Sessiondatum
-    $scope.date = ($scope.activeSession.toJson().anfangsdatum).toString().substring(0,10);
+    var anfang = ($scope.activeSession.toJson().anfangsdatum).toString().substring(0,10);
+    var ende = ($scope.activeSession.toJson().enddatum).toString().substring(0,10);
+    if (anfang==ende) {
+        $scope.date = anfang
+    } else {
+        $scope.date = anfang + " - " + ende
+    }
+
     $scope.totalDiffTime = {hours : 0, minutes : 0}; //leeres Object fuer die Differenz der Zeit
     $scope.totalDiffRoute = 0; //Differenz der Route
     
     //vollstaendiger Name des Klienten
     $scope.client = model.dataModel.getClientById($scope.activeSession.getClientId()).getFullName();
     
-    
-    
     //Falls keine Arbeits -oder Zeiteinheiten vorhanden sind. Textmeldung auf true setzen
     $scope.emptywork = false;
     $scope.emptytrip = false;
     if ($scope.arbeiten.length==0) {
-        console.log($scope.arbeiten.length);
         $scope.emptywork = true;
     }
     if ($scope.fahrten.length == 0) {
@@ -275,35 +286,48 @@ angular.module('starter.controllers', [])
     
     for(var i=0,anz=$scope.fahrten.length;i<anz;i++){
         var _fa = $scope.fahrten[i]; //Fahrt des aktuellen Durchlaufs
-        _fa.differenz = TimeCalculatorService.time(_fa.anfangszeit, _fa.endzeit); //caching der Zeitdifferenz der aktuellen Fahrt
+        var diff = TimeCalculatorService.difference(_fa); //caching der Zeitdifferenz der aktuellen Fahrt
         
-        addToTotalTime(_fa.differenz); //Zeitdifferenz dazuzaehlen
+        addToTotalTime(diff); //Zeitdifferenz dazuzaehlen
         _fa.diffRoute = parseFloat(_fa.endkilometer)-parseFloat(_fa.anfangskilometer);//caching der Kilometerdifferenz
+        console.log(diff);
         $scope.totalDiffRoute += _fa.diffRoute; //hinzuzaehlen zur gesamten Differenz
-        _fa.differenz = _fa.differenz.hours + " Stunden " + _fa.differenz.minutes + " Minuten"; //ausgabe zurechtschneiden
+        _fa.differenz = diff.hours + " Stunden " + diff.minutes + " Minuten"; //ausgabe zurechtschneiden
     }
     
     for(var i=0,anz=$scope.arbeiten.length;i<anz;i++){
         var _ar = $scope.arbeiten[i]; //Arbeit des aktuellen Durchlaufs
-        _ar.differenz = TimeCalculatorService.time(_ar.anfangszeit, _ar.endzeit); //caching der Zeitdifferenz
-        addToTotalTime(_ar.differenz); //zur gesamten Dauer hinzufuegen
-        _ar.differenz = _ar.differenz.hours + " Stunden " + _ar.differenz.minutes + " Minuten"; //ausgabe zurechtstueckeln
+        var diff = TimeCalculatorService.difference(_ar); //caching der Zeitdifferenz
+        
+        addToTotalTime(diff); //zur gesamten Dauer hinzufuegen
+        _ar.differenz = diff.hours + " Stunden " + diff.minutes + " Minuten"; //ausgabe zurechtstueckeln
         
         var leistungsId= _ar.leistungsId; //caching LeistungsId
         $scope.arbeiten[i].leistung=model.dataModel.getLeistungById(leistungsId).getName(); //Namen der Leistung ausgeben!
     }
     
     function addToTotalTime(time){ //funktion erstellt, da sie 2 mal gebraucht wird!
+        //var _hours = parseInt(time.hours);
+        //var _mins = parseInt(time.minutes);
+        //
+        //
+        //$scope.totalDiffTime.hours += _hours;
+        //$scope.totalDiffTime.minutes += _mins;
+        //
+        //if ($scope.totalDiffTime.minutes>60) { //wenn ueber 60 minuten, wieder anpassen!
+        //    $scope.totalDiffTime.minutes=$scope.totalDiffTime.minutes - 60;
+        $scope.totalDiffTime += time;
+    }
+    
+    function substractFromTotalTime(time){
         var _hours = parseInt(time.hours);
         var _mins = parseInt(time.minutes);
         
-        
-        $scope.totalDiffTime.hours += _hours;
-        $scope.totalDiffTime.minutes += _mins;
-        
-        if ($scope.totalDiffTime.minutes>60) { //wenn ueber 60 minuten, wieder anpassen!
-            $scope.totalDiffTime.minutes=$scope.totalDiffTime.minutes - 60;
-            $scope.totalDiffTime.hours++;
+        $scope.totalDiffTime.hours -= _hours;
+        $scope.totalDiffTime.minutes -= _mins;
+        if ($scope.totalDiffTime.minutes<0) { //wenn ueber 60 minuten, wieder anpassen!
+            $scope.totalDiffTime.minutes=$scope.totalDiffTime.minutes + 60;
+            $scope.totalDiffTime.hours--;
         }
     }
     
@@ -345,7 +369,9 @@ angular.module('starter.controllers', [])
                     break;
                 }
             }
-            
+            var _ar = $scope.arbeiten[i];
+            _ar.differenz = TimeCalculatorService.time(_ar.anfangszeit, _ar.endzeit); //caching der Zeitdifferenz der aktuellen Fahrt
+            substractFromTotalTime(_ar.differenz); //Zeitdifferenz dazuzaehlen
             $scope.arbeiten.splice(deleteIndex,1); //aus der Ansicht im Fenster loeschen - Grund: JSON zu loeschen hat auf Model keine direkte Auswirkung! umgekehrt aktualisiert sich die Ansicht nicht sofort (erst bei neuem Laden), wenn aus dem Model etwas geloescht wird
             model.dataModel.getActiveSession().getArbeiten().splice(deleteIndex, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
             DataModel.update(model.dataModel, true); //speichern//Geht noch nicht!!!!
@@ -363,6 +389,13 @@ angular.module('starter.controllers', [])
                     break;
                 }
             }
+            
+            var _delFa = $scope.fahrten[i];
+            _delFa.diffRoute = parseFloat(_fa.endkilometer)-parseFloat(_fa.anfangskilometer);//caching der Kilometerdifferenz
+            $scope.totalDiffRoute -= _fa.diffRoute; //hinzuzaehlen zur gesamten Differenz 
+            _fa.differenz = TimeCalculatorService.time(_fa.anfangszeit, _fa.endzeit); //caching der Zeitdifferenz der aktuellen Fahrt
+            substractFromTotalTime(_fa.differenz); //Zeitdifferenz dazuzaehlen
+            
             $scope.fahrten.splice(deleteIndex, 1);  //aus der Ansicht im Fenster loeschen - Grund: JSON zu loeschen hat auf Model keine direkte Auswirkung!
             model.dataModel.getActiveSession().getFahrten().splice(deleteIndex, 1);//aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
             DataModel.update(model.dataModel, true); //speichern
@@ -415,40 +448,83 @@ angular.module('starter.controllers', [])
     
     $scope.callSessionbearbeitungFahrt = function(fahrtId){
         $scope.activeSession.getFahrtById(fahrtId).setActive(true);
-        $state.go('sessionbearbeitungFahrt');
+        $state.go('fahrtenmanager');
     }
     
     $scope.callSessionbearbeitungArbeit = function(arbeitsId){
         $scope.activeSession.getArbeitById(arbeitsId).setActive(true);
-        $state.go('sessionbearbeitungArbeit');
+        $state.go('arbeitsmanager');
     }
 })
 
 .controller('ArbeitsmanagerCtrl', function($scope, $state, Arbeit, DataModel, $ionicPopup, FormvalidationService, TimeCalculatorService, $stateParams) {
     //aktuelle Session des Modells
     var currentsession = model.dataModel.getActiveSession();
-    
-    //Gespeichertes Datum voreintragen
-    $scope.activeArbeit = {
-        anfangsdatum: new Date(currentsession.getAnfangsdatum()), //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
-        enddatum:  new Date(currentsession.getAnfangsdatum()) //ENDDATUM!!!
+    if (model.dataModel.getActiveArbeit(currentsession)) {
+        var activeArbeitObj = model.dataModel.getActiveArbeit(currentsession);
+        var activeArbeit = model.dataModel.getActiveArbeit(currentsession).toJson();
+        $scope.bearbeitung  = true;
+        $scope.erstellung  = false;
+    }else{
+        var activeArbeit = undefined;
+        $scope.erstellung  = true;
+        $scope.bearbeitung  = false;
     }
 
     $scope.leistungen = model.dataModel.getLeistungList('arbeit'); //Leistungen im JSON-Format
     
+
+    //Gespeichertes Datum voreintragen
+    $scope.arbeit = {
+        anfangsdatum: activeArbeit?new Date(activeArbeit.anfangsdatum):new Date(currentsession.getAnfangsdatum()), //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
+        enddatum:  activeArbeit?new Date(activeArbeit.enddatum):new Date(currentsession.getEnddatum()), //ENDDATUM!!!
+    }
+    
+    if (activeArbeit && activeArbeit.leistungsId!=undefined && activeArbeit.leistungsId!=null) {
+        for(var i=0, anz=$scope.leistungen.length; i<anz; i++){
+            var _tempLeis = $scope.leistungen[i];
+            if (activeArbeit.leistungsId===_tempLeis.id) {
+                $scope.selected = {value : i};
+                break;
+            }
+        }
+    }
+    //console.log($scope.selectLeistung);
+    $scope.uhranfang = activeArbeit?activeArbeit.anfangszeit:null;
+    $scope.uhrende = activeArbeit?activeArbeit.endzeit:null;
+    
+    
     $scope.callSessiondetail = function(save) {
-        
+        console.log($scope.selectLeistung);
         if (save===false) {
+            if (activeArbeit) {
+                activeArbeitObj.setActive(false);
+            }
             $state.go('sessiondetail');
             return;
         }
-        
         var leis = document.getElementById("leistung");
         var leisId = leis.options[leis.selectedIndex].getAttribute('data-leistungs-id');
         
         var start = document.getElementById("timeA").value;
         var ende = document.getElementById("timeE").value;
         var dauer = TimeCalculatorService.time(start, ende);
+        function DateTest(){
+                var hours = start.split(':')[0];
+                var minutes = start.split(':')[1];
+                var ms = 0;
+                ms += minutes*60*1000;
+                ms += hours*60*60*1000;
+                
+                var datum = new Date(document.getElementById("anfangsdatum").value);
+                console.log(datum.getTimezoneOffset());
+                ms += datum.getTimezoneOffset()*60*1000;
+                ms += datum.getTime();
+                console.log(ms);
+                console.log(new Date(ms));
+        }
+        DateTest();
+        
         var stunden = dauer.hours;
         if (parseInt(stunden)<0) {
             var alertPopup = $ionicPopup.alert({
@@ -484,14 +560,30 @@ angular.module('starter.controllers', [])
             confirmPopup.then(function(res) {
                 if(res) {
                   /*arbeitssession freigeben und in sessionmanager wechseln*/
-                  var arbeit = new Arbeit.create({
+                  var _anfangsdatum = new Date(document.getElementById("anfangsdatum").value);
+                  var _enddatum = new Date(document.getElementById("enddatum").value);
+                  var _anfangszeit = document.getElementById("timeA").value;
+                  var _endzeit = document.getElementById("timeE").value;
+                  if (activeArbeit) {
+                    activeArbeitObj.setAnfangsdatum(_anfangsdatum);
+                    activeArbeitObj.setEnddatum(_enddatum);
+                    activeArbeitObj.setAnfangszeit(_anfangszeit);
+                    activeArbeitObj.setEndzeit(_endzeit);
+                    activeArbeitObj.setLeistungsId(leisId);
+                    activeArbeitObj.setActive(false);
+                  }else{
+                    var arbeit = new Arbeit.create({
                         id: arbeitsId,
-                        anfangsdatum: new Date(document.getElementById("anfangsdatum").value),
-                        anfangszeit: document.getElementById("timeA").value,
-                        endzeit: document.getElementById("timeE").value,
+                        anfangsdatum: _anfangsdatum,
+                        enddatum: _enddatum,
+                        anfangszeit: _anfangszeit,
+                        endzeit: _endzeit,
                         leistungsId : leisId
                     })
-                  currentsession.addArbeit(arbeit); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
+                    currentsession.addArbeit(arbeit); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
+                  }
+                  
+                  
                   DataModel.update(model.dataModel, true);//model im local storage aktualisieren
                   
                   if ($stateParams.sessionmanager == true) {
@@ -512,44 +604,80 @@ angular.module('starter.controllers', [])
 })
 
 .controller('FahrtenmanagerCtrl', function($scope, DataModel, Fahrt, $state, $ionicPopup, FormvalidationService, TimeCalculatorService, $stateParams) {
-    
-
     //aktuelle Session
     var currentsession = model.dataModel.getActiveSession();
+    
+    if (model.dataModel.getActiveFahrt(currentsession)) {
+        var activeFahrtObj = model.dataModel.getActiveFahrt(currentsession);
+        var activeFahrt = model.dataModel.getActiveFahrt(currentsession).toJson();
+        $scope.bearbeitung  = true;
+        $scope.erstellung  = false;
+    }else{
+        var activeFahrt = undefined;
+        $scope.erstellung  = true;
+        $scope.bearbeitung  = false;
+    }
     
     $scope.back = function() {
         $state.go('sessiondetail'); //Zurueck in die Sessiondetails
     }
+    $scope.leistungen = model.dataModel.getLeistungList('fahrt');
+    if (activeFahrt && activeFahrt.leistungsId!=undefined && activeFahrt.leistungsId!=null) {
+        for(var i=0, anz=$scope.leistungen.length; i<anz; i++){
+            var _tempLeis = $scope.leistungen[i];
+            if (activeFahrt.leistungsId===_tempLeis.id) {
+                $scope.selected = {value : i};
+                break;
+            }
+        }
+    }
+    
 
     //Datum eintragen
-    $scope.activeFahrt = {
-        anfangsdatum: new Date(currentsession.getAnfangsdatum()),
-        enddatum: new Date(currentsession.getAnfangsdatum())
+    $scope.fahrt = {
+        anfangsdatum: activeFahrt?new Date(activeFahrt.anfangsdatum):new Date(currentsession.getAnfangsdatum()), //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
+        enddatum:  activeFahrt?new Date(activeFahrt.enddatum):new Date(currentsession.getEnddatum()), //ENDDATUM!!!
+    }
+
+    
+    //console.log($scope.selectLeistung);
+    $scope.uhranfang = activeFahrt?activeFahrt.anfangszeit:null;
+    $scope.uhrende = activeFahrt?activeFahrt.endzeit:null;
+    $scope.kanfang = activeFahrt?parseFloat(activeFahrt.anfangskilometer):null;
+    $scope.kmende = activeFahrt?parseFloat(activeFahrt.endkilometer):null;
+    $scope.anfangsort = activeFahrt?activeFahrt.anfangsort:null;
+    $scope.endort = activeFahrt?activeFahrt.endort:null;
+    
+    if (!activeFahrt) {
+        //Anfangsort eintragen
+        if (model.dataModel.getMitarbeiter().getLetzteStandort()) {
+            $scope.anfangsort = model.dataModel.getMitarbeiter().getLetzteStandort();
+        }
+        
+        if (model.dataModel.getMitarbeiter().getLetzteKilometer()) {
+            $scope.kanfang = parseInt(model.dataModel.getMitarbeiter().getLetzteKilometer());
+        }
     }
     
-    //Anfangsort eintragen
-    if (model.dataModel.getMitarbeiter().getLetzteStandort()) {
-        document.getElementById('anfangsort').value = model.dataModel.getMitarbeiter().getLetzteStandort();
-    }
-    if (model.dataModel.getMitarbeiter().getLetzteKilometer()) {
-        $scope.kanfang = parseInt(model.dataModel.getMitarbeiter().getLetzteKilometer());
-    }
-    
-    
-    //Leistungen Laden
-    $scope.leistungen = model.dataModel.getLeistungList('fahrt');
     
     //KFZ voreintragen
-    $scope.kfz = model.dataModel.getMitarbeiter().getStandKfz();
+    if (activeFahrt) {
+        $scope.kfz = activeFahrt.kfz
+    }else{
+        $scope.kfz = model.dataModel.getMitarbeiter().getStandKfz();
+    }
    
     $scope.callSessiondetail = function(save) {
         if (save===false) {
+            if (activeFahrt) {
+            activeFahrtObj.setActive(false);
+            }
             $state.go('sessiondetail');
             return;
         }
         
         var leis = document.getElementById("leistung");
-        var leisId = leis.options[leis.selectedIndex].getAttribute('data-id');
+        var leisId = leis.options[leis.selectedIndex].getAttribute('data-leistung-id');
         
         //ArbeitsId ermitteln
         if (!currentsession.getFahrten()){ //currentsession instanceof Session -> keine Suche im Array mehr notwendig
@@ -570,11 +698,19 @@ angular.module('starter.controllers', [])
             return;
         }
         
-        var anfangsort = document.getElementById('anfangsort').value;
-        var endort = document.getElementById('endort').value;
-        var anfangsdatum = document.getElementById("anfangsdatum").value;
-        var anfangszeit = document.getElementById("timeA").value;
-        var endzeit = document.getElementById("timeE").value;
+            var anfangsdatum = new Date(document.getElementById("anfangsdatum").value);
+            var enddatum =  new Date(document.getElementById("enddatum").value);
+            var anfangszeit = document.getElementById("timeA").value;
+            var endzeit = document.getElementById("timeE").value;
+            var beginn = TimeCalculatorService.createDateInMs(anfangsdatum, anfangszeit);
+            var ende = TimeCalculatorService.createDateInMs(enddatum, endzeit);
+            console.log(beginn);
+            console.log(ende);
+            var anfangskilometer = document.getElementById("kanfang").value;
+            var endkilometer = document.getElementById("kmende").value;
+            var anfangsort = document.getElementById("anfangsort").value;
+            var endort = document.getElementById("endort").value;
+            var kfz = document.getElementById("kfz").value;
         
         var dauer = TimeCalculatorService.time(anfangszeit, endzeit);
         var stunden = dauer.hours;
@@ -588,34 +724,56 @@ angular.module('starter.controllers', [])
         var minuten = dauer.minutes;
         
         if (passt) {
+            var beginnObj = TimeCalculatorService.createDateObject(beginn);
+            var endeObj = TimeCalculatorService.createDateObject(ende);
+            var diff = TimeCalculatorService.createDateObject(ende-beginn);
+            
+            console.log(diff);
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Fahrtzeit hinzufügen',
                 template: 'Folgende Fahrtzeiten werden erfasst: <br />' 
                             + leis.options[leistung.selectedIndex].text + ", von " + anfangsort + " bis " + endort
-                            + '<br />am ' + anfangsdatum + ' von ' + anfangszeit +  ' bis '  + endzeit
-                            + '<br />(' + gesamtkilometer + ' Kilometer, ' + stunden + "h " + minuten + "min)" 
+                            + '<br />am ' + anfangsdatum + ' von ' + beginn.hours +  ' bis '  + endeObj.hours
+                            + '<br />(' + gesamtkilometer + ' Kilometer, ' + diff.hours + "h " + diff.minutes + "min)" 
             });
             confirmPopup.then(function(res) {
                 if(res) {
-                  /*fahrtssession freigeben und in sessionmanager wechseln*/
-                  var fahrt = new Fahrt.create({
+                    if (activeFahrt) {
+                        activeFahrtObj.setAnfangskilometer(anfangskilometer);
+                        activeFahrtObj.setEndkilometer(endkilometer);
+                        activeFahrtObj.setAnfangsort(anfangsort);
+                        activeFahrtObj.setEndort(endort);
+                        //activeFahrtObj.setAnfangsdatum(anfangsdatum);
+                        //activeFahrtObj.setEnddatum(enddatum);
+                        //activeFahrtObj.setAnfangszeit(anfangszeit);
+                        //activeFahrtObj.setEndzeit(endzeit);
+                        activeFahrtObj.setBeginn(beginn);
+                        activeFahrtObj.setEnde(ende);
+                        activeFahrtObj.setLeistungsId(leisId);
+                        activeFahrtObj.setStandKfz(kfz);
+                        activeFahrtObj.setActive(false);
+                    }else{
+                        var fahrt = new Fahrt.create({
                         id: fahrtId,
-                        anfangsdatum: new Date(anfangsdatum),
-                        anfangszeit: anfangszeit,
-                        endzeit: endzeit,
-                        anfangskilometer: document.getElementById('kanfang').value,
-                        endkilometer: document.getElementById('kmende').value,
+                        //anfangsdatum: new Date(anfangsdatum),
+                        //enddatum: new Date(enddatum),
+                        //anfangszeit: anfangszeit,
+                        //endzeit: endzeit,
+                        beginn : beginn,
+                        ende : ende,
+                        anfangskilometer: anfangskilometer,
+                        endkilometer: endkilometer,
                         anfangsort: anfangsort,
                         endort: endort,
+                        kfz : kfz,
                         leistungsId: leisId
-                    })
-                  
-                  currentsession.addFahrt(fahrt); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
-                  
-                 model.dataModel.getMitarbeiter().setLetzteStandort(endort);
-                 model.dataModel.getMitarbeiter().setLetzteKilometer(document.getElementById('kmende').value);
-                 DataModel.update(model.dataModel, true); //model im localstorage aktualisieren
-
+                        })
+                        currentsession.addFahrt(fahrt); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
+                    }
+                  /*fahrtssession freigeben und in sessionmanager wechseln*/
+                    model.dataModel.getMitarbeiter().setLetzteStandort(endort);
+                    model.dataModel.getMitarbeiter().setLetzteKilometer(document.getElementById('kmende').value);
+                    DataModel.update(model.dataModel, true); //model im localstorage aktualisieren
                     $state.go('sessiondetail');
                 } else {
                   /*Alles bleibt so wie es ist!*/

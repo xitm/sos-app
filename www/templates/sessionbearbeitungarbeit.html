@@ -21,7 +21,18 @@
             <img src="img/notizenbild.png" />
         </div>
         
-       <div class="list">
+       <div class="list" ng-if="bearbeitung">
+            <label class="item item-input item-select" id="beschriftung">
+                <div class="input-label" >
+                  <span >Leistung</span>
+                </div>
+                <select id='leistung'>
+                    <option ng-repeat='leistung in leistungen' ng-selected="{{selected.value}}" data-leistungs-id="{{leistung.id}}" >{{leistung.name}}</option>
+                </select>
+            </label>
+      </div>
+       
+       <div class="list" ng-if="erstellung">
             <label class="item item-input item-select" id="beschriftung">
                 <div class="input-label" >
                   <span >Leistung</span>
@@ -47,7 +58,7 @@
             <div class="col">
                 <label class="item item-input" id="styledatum">
                     <span>Anfangsdatum</span>
-                    <input class="textbox-n" type="date" id="anfangsdatum" ng-model="activeArbeit.anfangsdatum" style="text-align: right"/>
+                    <input class="textbox-n" type="date" id="anfangsdatum" ng-model="arbeit.anfangsdatum" style="text-align: right"/>
                 </label>
             </div>
         </div>
@@ -55,7 +66,7 @@
             <div class="col">
                 <label class="item item-input" id=styledatumE">
                     <span>Enddatum</span> 
-                    <input class="textbox-n" type="date" id="enddadtum" ng-model="activeArbeit.enddatum" style="text-align: right" />
+                    <input class="textbox-n" type="date" id="enddatum" ng-model="arbeit.enddatum" style="text-align: right" />
                 </label>
             </div>
         </div>
@@ -66,7 +77,7 @@
             <div class="col col-50">
                 <label class="item item-input" id="styleA" ng-click="hideSpanA = !hideSpanA">
                     <span ng-hide="hideSpanA" ng-if="!uhranfang" >Anfangszeit</span>
-                    <input class="textbox-n" id="timeA" type="text" ng-model="uhranfang" value="{{activeArbeit.anfangszeit}}" onfocus="(this.type='time')"/>
+                    <input class="textbox-n" id="timeA" type="text" ng-model="uhranfang" value="{{arbeit.anfangszeit}}" onfocus="(this.type='time')"/>
                     <span class="input-label" ng-if="uhranfang" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>
@@ -76,7 +87,7 @@
             <div class="col col-50">
                 <label class="item item-input" id="styleE" ng-click="hideSpanE = !hideSpanE">
                     <span ng-hide="hideSpanE" ng-if="!uhrende" >Endzeit</span>
-                    <input class="textbox-n" id="timeE" type="text" ng-model="uhrende" value='{{activeArbeit.endzeit}}' onfocus="(this.type='time')" />
+                    <input class="textbox-n" id="timeE" type="text" ng-model="uhrende" value='{{arbeit.endzeit}}' onfocus="(this.type='time')" />
                     <span class="input-label" ng-if="uhrende" style="font-size: smaller; color: #aaa;">Uhr</span>
                 </label>
             </div>

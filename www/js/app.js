@@ -78,9 +78,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   $urlRouterProvider.otherwise('login');
   $ionicConfigProvider.views.maxCache(0);
 
+})
+
+.directive('myTempTemplate', function() {
+  return {
+    template : "<div id='loading'><h4>L&auml;dt...</div>"
+  }
 });
 
 model = {
   irgendeineVaribledazu: "KeineAhnungs"
 }
+
 
