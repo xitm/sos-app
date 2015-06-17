@@ -124,7 +124,7 @@ angular.module('starter.services', [])
     
     this.difference = function(object){
         var offset = new Date(0).getTimezoneOffset()*60*1000;
-        var diff = this.createDateObject(object.ende - object.beginn + offset);
+        var diff = this.createDateObject(object.ende - object.beginn);
         return diff;
     }
     
@@ -132,14 +132,29 @@ angular.module('starter.services', [])
         //date ist als Datum mit der Zeit 00:00 zu uebergeben
         //time ist als String mit dem Format hh:mm zu uebergeben
         var ms = 0;
-        ms += date.getTime(); //wandelt das Datum in Millisekunden um!
-    
-        var hours = time.split(':')[0];
-        var minutes = time.split(':')[1];
+        if (time!=undefined) {
+            ms += date.getTime(); //wandelt das Datum in Millisekunden um!
         
-        ms += hours*60*60*1000; //wandelt die Stunden in Milliskenunden um
-        ms += minutes*60*1000; //wandelt die Minuten in Millisekunden um
-        ms += date.getTimezoneOffset()*60*1000;
+            var hours = time.split(':')[0];
+            var minutes = time.split(':')[1];
+            
+            ms += hours*60*60*1000; //wandelt die Stunden in Milliskenunden um
+            ms += minutes*60*1000; //wandelt die Minuten in Millisekunden um
+            ms += date.getTimezoneOffset()*60*1000;
+            
+        }else{
+            ms = new Date(parseInt(1970), parseInt(date.months), parseInt(date.days+1), parseInt(date.hours+1), parseInt(date.minutes), 0);
+            //ms.setFullYear(parseInt(1970), parseInt(date.months), parseInt(date.days));
+            //ms.setHours(parseInt(date.hours));
+            //ms.setMinutes(parseInt(date.minutes));
+            //ms.setMilliseconds(0);
+            console.log(date);
+            console.log(date.hours + ":" + date.minutes);
+            console.log(ms.getHours() + ":" + ms.getMinutes());
+            console.log(ms);
+            ms = ms.getTime();
+            console.log(ms);
+        }
         return ms;
     }
     
@@ -155,23 +170,6 @@ angular.module('starter.services', [])
             minutes : date.getMinutes() - dayZero.getMinutes()
         }
         return timeModel;
-        //if (timeModel.minutes<0) {
-        //    timeModel.minutes = timeModel.minutes+60;
-        //    timeModel.hours--;
-        //}
-        //if (timeModel.hours<0) {
-        //    timeModel.hours = timeModel.hours+24;
-        //    timeModel.days--;
-        //}
-        //if (timeModel.days<0) {
-        //    
-        //}
-        //return {
-        //    year : Math.floor(date/365/12/30/60/60/1000),
-        //    month : Math.floor(date/24/60/60/1000),
-        //    day : Math.floor(date/60/60/1000),
-        //    hours : Math.floor(date/60/1000)
-        //}
     }
 })
 
@@ -1074,12 +1072,14 @@ angular.module('starter.services', [])
 })
 //----------- 7. - Arbeit_Class_Definition------//
 .factory('Arbeit', function(){
-    function Arbeit(id, anfangsdatum, enddatum, anfangszeit, endzeit, leistungsId, active) {
+    function Arbeit(id, beginn, ende, leistungsId, active) {
         var _id = undefined;
-        var _anfangsdatum = undefined;
-        var _enddatum = undefined;
-        var _anfangszeit = undefined;
-        var _endzeit = undefined;
+        //var _anfangsdatum = undefined;
+        //var _enddatum = undefined;
+        //var _anfangszeit = undefined;
+        //var _endzeit = undefined;
+        var _beginn = undefined;
+        var _ende = ende;
         var _leistungsId = undefined;
         var _active = false;
         
@@ -1091,35 +1091,49 @@ angular.module('starter.services', [])
             return _id;
         }
         
-        //7.2 datum_definitionen
-        this.setAnfangsdatum = function(anfangsdatum) {
-            _anfangsdatum = anfangsdatum;
+        ////7.2 datum_definitionen
+        //this.setAnfangsdatum = function(anfangsdatum) {
+        //    _anfangsdatum = anfangsdatum;
+        //}
+        //this.getAnfangsdatum = function() {
+        //    return _anfangsdatum;
+        //}
+        //
+        //this.setEnddatum = function(enddatum) {
+        //    _enddatum = enddatum;
+        //}
+        //this.getEnddatum = function() {
+        //    return _enddatum;
+        //}
+        //
+        ////7.3 anfangszeit_definitionen
+        //this.setAnfangszeit = function(anfangszeit) {
+        //    _anfangszeit = anfangszeit;
+        //}
+        //this.getAnfangszeit = function() {
+        //    return _anfangszeit;
+        //}
+        //
+        ////7.4 endzeit_definitionen
+        //this.setEndzeit = function(endzeit) {
+        //    _endzeit = endzeit;
+        //}
+        //this.getEndzeit = function() {
+        //    return _endzeit;
+        //}
+        
+        this.setBeginn = function(beginn) {
+            _beginn = beginn;
         }
-        this.getAnfangsdatum = function() {
-            return _anfangsdatum;
+        this.getBeginn = function() {
+            return _beginn;
         }
         
-        this.setEnddatum = function(enddatum) {
-            _enddatum = enddatum;
+        this.setEnde = function(ende) {
+            _ende = ende;
         }
-        this.getEnddatum = function() {
-            return _enddatum;
-        }
-        
-        //7.3 anfangszeit_definitionen
-        this.setAnfangszeit = function(anfangszeit) {
-            _anfangszeit = anfangszeit;
-        }
-        this.getAnfangszeit = function() {
-            return _anfangszeit;
-        }
-        
-        //7.4 endzeit_definitionen
-        this.setEndzeit = function(endzeit) {
-            _endzeit = endzeit;
-        }
-        this.getEndzeit = function() {
-            return _endzeit;
+        this.getEnde = function() {
+            return _ende;
         }
         
         //7.5 leistung_definitionen
@@ -1139,10 +1153,12 @@ angular.module('starter.services', [])
         }
         
         this.setId(id);
-        this.setAnfangsdatum(anfangsdatum);
-        this.setEnddatum(enddatum);
-        this.setAnfangszeit(anfangszeit);
-        this.setEndzeit(endzeit);
+        //this.setAnfangsdatum(anfangsdatum);
+        //this.setEnddatum(enddatum);
+        //this.setAnfangszeit(anfangszeit);
+        //this.setEndzeit(endzeit);
+        this.setBeginn(beginn);
+        this.setEnde(ende);
         this.setLeistungsId(leistungsId);
         if (active) {
             this.setActive(active);
@@ -1152,10 +1168,12 @@ angular.module('starter.services', [])
     Arbeit.prototype.toJson = function(){
         return {
             id : this.getId(),
-            anfangsdatum : this.getAnfangsdatum(),
-            enddatum: this.getEnddatum(),
-            anfangszeit : this.getAnfangszeit(),
-            endzeit : this.getEndzeit(),
+            //anfangsdatum : this.getAnfangsdatum(),
+            //enddatum: this.getEnddatum(),
+            //anfangszeit : this.getAnfangszeit(),
+            //endzeit : this.getEndzeit(),
+            beginn : this.getBeginn(),
+            ende : this.getEnde(),
             leistungsId : this.getLeistungsId(),
             active : this.getActive()
         }
@@ -1163,7 +1181,7 @@ angular.module('starter.services', [])
     
     Arbeit.create = function(JSONstructure){
         
-        var ar = new Arbeit(JSONstructure.id, JSONstructure.anfangsdatum, JSONstructure.enddatum, JSONstructure.anfangszeit,JSONstructure.endzeit, JSONstructure.leistungsId);
+        var ar = new Arbeit(JSONstructure.id, JSONstructure.beginn,JSONstructure.ende, JSONstructure.leistungsId);
         return(
             ar
         )
