@@ -97,22 +97,25 @@ angular.module('starter.controllers', [])
             template : "<div my-temp-template></div>"
         });
         if (localStorage.getItem("mle_model2")===null) { //wenn kein lokaler Speicher besteht -> nur beim ersten Mal der Fall!
+            console.log("Baut Internetverbindung auf!");
             model.dataModel = DataModel.syncWithSource(model.dataModel, true); //sync mit Webservice
-
+            model.dataModel.then(function(data){ //ergebnis des Promises, also was passiert nunt?
+                model.dataModel = data;
+                DataModel.update(model.dataModel, true);
+                $ionicLoading.hide();
+                },
+                function(error){
+                    $ionicLoading.hide();
+                    alert(error);
+            });
         }else{
             model.dataModel = DataModel.create(localStorage.getItem("mle_model2")); //Anpassung an neue Service-Gestaltung
-            model.dataModel = DataModel.syncWithSource(model.dataModel); //sync mit Webservice
+            $ionicLoading.hide();
+            console.log("Baut keine Internetverbindung auf!");
+            //model.dataModel = DataModel.syncWithSource(model.dataModel); //sync mit Webservice
         }
         
-        model.dataModel.then(function(data){ //ergebnis des Promises, also was passiert nunt?
-            model.dataModel = data;
-            DataModel.update(model.dataModel, true);
-            $ionicLoading.hide();
-            },
-            function(error){
-                $ionicLoading.hide();
-                alert(error);
-        });
+
 
     $scope.init = function() {
       $scope.passcode = "";
@@ -207,7 +210,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessionuebersichtCtrl', function($scope, $state, $ionicPopup, DataModel, $ionicViewSwitcher) {
+.controller('SessionuebersichtCtrl', function($scope, $state, $ionicPopup, DataModel, $ionicViewSwitcher, $ionicLoading) {
     $scope.callSessiondetail=function(sessionId){
         model.dataModel.getSessionById(sessionId).setActive(true); //Session wird aktiv gesetzt
         $ionicViewSwitcher.nextDirection('forward'); //Richtung der Animation festlegen
@@ -234,9 +237,24 @@ angular.module('starter.controllers', [])
         });
         confirmPopup.then(function(res) {
             if (res) {
+                $ionicLoading.show({
+                    template : "<div my-temp-template></div>"
+                });
                 //Session hochladen
-                DataModel.uploadData(model.dataModel);
-                $state.reload();
+                DataModel.uploadData(model.dataModel, function(){
+                    model.dataModel = DataModel.syncWithSource(model.dataModel, true); //sync mit Webservice
+                    model.dataModel.then(function(data){ //ergebnis des Promises, also was passiert nunt?
+                        model.dataModel = data;
+                        DataModel.update(model.dataModel, true);
+                        $ionicLoading.hide();
+                        $state.reload();
+                        },
+                        function(error){
+                            $ionicLoading.hide();
+                            alert(error);
+                    });
+                });
+                
             }else {
                 //nichts machen
             }
@@ -315,7 +333,6 @@ angular.module('starter.controllers', [])
         addToTotalTime(diff); //zur gesamten Dauer hinzufuegen
         var leistungsId= _ar.leistungsId; //caching LeistungsId
         $scope.arbeiten[i].leistung=model.dataModel.getLeistungById(leistungsId).getName(); //Namen der Leistung ausgeben!
-        
     }
     
         $scope.totalDiffTime = TimeCalculatorService.createDateObject($scope.totalDiffTime);
@@ -526,16 +543,16 @@ angular.module('starter.controllers', [])
         var leisId = leis.options[leis.selectedIndex].getAttribute('data-leistungs-id');
         
 
-        var beginn = new Date(document.getElementById("anfangsdatum").value);
-        var ende = new Date(document.getElementById("enddatum").value);
+        var anfangsdatum = new Date(document.getElementById("anfangsdatum").value);
+        var enddatum = new Date(document.getElementById("enddatum").value);
         var anfangszeit = document.getElementById("timeA").value;
         var endzeit = document.getElementById("timeE").value;
-        beginn = TimeCalculatorService.createDateInMs(beginn, anfangszeit);
-        ende = TimeCalculatorService.createDateInMs(ende, endzeit);
+        var beginn = TimeCalculatorService.createDateInMs(anfangsdatum, anfangszeit);
+        var ende = TimeCalculatorService.createDateInMs(enddatum, endzeit);
         
         var dauer = TimeCalculatorService.createDateObject(ende-beginn)
-        
-        if (dauer.stunden<0 && dauer.minutes<0 && dauer.days<0 ) {
+        console.log(dauer);
+        if (dauer.stunden<0 || dauer.minutes<0 || dauer.days<0 || dauer.months<0 || dauer.years<0) {
             var alertPopup = $ionicPopup.alert({
                 title:"Fehler",
                 template: "Die Dauer der Arbeit ist kleiner 0!"
@@ -563,6 +580,7 @@ angular.module('starter.controllers', [])
                 template: 'Folgende Arbeitsdaten werden erfasst: <br/>'
                         + leis.options[leis.selectedIndex].text
                         + '<br /> von ' + new Date(beginn).toString().substring(0,10) + dates
+                        + '<br /> von ' + anfangszeit + " bis " + endzeit
                         + ' (' + tage + dauer.hours + 'h ' + dauer.minutes + 'min)'  //Arbeitsdaten!!! Geht das noch schöner?
                         
             });
@@ -573,8 +591,8 @@ angular.module('starter.controllers', [])
                     var ende = new Date(document.getElementById("enddatum").value);
                     var anfangszeit = document.getElementById("timeA").value;
                     var endzeit = document.getElementById("timeE").value;
-                    var beginn = TimeCalculatorService.createDateInMs(beginn, anfangszeit);
-                    var ende = TimeCalculatorService.createDateInMs(ende, endzeit);
+                    beginn = TimeCalculatorService.createDateInMs(beginn, anfangszeit);
+                    ende = TimeCalculatorService.createDateInMs(ende, endzeit);
                     
                     if (activeArbeit) {
                         //activeArbeitObj.setAnfangsdatum(_anfangsdatum);
@@ -728,35 +746,40 @@ angular.module('starter.controllers', [])
             var endzeit = document.getElementById("timeE").value;
             var beginn = TimeCalculatorService.createDateInMs(anfangsdatum, anfangszeit);
             var ende = TimeCalculatorService.createDateInMs(enddatum, endzeit);
+            
             var anfangskilometer = document.getElementById("kanfang").value;
             var endkilometer = document.getElementById("kmende").value;
             var anfangsort = document.getElementById("anfangsort").value;
             var endort = document.getElementById("endort").value;
             var kfz = document.getElementById("kfz").value;
         
-        var dauer = TimeCalculatorService.time(anfangszeit, endzeit);
-        var stunden = dauer.hours;
-        if (parseInt(stunden)<0) {
+        var dauer = TimeCalculatorService.createDateObject(ende-beginn
+                                                           );
+        if (parseInt(dauer.hours)<0) {
             var alertPopup = $ionicPopup.alert({
                 title:"Fehler",
                 template: "Die Dauer der Fahrt ist kleiner 0!"
             })
             return
         }
-        var minuten = dauer.minutes;
         
         if (passt) {
-            var beginnObj = TimeCalculatorService.createDateObject(beginn);
-            var endeObj = TimeCalculatorService.createDateObject(ende);
-            var diff = TimeCalculatorService.createDateObject(ende-beginn);
             
-           
+            var tage = (dauer.days!=0)?(dauer.days + " Tage "):"";
+            var beginndate = new Date(beginn);
+            beginndate = beginndate.toString().substring(0,10);
+            var enddate = new Date(ende);
+            enddate = enddate.toString().substring(0,10);
+
+            var dateMsg = (beginndate===enddate)?("am " + beginndate):("von " + beginndate + " bis " + enddate);
+            
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Fahrtzeit hinzufügen',
                 template: 'Folgende Fahrtzeiten werden erfasst: <br />' 
                             + leis.options[leistung.selectedIndex].text + ", von " + anfangsort + " bis " + endort
-                            + '<br />am ' + anfangsdatum + ' von ' + beginnObj.hours +  ' bis '  + endeObj.hours
-                            + '<br />(' + gesamtkilometer + ' Kilometer, ' + diff.hours + "h " + diff.minutes + "min)" 
+                            + '<br /> ' + dateMsg +
+                            '<br />' +' von ' + anfangszeit +  ' bis '  + endzeit
+                            + '<br />(' + gesamtkilometer + ' Kilometer, ' + tage + "" + dauer.hours + "h " + dauer.minutes + "min)" 
             });
             confirmPopup.then(function(res) {
                 if(res) {
