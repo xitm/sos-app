@@ -1325,9 +1325,14 @@ angular.module('starter.services', [])
         });
     }
     
-    this.uploadData = function(objectBusinessObject){
+    this.uploadData = function(objectBusinessObject, successFunction){
         var _sessions = objectBusinessObject.getMitarbeiter().getSessions();
         //console.log(_sessions);
+        if (!successFunction) {
+            successFunction = function(data){
+                console.log(data);
+            }
+        }
         for(var i=0,anz=_sessions.length;i<anz;i++){
             var _ses = _sessions[0];
             console.log(_ses.toJson());
@@ -1337,9 +1342,7 @@ angular.module('starter.services', [])
                 data : _ses.toJson()
             }
             _sessions.splice(0,1);
-            $http(uploadOptions).success(function(data){
-                console.log(data);
-            })
+            $http(uploadOptions).success(successFunction);
         }
         this.update(model.dataModel, true);
     }
