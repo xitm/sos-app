@@ -1335,7 +1335,6 @@ angular.module('starter.services', [])
         }
         for(var i=0,anz=_sessions.length;i<anz;i++){
             var _ses = _sessions[0];
-            console.log(_ses.toJson());
             var uploadOptions = {
                 method : 'POST',
                 url : 'http://rest.learncode.academy/api/mciapp/testdata_sessionsTest',

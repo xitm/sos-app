@@ -241,19 +241,34 @@ angular.module('starter.controllers', [])
                     template : "<div my-temp-template></div>"
                 });
                 //Session hochladen
-                DataModel.uploadData(model.dataModel, function(){
-                    model.dataModel = DataModel.syncWithSource(model.dataModel, true); //sync mit Webservice
-                    model.dataModel.then(function(data){ //ergebnis des Promises, also was passiert nunt?
-                        model.dataModel = data;
-                        DataModel.update(model.dataModel, true);
-                        $ionicLoading.hide();
-                        $state.reload();
-                        },
-                        function(error){
+                if (model.dataModel.getMitarbeiter().getSessions().length!=0) {
+                    DataModel.uploadData(model.dataModel, function(){
+                        model.dataModel = DataModel.syncWithSource(model.dataModel, true); //sync mit Webservice
+                        model.dataModel.then(function(data){ //ergebnis des Promises, also was passiert nunt?
+                            model.dataModel = data;
+                            DataModel.update(model.dataModel, true);
                             $ionicLoading.hide();
-                            alert(error);
+                            $state.reload();
+                            },
+                            function(error){
+                                $ionicLoading.hide();
+                                alert(error);
+                        });
                     });
-                });
+                }else{
+                     model.dataModel = DataModel.syncWithSource(model.dataModel, true); //sync mit Webservice
+                        model.dataModel.then(function(data){ //ergebnis des Promises, also was passiert nunt?
+                            model.dataModel = data;
+                            DataModel.update(model.dataModel, true);
+                            $ionicLoading.hide();
+                            $state.reload();
+                            },
+                            function(error){
+                                $ionicLoading.hide();
+                                alert(error);
+                        });
+                }
+
                 
             }else {
                 //nichts machen
