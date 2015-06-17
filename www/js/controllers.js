@@ -54,8 +54,8 @@ angular.module('starter.controllers', [])
         //Session erstellen
         var session = new Session.create(
             {id: sessionid,
-            anfangsdatum: new Date(document.getElementById("datum").value), //Datum vom Auswahlfeld
-            enddatum: new Date(document.getElementById("datum").value),
+            beginn: new Date(document.getElementById("datum").value), //Datum vom Auswahlfeld
+            ende: new Date(document.getElementById("datum").value),
             clientId: client.getAttribute('data-id')//clientId
             }
         )
@@ -259,12 +259,11 @@ angular.module('starter.controllers', [])
     }
     
     //Sessiondatum
-    var anfang = ($scope.activeSession.toJson().anfangsdatum).toString().substring(0,10);
-    var ende = ($scope.activeSession.toJson().enddatum).toString().substring(0,10);
-    if (anfang==ende) {
-        $scope.date = anfang;
+    var date = $scope.activeSession.timeFrame()
+    if (new Date(date.min).toString().substring(0,10) == new Date(date.max).toString().substring(0,10)) {
+        $scope.date = new Date(date.min).toString().substring(0,10);
     } else {
-        $scope.date = anfang + " - " + ende;
+        $scope.date = new Date(date.min).toString().substring(0,10) + " - " + new Date(date.max).toString().substring(0,10);
     }
 
     $scope.totalDiffTime = 0; //leeres Object fuer die Differenz der Zeit
@@ -287,9 +286,15 @@ angular.module('starter.controllers', [])
     for(var i=0,anz=$scope.fahrten.length;i<anz;i++){
         var _fa = $scope.fahrten[i]; //Fahrt des aktuellen Durchlaufs
         var diff = TimeCalculatorService.difference(_fa); //caching der Zeitdifferenz der aktuellen Fahrt
+        
         _fa.diffRoute = parseFloat(_fa.endkilometer)-parseFloat(_fa.anfangskilometer);//caching der Kilometerdifferenz
         $scope.totalDiffRoute += _fa.diffRoute; //hinzuzaehlen zur gesamten Differenz
-        _fa.differenz = diff.hours + " Stunden " + diff.minutes + " Minuten"; //ausgabe zurechtschneiden
+        if (diff.days!=0) {
+            var days = diff.days + " Tage ";
+        }else{
+            var days = "";
+        }
+        _fa.differenz = days + diff.hours + " Stunden " + diff.minutes + " Minuten"; //ausgabe zurechtschneiden
         
         diff = TimeCalculatorService.createDateInMs(diff);
         addToTotalTime(diff); //Zeitdifferenz dazuzaehlen
@@ -298,22 +303,38 @@ angular.module('starter.controllers', [])
     for(var i=0,anz=$scope.arbeiten.length;i<anz;i++){
         var _ar = $scope.arbeiten[i]; //Arbeit des aktuellen Durchlaufs
         var diff = TimeCalculatorService.difference(_ar); //caching der Zeitdifferenz
-
-        _ar.differenz = diff.hours + " Stunden " + diff.minutes + " Minuten"; //ausgabe zurechtstueckeln
+        
+        if (diff.days!=0) {
+            var days = diff.days + " Tage ";
+        }else{
+            var days = "";
+        }
+        _ar.differenz = days + diff.hours + " Stunden " + diff.minutes + " Minuten"; //ausgabe zurechtschneiden
+        
         diff = TimeCalculatorService.createDateInMs(diff);
         addToTotalTime(diff); //zur gesamten Dauer hinzufuegen
         var leistungsId= _ar.leistungsId; //caching LeistungsId
         $scope.arbeiten[i].leistung=model.dataModel.getLeistungById(leistungsId).getName(); //Namen der Leistung ausgeben!
-        console.log(diff);
+        
     }
     
-    console.log($scope.totalDiffTime);
+        $scope.totalDiffTime = TimeCalculatorService.createDateObject($scope.totalDiffTime);
+         if ($scope.totalDiffTime.days != 0) {
+            $scope.taglabel = "Tage";
+         } else {
+            $scope.taglabel= "";
+            $scope.totalDiffTime.days = null;
+         }
+
     function addToTotalTime(time){ //funktion erstellt, da sie 2 mal gebraucht wird!
         $scope.totalDiffTime += time;
+
     }
     
     function substractFromTotalTime(time){
-        $scope.totalDiffTime -= time;
+        $scope.totalDiffTime.hours -= time.hours;
+        $scope.totalDiffTime.minutes -= time.minutes;
+        $scope.totalDiffTime.days -= time.days;
     }
     
     //Object zur Ueberpruefung der Loeschung
@@ -392,6 +413,7 @@ angular.module('starter.controllers', [])
             
         
         }
+        
     }    
     
     $scope.callFahrtenmanager = function() {
@@ -461,8 +483,8 @@ angular.module('starter.controllers', [])
 
     //Gespeichertes Datum voreintragen
     $scope.arbeit = {
-        anfangsdatum: activeArbeit?new Date(activeArbeit.anfangsdatum):new Date(currentsession.getAnfangsdatum()), //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
-        enddatum:  activeArbeit?new Date(activeArbeit.enddatum):new Date(currentsession.getEnddatum()), //ENDDATUM!!!
+        anfangsdatum: activeArbeit?new Date(activeArbeit.beginn):new Date(currentsession.getBeginn()), //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
+        enddatum:  activeArbeit?new Date(activeArbeit.ende):new Date(currentsession.getEnde()), //ENDDATUM!!!
     }
     
     if (activeArbeit && activeArbeit.leistungsId!=undefined && activeArbeit.leistungsId!=null) {
@@ -474,9 +496,21 @@ angular.module('starter.controllers', [])
             }
         }
     }
+    
+    if (activeArbeit) {
+        var anfang = {
+            hours: (new Date(activeArbeit.beginn).getHours()==0)?("00"):((new Date(activeArbeit.beginn).getHours()<10 && new Date(activeArbeit.beginn).getHours()!=0)?("0"+new Date(activeArbeit.beginn).getHours()):(new Date(activeArbeit.beginn).getHours())),
+            minutes: (new Date(activeArbeit.ende).getMinutes()==0)?("00"):((new Date(activeArbeit.beginn).getMinutes()<10  && new Date(activeArbeit.beginn).getMinutes()!=0)?("0"+new Date(activeArbeit.beginn).getMinutes()):(new Date(activeArbeit.beginn).getMinutes()))
+        }
+        var ende = {
+            hours: (new Date(activeArbeit.ende).getHours()==0)?("00"):((new Date(activeArbeit.ende).getHours()<10 && new Date(activeArbeit.ende).getHours()!=0)?("0"+new Date(activeArbeit.ende).getHours()):(new Date(activeArbeit.ende).getHours())),
+            minutes: (new Date(activeArbeit.ende).getMinutes()==0)?("00"):((new Date(activeArbeit.ende).getMinutes()<10 && new Date(activeArbeit.ende).getMinutes()!=0)?("0"+new Date(activeArbeit.ende).getMinutes()):(new Date(activeArbeit.ende).getMinutes()))
+        }
+    }
+     
     //console.log($scope.selectLeistung);
-    $scope.uhranfang = activeArbeit?activeArbeit.anfangszeit:null;
-    $scope.uhrende = activeArbeit?activeArbeit.endzeit:null;
+    $scope.uhranfang = activeArbeit?(anfang.hours + ":" + anfang.minutes):null;
+    $scope.uhrende = activeArbeit?(ende.hours + ":" + ende.minutes):null;
     
     
     $scope.callSessiondetail = function(save) {
@@ -491,35 +525,23 @@ angular.module('starter.controllers', [])
         var leis = document.getElementById("leistung");
         var leisId = leis.options[leis.selectedIndex].getAttribute('data-leistungs-id');
         
-        var start = document.getElementById("timeA").value;
-        var ende = document.getElementById("timeE").value;
-        var dauer = TimeCalculatorService.time(start, ende);
-        function DateTest(){
-                var hours = start.split(':')[0];
-                var minutes = start.split(':')[1];
-                var ms = 0;
-                ms += minutes*60*1000;
-                ms += hours*60*60*1000;
-                
-                var datum = new Date(document.getElementById("anfangsdatum").value);
-                //console.log(datum.getTimezoneOffset());
-                ms += datum.getTimezoneOffset()*60*1000;
-                ms += datum.getTime();
-                //console.log(ms);
-                //console.log(new Date(ms));
-        }
-        DateTest();
+
+        var beginn = new Date(document.getElementById("anfangsdatum").value);
+        var ende = new Date(document.getElementById("enddatum").value);
+        var anfangszeit = document.getElementById("timeA").value;
+        var endzeit = document.getElementById("timeE").value;
+        beginn = TimeCalculatorService.createDateInMs(beginn, anfangszeit);
+        ende = TimeCalculatorService.createDateInMs(ende, endzeit);
         
-        var stunden = dauer.hours;
-        if (parseInt(stunden)<0) {
+        var dauer = TimeCalculatorService.createDateObject(ende-beginn)
+        
+        if (dauer.stunden<0 && dauer.minutes<0 && dauer.days<0 ) {
             var alertPopup = $ionicPopup.alert({
                 title:"Fehler",
                 template: "Die Dauer der Arbeit ist kleiner 0!"
             })
             return
         }
-        var minuten = dauer.minutes;
-        
         //Fehlerbehandlung, zuerst CSS wieder normal machen
         var passt = FormvalidationService.validateArbeit();
         
@@ -533,24 +555,26 @@ angular.module('starter.controllers', [])
         
         //Testvariable abfragen
         if (passt) {
-            var dauer = document.getElementById("timeA").value - document.getElementById("timeE").value;
+            var tage = (dauer.days!=0)?(dauer.days + " Tage "):"";
+            var dates = (new Date(ende).toString().substring(0,10) != new Date(beginn).toString().substring(0,10))?(" bis " + new Date(ende).toString().substring(0,10)):"";
+            
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Arbeitszeit hinzufügen',
                 template: 'Folgende Arbeitsdaten werden erfasst: <br/>'
-                        + leis.options[leis.selectedIndex].text + ", am " + document.getElementById("anfangsdatum").value 
-                        + '<br /> von ' + start +  '  bis '  + ende
-                        + ' (' + stunden + 'h ' + minuten + 'min)'  //Arbeitsdaten!!! Geht das noch schöner?
+                        + leis.options[leis.selectedIndex].text
+                        + '<br /> von ' + new Date(beginn).toString().substring(0,10) + dates
+                        + ' (' + tage + dauer.hours + 'h ' + dauer.minutes + 'min)'  //Arbeitsdaten!!! Geht das noch schöner?
                         
             });
             confirmPopup.then(function(res) {
                 if(res) {
                     /*arbeitssession freigeben und in sessionmanager wechseln*/
-                    var anfangsdatum = new Date(document.getElementById("anfangsdatum").value);
-                    var enddatum = new Date(document.getElementById("enddatum").value);
+                    var beginn = new Date(document.getElementById("anfangsdatum").value);
+                    var ende = new Date(document.getElementById("enddatum").value);
                     var anfangszeit = document.getElementById("timeA").value;
                     var endzeit = document.getElementById("timeE").value;
-                    var beginn = TimeCalculatorService.createDateInMs(anfangsdatum, anfangszeit);
-                    var ende = TimeCalculatorService.createDateInMs(enddatum, endzeit);
+                    var beginn = TimeCalculatorService.createDateInMs(beginn, anfangszeit);
+                    var ende = TimeCalculatorService.createDateInMs(ende, endzeit);
                     
                     if (activeArbeit) {
                         //activeArbeitObj.setAnfangsdatum(_anfangsdatum);
@@ -627,14 +651,22 @@ angular.module('starter.controllers', [])
 
     //Datum eintragen
     $scope.fahrt = {
-        anfangsdatum: activeFahrt?new Date(activeFahrt.anfangsdatum):new Date(currentsession.getAnfangsdatum()), //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
-        enddatum:  activeFahrt?new Date(activeFahrt.enddatum):new Date(currentsession.getEnddatum()), //ENDDATUM!!!
+        anfangsdatum: activeFahrt?new Date(activeFahrt.beginn):new Date(currentsession.getBeginn()), //Da currentsession bereits instanceof Session -> keine Suche im Index mehr!
+        enddatum:  activeFahrt?new Date(activeFahrt.ende):new Date(currentsession.getEnde()), //ENDDATUM!!!
     }
-
+    if (activeFahrt) {
+        var anfang = {
+            hours: (new Date(activeFahrt.beginn).getHours()==0)?("00"):((new Date(activeFahrt.beginn).getHours()<10 && new Date(activeFahrt.beginn).getHours()!=0)?("0"+new Date(activeFahrt.beginn).getHours()):(new Date(activeFahrt.beginn).getHours())),
+            minutes: (new Date(activeFahrt.ende).getMinutes()==0)?("00"):((new Date(activeFahrt.beginn).getMinutes()<10  && new Date(activeFahrt.beginn).getMinutes()!=0)?("0"+new Date(activeFahrt.beginn).getMinutes()):(new Date(activeFahrt.beginn).getMinutes()))
+        }
+        var ende = {
+            hours: (new Date(activeFahrt.ende).getHours()==0)?("00"):((new Date(activeFahrt.ende).getHours()<10 && new Date(activeFahrt.ende).getHours()!=0)?("0"+new Date(activeFahrt.ende).getHours()):(new Date(activeFahrt.ende).getHours())),
+            minutes: (new Date(activeFahrt.ende).getMinutes()==0)?("00"):((new Date(activeFahrt.ende).getMinutes()<10 && new Date(activeFahrt.ende).getMinutes()!=0)?("0"+new Date(activeFahrt.ende).getMinutes()):(new Date(activeFahrt.ende).getMinutes()))
+        }
+    }
     
-    //console.log($scope.selectLeistung);
-    $scope.uhranfang = activeFahrt?activeFahrt.anfangszeit:null;
-    $scope.uhrende = activeFahrt?activeFahrt.endzeit:null;
+    $scope.uhranfang = activeFahrt?(anfang.hours + ":" + anfang.minutes):null;
+    $scope.uhrende = activeFahrt?(ende.hours + ":" + ende.minutes):null;
     $scope.kanfang = activeFahrt?parseFloat(activeFahrt.anfangskilometer):null;
     $scope.kmende = activeFahrt?parseFloat(activeFahrt.endkilometer):null;
     $scope.anfangsort = activeFahrt?activeFahrt.anfangsort:null;
@@ -718,12 +750,12 @@ angular.module('starter.controllers', [])
             var endeObj = TimeCalculatorService.createDateObject(ende);
             var diff = TimeCalculatorService.createDateObject(ende-beginn);
             
-            console.log(diff);
+           
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Fahrtzeit hinzufügen',
                 template: 'Folgende Fahrtzeiten werden erfasst: <br />' 
                             + leis.options[leistung.selectedIndex].text + ", von " + anfangsort + " bis " + endort
-                            + '<br />am ' + anfangsdatum + ' von ' + beginn.hours +  ' bis '  + endeObj.hours
+                            + '<br />am ' + anfangsdatum + ' von ' + beginnObj.hours +  ' bis '  + endeObj.hours
                             + '<br />(' + gesamtkilometer + ' Kilometer, ' + diff.hours + "h " + diff.minutes + "min)" 
             });
             confirmPopup.then(function(res) {
@@ -740,7 +772,7 @@ angular.module('starter.controllers', [])
                         activeFahrtObj.setBeginn(beginn);
                         activeFahrtObj.setEnde(ende);
                         activeFahrtObj.setLeistungsId(leisId);
-                        activeFahrtObj.setStandKfz(kfz);
+                        activeFahrtObj.setKfz(kfz);
                         activeFahrtObj.setActive(false);
                     }else{
                         var fahrt = new Fahrt.create({
@@ -785,7 +817,7 @@ angular.module('starter.controllers', [])
     //datum auf angemessenes format zuschneiden
     for(var i=0,anz=$scope.sessions.length;i<anz;i++){
         var _ses = $scope.sessions[i];
-        _ses.date = (_ses.anfangsdatum).toString().substring(0,10);
+        _ses.date = (_ses.beginn).toString().substring(0,10);
     }
     
     $scope.onItemDelete = function(sessionId) {

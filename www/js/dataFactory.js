@@ -123,7 +123,6 @@ angular.module('starter.services', [])
     }
     
     this.difference = function(object){
-        var offset = new Date(0).getTimezoneOffset()*60*1000;
         var diff = this.createDateObject(object.ende - object.beginn);
         return diff;
     }
@@ -148,12 +147,7 @@ angular.module('starter.services', [])
             //ms.setHours(parseInt(date.hours));
             //ms.setMinutes(parseInt(date.minutes));
             //ms.setMilliseconds(0);
-            console.log(date);
-            console.log(date.hours + ":" + date.minutes);
-            console.log(ms.getHours() + ":" + ms.getMinutes());
-            console.log(ms);
             ms = ms.getTime();
-            console.log(ms);
         }
         return ms;
     }
@@ -428,6 +422,8 @@ angular.module('starter.services', [])
             clienten : _clRes
         };
     }
+    
+    
     
     //1.Zusatz Create_option
     BusinessObject.create = function(JSONstructure){
@@ -740,10 +736,10 @@ angular.module('starter.services', [])
 //----------- 5. - Session_Class_Definition------//
 .factory('Session', function(Arbeit, Fahrt){
     
-    function Session(id, anfangsdatum, enddatum, clientId, deleted){
+    function Session(id, beginn, ende, clientId, deleted){
         var _id = undefined;
-        var _anfangsdatum = undefined;
-        var _enddatum = undefined;
+        var _beginn = undefined;
+        var _ende = undefined;
         var _clientId = undefined;
         var _fahrten= [];
         var _arbeiten = [];
@@ -761,18 +757,18 @@ angular.module('starter.services', [])
         
         
         //5.2 sessionDatum_definitionen
-        this.setAnfangsdatum = function(sessionDatum) {
-            _anfangsdatum = sessionDatum;
+        this.setBeginn = function(sessionDatum) {
+            _beginn = sessionDatum;
         }
-        this.getAnfangsdatum = function() {
-            return _anfangsdatum;
+        this.getBeginn = function() {
+            return _beginn;
         }
         
-        this.setEnddatum = function(enddatum) {
-            _enddatum = enddatum;
+        this.setEnde = function(ende) {
+            _ende = ende;
         }
-        this.getEnddatum = function() {
-            return _enddatum;
+        this.getEnde = function() {
+            return _ende;
         }
         
         //5.3 client_definitionen
@@ -814,8 +810,8 @@ angular.module('starter.services', [])
         }
         
         this.setId(id); //Errorhandling!
-        this.setAnfangsdatum(anfangsdatum);
-        this.setEnddatum(enddatum);
+        this.setBeginn(beginn);
+        this.setEnde(ende);
         this.setClientId(clientId); 
         if(deleted){this.setDeleted(deleted)};
     }
@@ -858,8 +854,8 @@ angular.module('starter.services', [])
         
         return {
             id : this.getId(),
-            anfangsdatum : this.getAnfangsdatum(),
-            enddatum: this.getEnddatum(),
+            beginn : this.getBeginn(),
+            ende: this.getEnde(),
             clientId : this.getClientId(),
             fahrten : _faRes,
             arbeiten : _arRes,
@@ -867,11 +863,44 @@ angular.module('starter.services', [])
         }
     }
     
+    Session.prototype.timeFrame = function() {
+        
+        var fahrten = this.getFahrten();
+        var arbeiten = this.getArbeiten();
+        var min = undefined;
+        var max = undefined;
+        for(var i=0, anz=fahrten.length; i<anz; i++){
+            var fa = fahrten[i];
+            if (min==undefined || fa.getBeginn()<min) {
+                min = fa.getBeginn();
+            }
+            if (max==undefined || fa.getEnde()>max) {
+                max = fa.getEnde();
+            }
+        }        
+        //Arbeiten holen
+        
+        for(var i=0, anz=arbeiten.length; i<anz; i++){
+            var ar = arbeiten[i];
+            if (min==undefined || ar.getBeginn()<min) {
+                min = ar.getBeginn();
+            }
+            if (max==undefined || ar.getEnde()>max) {
+                max = ar.getEnde();
+            }
+        }  
+        
+        return {
+            min : min,
+            max : max
+        }
+    }
+    
     Session.create = function(JSONstructure){
         //Varbiablendeklarationen
         var _fahrten = JSONstructure.fahrten;//fahrconsole.log(JSONstructure.fahrten);
         var _arbeiten = JSONstructure.arbeiten;//arbeiten gesondert ausweisen
-        var ses = new Session(JSONstructure.id, JSONstructure.anfangsdatum, JSONstructure.enddatum, JSONstructure.clientId, JSONstructure.deleted);
+        var ses = new Session(JSONstructure.id, JSONstructure.beginn, JSONstructure.ende, JSONstructure.clientId, JSONstructure.deleted);
         //zusätzliche Fahrten adden
         if (_fahrten) {//wenn keine Fahrten vorhanden sind -> undefined!
             for(var i = 0, anz=_fahrten.length; i<anz; i++){
