@@ -5,14 +5,33 @@
 
   
   <ion-header-bar align-title="left" class="bar-positive">
-    <h1 class="title paddingtop">Arbeitsoberfläche</h1>
-    <div class="button icon-right ion-chevron-right button-clear" style="padding-top: 10px;" ng-click="callSessionuebersicht()" >
+    <div class="button icon-left ion-chevron-left button-clear" style="padding-top: 10px;" ng-click="callSessionuebersicht()" >
         Sessions
     </div>
+    <h1 class="title paddingtop">Arbeitsoberfläche</h1>
   </ion-header-bar>
 
   <ion-content class="padding has-header">
       <div style="height:50px"><!-- Placeholder --></div>
+      
+      <div style="text-align: center">
+            <img src="img/family.png" style="width:40%;"/>
+        </div>
+      
+       </ion-list>
+      <label class="item item-input">
+        <i class="icon ion-search placeholder-icon"></i>
+        <input type="search" minlength="2" id="kunde" placeholder="Kunde suchen" ng-model="search" ng-change="searchContacts()">
+      </label>
+      
+      <ion-list>
+        <div class="list" ng-hide="clicked">
+          <a ng-repeat="contact in contacts | filter:search | limitTo: 3" class="item" ng-if="search" data-id=null ng-model="change" ng-click="updateInput(contact)">
+            <h2>{{contact.fullName}}</h2>
+          </a>
+        </div>
+        
+        
       <div class="padding row">
         
         <div class="col col-25 padding">
@@ -28,33 +47,11 @@
       </div>
         
         <div style="height:30px"><!-- Placeholder --></div>
-        
-        <div class="padding" style="text-align: center">
-            <img src="img/family.png"/>
-        </div>
-      
-      
-      <!---Testanfang-->
-      
-    
 
-      <!---Testende-->
       
       <div class="button button-block button-positive" ng-click="callSessiondetail()" >
         Session Starten
       </div>
-      
-      <label class="item item-input">
-        <i class="icon ion-search placeholder-icon"></i>
-        <input type="search" minlength="2" id="kunde" placeholder="Kunde suchen" ng-model="search" ng-change="searchContacts()">
-      </label>
-      <ion-list>
-        <div class="list" ng-hide="clicked">
-          <a ng-repeat="contact in contacts | filter:search" class="item" ng-if="search" data-id=null ng-model="change" ng-click="updateInput(contact)">
-            <h2>{{contact.fullName}}</h2>
-          </a>
-        </div>
-      </ion-list>
       
       <div class="padding"></div>
       
