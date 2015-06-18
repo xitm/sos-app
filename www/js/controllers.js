@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, DataModel, Session, $state, $filter, $ionicPopup, $ionicPlatform) {
+.controller('DashCtrl', function($scope, DataModel, TimeCalculatorService, Session, $state, $filter, $ionicPopup, $ionicPlatform) {
     $scope.clicked = false;
     $scope.date = new Date();
     
@@ -51,11 +51,17 @@ angular.module('starter.controllers', [])
         //Routine, das im localstorage zu speicher fehlt noch! --> damit das App auch geschlossen und wieder geöffnet werden kann.
         
         /*------------------*/
+        var beginn = new Date(document.getElementById("datum").value);
+        beginn = TimeCalculatorService.createDateInMs(beginn, "00:00");
+        var ende = new Date(document.getElementById("datum").value);
+        ende = TimeCalculatorService.createDateInMs(ende, "00:00");
+        console.log("beginn " + beginn);
+        console.log("ende " + ende);
         //Session erstellen
         var session = new Session.create(
             {id: sessionid,
-            beginn: new Date(document.getElementById("datum").value), //Datum vom Auswahlfeld
-            ende: new Date(document.getElementById("datum").value),
+            beginn: beginn, //Datum vom Auswahlfeld
+            ende: ende,
             clientId: client.getAttribute('data-id')//clientId
             }
         )
@@ -64,6 +70,7 @@ angular.module('starter.controllers', [])
         
         //Session hinzufügen
         model.dataModel.getMitarbeiter().addSession(session) //session zum MA hinzufuegen
+        console.log(model.dataModel.getActiveSession().toJson());
         DataModel.update(model.dataModel, true); //model im local storage updaten
         //Sessionmanager aufrufen
         $state.go('sessiondetail')
@@ -229,11 +236,16 @@ angular.module('starter.controllers', [])
             }
         }
         
+        if (sessionCount>0) {
+            sessionCount = " und folgende Anzahl an Sessions wird hochgeladen: " + sessionCount + ".";
+        }else{
+            sessionCount=". ";
+        }
         
         //popup  vor hochladen
         var confirmPopup = $ionicPopup.confirm({
-            title: "Sessions Hochladen",
-            template: sessionCount + " Session werden hochgeladen. Bitte um Bestätigung"
+            title: "Synchronisierung Datenbank",
+            template: "Es erfolgt die Synchronisierung" + sessionCount + " Bitte um Best&auml;tigung."
         });
         confirmPopup.then(function(res) {
             if (res) {
@@ -292,11 +304,37 @@ angular.module('starter.controllers', [])
     }
     
     //Sessiondatum
-    var date = $scope.activeSession.timeFrame()
-    if (new Date(date.min).toString().substring(0,10) == new Date(date.max).toString().substring(0,10)) {
-        $scope.date = new Date(date.min).toString().substring(0,10);
+    var date = $scope.activeSession.timeFrame();
+    var minObj = new Date(date.min);
+    var maxObj = new Date(date.max);
+    date.min = TimeCalculatorService.createGermanOutput(minObj);
+    date.max = TimeCalculatorService.createGermanOutput(maxObj);
+    
+    minObj.hours = minObj.getHours();
+    minObj.minutes = minObj.getMinutes();
+    
+    maxObj.hours = maxObj.getHours();
+    maxObj.minutes = maxObj.getMinutes();
+    
+    function correctDisplayTime(minOrHour){
+        if (minOrHour<10) {
+            minOrHour = "0" + minOrHour;
+        }
+        return minOrHour;
+    }
+    
+    minObj.hours = correctDisplayTime(minObj.hours);
+    minObj.minutes = correctDisplayTime(minObj.minutes);
+    maxObj.hours = correctDisplayTime(maxObj.hours);
+    maxObj.minutes = correctDisplayTime(maxObj.minutes);
+    
+    if ((date.min).substring(0,10) == (date.max).substring(0,10)) {
+        $scope.date = date.min + ", von " + minObj.hours + ":" + minObj.minutes + " Uhr bis " + maxObj.hours + ":" + maxObj.minutes;
     } else {
-        $scope.date = new Date(date.min).toString().substring(0,10) + " - " + new Date(date.max).toString().substring(0,10);
+        $scope.date = date.min + " um " + minObj.hours + ":" + minObj.minutes + "Uhr - " + date.max + " um " + maxObj.hours + ":" + maxObj.minutes + "Uhr";
+    }
+    if (date.min == undefined) {
+        $scope.date = "";
     }
 
     $scope.totalDiffTime = 0; //leeres Object fuer die Differenz der Zeit
@@ -566,7 +604,7 @@ angular.module('starter.controllers', [])
         var ende = TimeCalculatorService.createDateInMs(enddatum, endzeit);
         
         var dauer = TimeCalculatorService.createDateObject(ende-beginn)
-        console.log(dauer);
+        //console.log(dauer);
         if (dauer.stunden<0 || dauer.minutes<0 || dauer.days<0 || dauer.months<0 || dauer.years<0) {
             var alertPopup = $ionicPopup.alert({
                 title:"Fehler",
@@ -768,9 +806,8 @@ angular.module('starter.controllers', [])
             var endort = document.getElementById("endort").value;
             var kfz = document.getElementById("kfz").value;
         
-        var dauer = TimeCalculatorService.createDateObject(ende-beginn
-                                                           );
-        if (parseInt(dauer.hours)<0) {
+        var dauer = TimeCalculatorService.createDateObject(ende-beginn);
+        if (!parseInt(dauer.hours)) {
             var alertPopup = $ionicPopup.alert({
                 title:"Fehler",
                 template: "Die Dauer der Fahrt ist kleiner 0!"
@@ -845,17 +882,26 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('ListCtrl', function($scope, DataModel) {
+.controller('ListCtrl', function($scope, DataModel, TimeCalculatorService) {
     $scope.shouldShowDelete = false;
     $scope.data = {
         showDelete: false
     }
      
     $scope.sessions = model.dataModel.getSessionList(); //setzt die Sessions
+    var sessionsObj = model.dataModel.getMitarbeiter().getSessions();
     //datum auf angemessenes format zuschneiden
     for(var i=0,anz=$scope.sessions.length;i<anz;i++){
         var _ses = $scope.sessions[i];
-        _ses.date = (_ses.beginn).toString().substring(0,10);
+        _ses.date = sessionsObj[i].timeFrame();
+        _ses.dateObj = TimeCalculatorService.createDateObject(_ses.ende-_ses.beginn);
+        _ses.date.min = TimeCalculatorService.createGermanOutput(_ses.date.min);
+        _ses.date.max = TimeCalculatorService.createGermanOutput(_ses.date.max);
+        if (_ses.date.min === _ses.date.max) {
+            _ses.date = _ses.date.min;
+        }else{
+            _ses.date = _ses.date.min + " - " + _ses.date.max;
+        }
     }
     
     $scope.onItemDelete = function(sessionId) {

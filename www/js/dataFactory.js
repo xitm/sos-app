@@ -165,6 +165,45 @@ angular.module('starter.services', [])
         }
         return timeModel;
     }
+    
+    this.createGermanOutput = function(dateOrMs){
+        if (typeof dateOrMs == "object") {
+            //console.log("object");
+        }else{
+            //console.log("ms");
+        }
+        var date = new Date(dateOrMs);
+        var day = date.getDay();
+        var dayOfMonth = date.getDate();
+        var month = parseInt(date.getMonth()+1);
+        var year = date.getFullYear();
+        switch(day) {
+            case 0:
+                day = "Montag";
+                break;
+            case 2:
+                day = "Dienstag";
+                break;
+            case 3:
+                day = "Mittwoch";
+                break;
+            case 4:
+                day = "Donnerstag";
+                break;
+            case 5:
+                day = "Freitag";
+                break;
+            case 6:
+                day = "Samstag";
+                break;
+            case 7:
+                day = "Sonntag";
+                break;
+            default:
+                day = "fehler";
+        }
+        return(day + ", " + dayOfMonth + "." + month + "." + year);
+    }
 })
 
 
@@ -1220,15 +1259,16 @@ angular.module('starter.services', [])
 
 //Zusammenführen aller Model-Funktionen in einem Service
 .service('DataModel', function(BusinessObject, $http, $q, Client, Leistung){
-    
+    //auf Grundlage eines JSON-Strings wird ein neues BusinessObject erstellt
     this.create = function(JSONstring){
         return BusinessObject.create(JSON.parse(JSONstring));
     };
     
+    //das uebergebene Datenmodell wird aktualisiert und wenn save auf true gesetzt ist, wird es im localStorage gespeichert
     this.update = function(objectBusinessObject, save){
-        var res = objectBusinessObject.toJson();
+        var res = objectBusinessObject.toJson();//das mitgegebene BusinessObject wird zum JSON-Object umgewandelt
         if (save) {
-            localStorage.setItem('mle_model2', JSON.stringify(res));
+            localStorage.setItem('mle_model2', JSON.stringify(res));//effektive Speicherung im localStorage
         }
         return res;
     }
@@ -1236,11 +1276,12 @@ angular.module('starter.services', [])
     //synchonisiert alle relevanten Daten mit der Quelle, also dem Webservice
     this.syncWithSource = function(objectBusinessObject, FirstTimeCreate){//FirstTimeCreate, um die Funktion zu modifizieren, da sie den selben Funktionsumfang liefert!
         var mainScope = this; //caching des aktuellen Kontexts fuer die spaetere Verwendung
+        //dieser Abschnitt stellt sicher, dass die Asynchronitaet der Abfrage keine Probleme im JS verursacht"
         return $q(function(resolve, reject){
-            var checkFinishClients = false;
-            var checkFinishLeistungen = false;
-            var checkFinishMitarbeiter = false;
-            
+            var checkFinishClients = false;//pruefvariable clienten
+            var checkFinishLeistungen = false;//pruefvariable leistungen
+            var checkFinishMitarbeiter = false;//pruefvariable mitarbeiter
+            //leere Initialisierung des models            
             var _model = {
                 mitarbeiter : undefined,
                 leistungen : undefined,
@@ -1255,7 +1296,7 @@ angular.module('starter.services', [])
             //Clienten werden abgefragt
             $http(httpClientOptions).success(function(data){
                 _model.clienten = data;
-                checkFinishClients = true;
+                checkFinishClients = true;//pruefvariable auf true setzen
             });
             
             //Optionen fuer die Abfrage von Leistungen
@@ -1266,7 +1307,7 @@ angular.module('starter.services', [])
             //Leistungen werden abgefragt
             $http(httpLeistungsOptions).success(function(data){
                 _model.leistungen = data;
-                checkFinishLeistungen = true;
+                checkFinishLeistungen = true;//pruefvariable auf true setzen
             });
             
             //Optionen fuer die Abfrage des Mitarbeiters
@@ -1277,26 +1318,28 @@ angular.module('starter.services', [])
             //Mitarbeiter wird abgefragt
             $http(httpMitarbeiterOptions).success(function(data){
                 _model.mitarbeiter = data[0];                   
-                checkFinishMitarbeiter = true;
+                checkFinishMitarbeiter = true;//pruefvariable auf true setzen
             });
             
             var counter = 0;
             var timeout = undefined;
             function checkFinish(){
-                //nur wenn alle drei responses bereits ankamen!
+                //nur wenn alle drei pruefvariablen true sind, also alle Responses bereits ankamen!
                 if (checkFinishClients===true && checkFinishLeistungen===true && checkFinishMitarbeiter===true) {
                     if (FirstTimeCreate) {
                         objectBusinessObject = mainScope.create(JSON.stringify(_model)); //nur fuer den laufenden Gebrauch, nicht wenn zum ersten Mal gestartet wird
                     }
                     else{
+                        //clienten werden geleert, um keine doppelten Eintraege zu erhalten
                         objectBusinessObject.resetClienten();
-                        //clienten aktualisieren und jeweils einzeln hinzufuegen
+                        //clienten werden vom Webservice erhalten und einzeln an das BusinessObject angehaengt
                         for (var i=0,anz=_model.clienten.length;i<anz;i++) {
                             var _cl = _model.clienten[i];
                             objectBusinessObject.addClient(new Client.create(_cl));
                         }
-                        
+                        //leistungen werden geleert, um keine doppelten Eintraege zu erhalten
                         objectBusinessObject.resetLeistungen();
+                        //clienten werden vom Webservice erhalten und einzeln an das BusinessObject angehaengt
                         for (var i=0,anz=_model.leistungen.length;i<anz;i++) {
                             var _ls = _model.leistungen[i];
                             objectBusinessObject.addLeistung(new Leistung.create(_ls));
@@ -1306,10 +1349,9 @@ angular.module('starter.services', [])
                         objectBusinessObject.getMitarbeiter().setVorname(_model.mitarbeiter.vorname);
                         objectBusinessObject.getMitarbeiter().setNachname(_model.mitarbeiter.nachname);
                         objectBusinessObject.getMitarbeiter().setStandKfz(_model.mitarbeiter.kfz);
-                        //mainScope.create(JSON.stringify(_model));//wird gebraucht, da "this" hier den Kontext der function checkFinish waere und deshalb nicht die .create() aufrufen wuerde -> Versuch braechte "function of undefined"    
                     }
                     
-                    resolve(objectBusinessObject);
+                    resolve(objectBusinessObject);//resolve bedeutet, das in Klammern stehende object wird zurueckgegeben
                 }else{
                     //wenn mehr als 5 Fehlversuche gezaehlt wurden, wird abgebrochen!
                     if (counter > 5) {
@@ -1324,25 +1366,25 @@ angular.module('starter.services', [])
             checkFinish(); 
         });
     }
-    
-    this.uploadData = function(objectBusinessObject, successFunction){
-        var _sessions = objectBusinessObject.getMitarbeiter().getSessions();
-        //console.log(_sessions);
+    //diese Funktion beschaeftigt sich mit dem Upload der Sessions
+    this.uploadData = function(objectBusinessObject, successFunction){//uebergabe eines BusinessObjects und optional einer successFunction erwartet
+        var _sessions = objectBusinessObject.getMitarbeiter().getSessions();//caching der sessions
         if (!successFunction) {
             successFunction = function(data){
-                console.log(data);
+                //hier passiert nichts, wenn gewuenscht abaenderbar
             }
         }
+        //schleife, die jede einzelne Session hochlaedt
         for(var i=0,anz=_sessions.length;i<anz;i++){
-            var _ses = _sessions[0];
+            var _ses = _sessions[0];//caching der aktuellen Session, also an Stelle i
             var uploadOptions = {
                 method : 'POST',
                 url : 'http://rest.learncode.academy/api/mciapp/testdata_sessionsTest',
                 data : _ses.toJson()
             }
-            _sessions.splice(0,1);
-            $http(uploadOptions).success(successFunction);
+            _sessions.splice(0,1);//die session wird aus dem Model entfernt
+            $http(uploadOptions).success(successFunction); //wenn der Upload erfolgreich war, wird die mitgegebene successFunction aufgerufen
         }
-        this.update(model.dataModel, true);
+        this.update(model.dataModel, true);//model wird geupdatet und im localStorage angepasst
     }
 });
