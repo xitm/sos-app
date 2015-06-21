@@ -179,6 +179,9 @@ angular.module('starter.services', [])
         var year = date.getFullYear();
         switch(day) {
             case 0:
+                day = "Sonntag";
+                break;
+            case 1:
                 day = "Montag";
                 break;
             case 2:
@@ -196,12 +199,9 @@ angular.module('starter.services', [])
             case 6:
                 day = "Samstag";
                 break;
-            case 7:
-                day = "Sonntag";
-                break;
             default:
-                day = "fehler";
-        }
+                day="fehler";
+            }
         return(day + ", " + dayOfMonth + "." + month + "." + year);
     }
 })

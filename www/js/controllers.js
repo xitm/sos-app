@@ -165,6 +165,12 @@ angular.module('starter.controllers', [])
         }
         else {
             var confirmPopup = $ionicPopup.confirm({
+                buttons: [
+                    { text: 'Abbrechen',
+                    onTap: function(){return false}},
+                    { text: 'OK',
+                        type : 'button-positive',
+                        onTap: function(){return true}}],
                 title: 'Session Verwerfen?',
                 template: 'Du hast noch offene Fahrt- und Arbeitszeiten gespeichert. Möchtest du diese verwerfen?'
             });
@@ -202,8 +208,14 @@ angular.module('starter.controllers', [])
         /*Änderungen speichern?*/
         /*Sessiondetails hier drin wären nett*/
         var confirmPopup = $ionicPopup.confirm({
-          title: 'Session Abschließen?',
-          template: 'Möchtest du die Arbeits- und Fahrtzeiten zum hochladen freigeben?'
+            buttons: [
+                { text: 'Abbrechen',
+                onTap: function(){return false}},
+                { text: 'OK',
+                    type : 'button-positive',
+                    onTap: function(){return true}}],
+            title: 'Session Abschließen?',
+            template: 'Möchtest du die Arbeits- und Fahrtzeiten zum hochladen freigeben?'
         });
         confirmPopup.then(function(res) {
           if(res) {
@@ -244,6 +256,12 @@ angular.module('starter.controllers', [])
         
         //popup  vor hochladen
         var confirmPopup = $ionicPopup.confirm({
+            buttons: [
+                { text: 'Abbrechen',
+                onTap: function(){return false}},
+                { text: 'OK',
+                    type : 'button-positive',
+                    onTap: function(){return true}}],
             title: "Synchronisierung Datenbank",
             template: "Es erfolgt die Synchronisierung" + sessionCount + " Bitte um Best&auml;tigung."
         });
@@ -333,7 +351,8 @@ angular.module('starter.controllers', [])
     } else {
         $scope.date = date.min + " um " + minObj.hours + ":" + minObj.minutes + "Uhr - " + date.max + " um " + maxObj.hours + ":" + maxObj.minutes + "Uhr";
     }
-    if (date.min == undefined) {
+    console.log(date.min);
+    if ((date.min).substring(0,6) === "fehler") {
         $scope.date = "";
     }
 
@@ -487,18 +506,23 @@ angular.module('starter.controllers', [])
     }    
     
     $scope.callFahrtenmanager = function() {
-        $state.go('fahrtenmanager', {sessionmanager: false});
+        $state.go('fahrtenmanager');
     }
     $scope.callArbeitsmanager = function() {
-        $state.go('arbeitsmanager', {sessionmanager: false});
+        $state.go('arbeitsmanager');
     }
     
     $scope.callSessionuebersicht = function(sessionId){
         
-        
         //Sind Fahrten oder Arbeiten vorhanden?
         if (!(model.dataModel.getActiveSession().getFahrten()[0]) && !(model.dataModel.getActiveSession().getArbeiten()[0])) {
             var confirmPopup = $ionicPopup.confirm({ //wenn nein -> Session loeschen?
+                buttons: [
+                    { text: 'Abbrechen',
+                    onTap: function(){return false}},
+                    { text: 'OK',
+                        type : 'button-positive',
+                        onTap: function(){return true}}],
                 title: "Keine Einheiten vorhanden",
                 template: "In dieser Session sind keine Arbeits- und Fahrteinheiten mehr vorhanden, bei OK wird diese Session gelöscht"
             })
@@ -507,6 +531,7 @@ angular.module('starter.controllers', [])
                         var id= model.dataModel.getActiveSession().toJson().id; //SessionId
                         model.dataModel.getSessionList().splice(id, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
                         model.dataModel.getSessionById(id).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
+                        model.dataModel.getActiveSession().setActive(false);
                         DataModel.update(model.dataModel, true); //speichern
                         $ionicViewSwitcher.nextDirection('back');
                         $state.go('sessionuebersicht');
@@ -626,13 +651,22 @@ angular.module('starter.controllers', [])
         //Testvariable abfragen
         if (passt) {
             var tage = (dauer.days!=0)?(dauer.days + " Tage "):"";
-            var dates = (new Date(ende).toString().substring(0,10) != new Date(beginn).toString().substring(0,10))?(" bis " + new Date(ende).toString().substring(0,10)):"";
+            var beginndate = TimeCalculatorService.createGermanOutput(beginn);
+            var enddate = TimeCalculatorService.createGermanOutput(ende);
+
+            var dateMsg = (beginndate===enddate)?("am " + beginndate):("von " + beginndate + " bis " + enddate);
             
             var confirmPopup = $ionicPopup.confirm({
+                buttons: [
+                    { text: 'Abbrechen',
+                    onTap: function(){return false}},
+                    { text: 'OK',
+                        type : 'button-positive',
+                        onTap: function(){return true}}],
                 title: 'Arbeitszeit hinzufügen',
                 template: 'Folgende Arbeitsdaten werden erfasst: <br/>'
                         + leis.options[leis.selectedIndex].text
-                        + '<br /> von ' + new Date(beginn).toString().substring(0,10) + dates
+                        + '<br />' + dateMsg
                         + '<br /> von ' + anfangszeit + " bis " + endzeit
                         + ' (' + tage + dauer.hours + 'h ' + dauer.minutes + 'min)'  //Arbeitsdaten!!! Geht das noch schöner?
                         
@@ -807,7 +841,7 @@ angular.module('starter.controllers', [])
             var kfz = document.getElementById("kfz").value;
         
         var dauer = TimeCalculatorService.createDateObject(ende-beginn);
-        if (!parseInt(dauer.hours)) {
+        if (dauer.stunden<0 || dauer.minutes<0 || dauer.days<0 || dauer.months<0 || dauer.years<0) {
             var alertPopup = $ionicPopup.alert({
                 title:"Fehler",
                 template: "Die Dauer der Fahrt ist kleiner 0!"
@@ -818,22 +852,27 @@ angular.module('starter.controllers', [])
         if (passt) {
             
             var tage = (dauer.days!=0)?(dauer.days + " Tage "):"";
-            var beginndate = new Date(beginn);
-            beginndate = beginndate.toString().substring(0,10);
-            var enddate = new Date(ende);
-            enddate = enddate.toString().substring(0,10);
+            var beginndate = TimeCalculatorService.createGermanOutput(beginn);
+            var enddate = TimeCalculatorService.createGermanOutput(ende);
 
             var dateMsg = (beginndate===enddate)?("am " + beginndate):("von " + beginndate + " bis " + enddate);
             
             var confirmPopup = $ionicPopup.confirm({
+                buttons: [
+                        { text: 'Abbrechen',
+                        onTap: function(){return false}},
+                        { text: 'OK',
+                            type : 'button-positive',
+                            onTap: function(){return true}}],
                 title: 'Fahrtzeit hinzufügen',
                 template: 'Folgende Fahrtzeiten werden erfasst: <br />' 
                             + leis.options[leistung.selectedIndex].text + ", von " + anfangsort + " bis " + endort
                             + '<br /> ' + dateMsg +
-                            '<br />' +' von ' + anfangszeit +  ' bis '  + endzeit
+                            '<br />' +' von ' + anfangszeit +  ' Uhr bis '  + endzeit + ' Uhr'
                             + '<br />(' + gesamtkilometer + ' Kilometer, ' + tage + "" + dauer.hours + "h " + dauer.minutes + "min)" 
             });
             confirmPopup.then(function(res) {
+                console.log(res);
                 if(res) {
                     if (activeFahrt) {
                         activeFahrtObj.setAnfangskilometer(anfangskilometer);
