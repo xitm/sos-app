@@ -1,26 +1,18 @@
+anfangszeit: datum hinzufuegen //wtf? - still WTF?
 
-anfangszeit: datum hinzufuegen //wtf?
-popup : datum und beschriftung
-
-sessionübersicht : zeiten
 hinfahrt - rückfahrt überprüfen - nice to have
 id + mandant :getter/setter
-
 erstmaliges login erstellen
-
 settings-button //eventuell
 bei leistung: typ-id statt string
-    
-datumsformat
-
-tag - bei delete wird 0 angezeigt
-
 
 
 /*---------------------DONE--------------------*/
 Links zu REST //DONE
-
 synrchonisieren statt hochladen //DONE
-    popup-text //DONE
-    
+    popup-text //DONE 
 login : titel "SOS-KD" //DONE
+popup : datum und beschriftung //DONE
+sessionübersicht : zeiten //DONE
+datumsformat //DONE
+tag - bei delete wird 0 angezeigt //DONE
