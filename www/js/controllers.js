@@ -213,11 +213,8 @@ angular.module('starter.controllers', [])
           ]
         });
         myPopup.then(function(res) {
-          console.log('Tapped!', res);
+          /*Folgefunktionen beachten!*/
         });
-        $timeout(function() {
-           myPopup.close(); //close the popup after 3 seconds for some reason
-        }, 3000);
     }
     
     $scope.updateDatabase = function() {

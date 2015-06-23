@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
-.run(function($ionicPlatform, $state) {
+.run(function($ionicPlatform, $state, $ionicHistory) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -25,8 +25,10 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     document.addEventListener("pause", function() {
       if ($ionicHistory.currentStateName()==="") {
         model.lastState = undefined;
+      }else{
+        model.lastState = $ionicHistory.currentStateName();
       }
-      model.lastState = $ionicHistory.currentStateName();
+      
       
     });
   });

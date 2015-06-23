@@ -1347,7 +1347,7 @@ angular.module('starter.services', [])
     }
 })
 
-.service( 'HardwareBackButtonManager', function($ionicPlatform, $state, $ionicPopup, $ionicViewSwitcher){
+.service( 'HardwareBackButtonManager', function($ionicPlatform, $state, $ionicPopup, $ionicViewSwitcher, DataModel){
     this.deregister = undefined;
     
     this.disable = function(){
@@ -1389,11 +1389,8 @@ angular.module('starter.services', [])
                                 //model.dataModel.getSessionList().splice(id, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
                                 //model.dataModel.getSessionById(id).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
                                 model.dataModel.getActiveSession().setDeleted(true);
-                                alert("nach delete, vor active");
                                 model.dataModel.getActiveSession().setActive(false);
-                                alert("direkt vor update");
                                 DataModel.update(model.dataModel, true); //speichern
-                                alert("bis vor switcher!");
                                 $ionicViewSwitcher.nextDirection('back');
                                 $state.go('sessionuebersicht');
                             } else {
