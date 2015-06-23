@@ -1,11 +1,17 @@
+/*---------------------Bugs und Sonstiges--------*/
 anfangszeit: datum hinzufuegen //wtf? - still WTF?
 
 hinfahrt - rückfahrt überprüfen - nice to have
-id + mandant :getter/setter
+anmeldung?
 erstmaliges login erstellen
 settings-button //eventuell
 bei leistung: typ-id statt string
 
+
+/*--------------------Usability-Optimierungen----*/
+Datums- und Zeiteingabe: "jetzt" nur, wenn kein Wert eingetragen
+Sessionuebersicht: wenn keine Sessions mehr vorhanden sind, automatisch "Loeschmodus" ausschalten
+wenn Anfangsdatum -> Enddatum immer danach
 
 /*---------------------DONE--------------------*/
 Links zu REST //DONE
@@ -16,3 +22,11 @@ popup : datum und beschriftung //DONE
 sessionübersicht : zeiten //DONE
 datumsformat //DONE
 tag - bei delete wird 0 angezeigt //DONE
+mandant :getter/setter //DONE
+
+/*----!!!!!!!!!!!!!!---bis morgen---------*/
+Benutzerhandbuch
+evtl. Arbeitsbescheinigung
+Technische Doku (Programmierumgebung etc.)
+APKs
+Code durchschauen!

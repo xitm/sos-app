@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $state) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -18,6 +18,17 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       // org.apache.cordova.statusbar required
       StatusBar.styleLightContent();
     }
+    document.addEventListener("resume", function() {
+      console.log("The application is resuming from the background");
+      $state.go('login');
+    });
+    document.addEventListener("pause", function() {
+      if ($ionicHistory.currentStateName()==="") {
+        model.lastState = undefined;
+      }
+      model.lastState = $ionicHistory.currentStateName();
+      
+    });
   });
 })
 
@@ -55,14 +66,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     
     .state('arbeitsmanager', {
       url: '/arbeitsmanager',
-      params: {sessionmanager: null},
       templateUrl: 'templates/sessionbearbeitungarbeit.html',
       controller: 'ArbeitsmanagerCtrl'
   })
     
     .state('fahrtenmanager', {
       url: '/fahrtenmanager',
-      params: {sessionmanager: null},
       templateUrl: 'templates/sessionbearbeitungfahrt.html',
       controller: 'FahrtenmanagerCtrl'
   })
@@ -87,7 +96,26 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 });
 
 model = {
-  irgendeineVaribledazu: "KeineAhnungs"
+  lastState: undefined
 }
-
-
+  //
+  //function onLoad() {
+  //      alert("onLoad()");
+  //      document.addEventListener("deviceready", onDeviceReady, false);
+  //  }
+  //
+  //  // device APIs are available
+  //  //
+  //  function onDeviceReady() {
+  //    alert("onDeviceReady()");
+  //      // Register the event listener
+  //      //document.addEventListener("backbutton", onBackKeyDown, false);
+  //  }
+  //
+  //  // Handle the back button
+  //  //
+  //  function onBackKeyDown(event) {
+  //    alert("onBackKeyDown");
+  //    event.preventDefault();
+  //    event.stopPropagation();
+  //  }

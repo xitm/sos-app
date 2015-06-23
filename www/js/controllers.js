@@ -1,14 +1,9 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, DataModel, TimeCalculatorService, Session, $state, $filter, $ionicPopup, $ionicPlatform) {
+.controller('DashCtrl', function($scope, DataModel, TimeCalculatorService, Session, HardwareBackButtonManager, $state, $ionicHistory, $filter, $ionicPopup, $ionicPlatform) {
+    HardwareBackButtonManager.addCustomRoutine($ionicHistory.currentStateName());
     $scope.clicked = false;
     $scope.date = new Date();
-    
-    //$ionicPlatform.onHardwareBackButton(function() {
-    // event.preventDefault();
-    // event.stopPropagation();
-    // console.log('going back now yall');
-    //);
     
     $scope.callSessiondetail = function() {
         //clients für Auswahllisten
@@ -99,29 +94,52 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('LoginCtrl', function($scope, LoginService, DataModel, $http, $state, $ionicLoading, $ionicPopup) {
-        $ionicLoading.show({
-            template : "<div my-temp-template></div>"
-        });
-        if (localStorage.getItem("mle_model2")===null) { //wenn kein lokaler Speicher besteht -> nur beim ersten Mal der Fall!
-            console.log("Baut Internetverbindung auf!");
-            model.dataModel = DataModel.syncWithSource(model.dataModel, true); //sync mit Webservice
-            model.dataModel.then(function(data){ //ergebnis des Promises, also was passiert nunt?
-                model.dataModel = data;
-                DataModel.update(model.dataModel, true);
-                $ionicLoading.hide();
-                },
-                function(error){
-                    $ionicLoading.hide();
-                    alert(error);
+.controller('LoginCtrl', function($scope, LoginService, DataModel, HardwareBackButtonManager, $http, $state, $ionicLoading, $ionicHistory, $ionicPopup) {
+        HardwareBackButtonManager.addCustomRoutine($ionicHistory.currentStateName());
+        if (localStorage.getItem("mle_model2")===null) {
+            // An elaborate, custom popup
+            var myPopup = $ionicPopup.show({
+              template: '<label class="item item-input"><input type="text" ng-model="useroptions.benutzername" placeholder="Benutzername"></label>'
+                    + '<label class="item item-input"><input type="number" ng-model="useroptions.mandant" placeholder="Mandant"></label>'
+                    + '<label class="item item-input"><input type="password" ng-model="useroptions.passwort" placeholder="Passwort"></label>',
+              title: 'Mandant &Auml;ndern',
+              subTitle: 'Pers&ouml;nliche Daten',
+              scope: $scope.useroptions,
+              buttons: [
+                {
+                    text: '<b>Speichern</b>',
+                    type: 'button-positive',
+                    onTap: function(e) {
+                      /*Funktionalitaet beim Erstellen des Webservices beachten!*/
+                      return true;
+                    }
+                }
+              ]
             });
+            myPopup.then(function(res) {
+                $ionicLoading.show({
+                    template : "<div my-temp-template></div>"
+                });
+                console.log("Baut Internetverbindung auf!");
+                model.dataModel = DataModel.syncWithSource(model.dataModel, true); //sync mit Webservice
+                model.dataModel.then(function(data){ //ergebnis des Promises, also was passiert nunt?
+                    model.dataModel = data;
+                    DataModel.update(model.dataModel, true);
+                    $ionicLoading.hide();
+                    },
+                    function(error){
+                        $ionicLoading.hide();
+                        alert(error);
+                });
+            });
+
+    //wenn kein lokaler Speicher besteht -> nur beim ersten Mal der Fall
         }else{
             model.dataModel = DataModel.create(localStorage.getItem("mle_model2")); //Anpassung an neue Service-Gestaltung
             $ionicLoading.hide();
             console.log("Baut keine Internetverbindung auf!");
             //model.dataModel = DataModel.syncWithSource(model.dataModel); //sync mit Webservice
         }
-        
 
 
     $scope.init = function() {
@@ -132,7 +150,13 @@ angular.module('starter.controllers', [])
         $scope.passcode = $scope.passcode + value;
         if($scope.passcode.length == 4) {
             LoginService.loginUser($scope.passcode).success(function(data) {
-                $state.go('sessionuebersicht');
+                if(model.lastState!=undefined){
+                    $state.go(model.lastState);
+                    model.lastState = undefined;
+                }else{
+                    $state.go('sessionuebersicht');
+                }
+                
             }).error(function(data) {
               var alertPopup = $ionicPopup.alert({
                   title: 'Login failed!',
@@ -150,86 +174,8 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessionmanagerCtrl', function($scope, DataModel, $state, $ionicPopup) {
-    //aktive Session aus dem Datenmodell
-    var currentsession = model.dataModel.getActiveSession();
-    
-    $scope.callArbeitsoberflaeche = function() {
-        //Routine um aktive Session zu verwerfen
-        var goArbeitsoberflaeche = true;
-        //Prüfen ob bereits Arbeits und/oder Fahrtzeiten vorhanden sind
-        if (!(currentsession.getFahrten()[0]) && !(currentsession.getArbeiten()[0])) {
-            model.dataModel.deleteActiveSession();//löscht aktive Session - keine offenen Sessions mehr
-            DataModel.update(model.dataModel, true); //model im local storage updaten
-            $state.go('arbeitsoberflaeche');
-        }
-        else {
-            var confirmPopup = $ionicPopup.confirm({
-                buttons: [
-                    { text: 'Abbrechen',
-                    onTap: function(){return false}},
-                    { text: 'OK',
-                        type : 'button-positive',
-                        onTap: function(){return true}}],
-                title: 'Session Verwerfen?',
-                template: 'Du hast noch offene Fahrt- und Arbeitszeiten gespeichert. Möchtest du diese verwerfen?'
-            });
-            confirmPopup.then(function(res) {
-                if(res) {
-                    model.dataModel.deleteActiveSession();//löscht aktive Session - keine offenen Sessions mehr
-                    DataModel.update(model.dataModel, true); //model im local storage updaten
-                    /*für sessionübersicht freigeben und in arbeitsübersicht wechseln*/
-                    $state.go('arbeitsoberflaeche');
-                } else {
-                    return;
-                    /*Alles bleibt so wie es ist!*/
-                }
-            });
-        }
-    }
-    $scope.callArbeitsmanager = function() {
-        $state.go('arbeitsmanager', {sessionmanager: true});
-        
-    }
-    $scope.callFahrtenmanager = function() {
-        $state.go('fahrtenmanager', {sessionmanager: true});
-    }
-    $scope.finishSession = function() {
-        
-        //Wenn noch keine Session eingetragen ist, kann nichts abgeschlossen werden.
-        if ((!currentsession.getFahrten()[0]) && !(currentsession.getArbeiten()[0])) {
-            var alertPopup = $ionicPopup.alert({
-                title: "Fehler",
-                template: "Es wurden noch keine Fahrt- oder Arbeitseinheiten eingetragen"
-            })
-            return;
-        }
-        
-        /*Änderungen speichern?*/
-        /*Sessiondetails hier drin wären nett*/
-        var confirmPopup = $ionicPopup.confirm({
-            buttons: [
-                { text: 'Abbrechen',
-                onTap: function(){return false}},
-                { text: 'OK',
-                    type : 'button-positive',
-                    onTap: function(){return true}}],
-            title: 'Session Abschließen?',
-            template: 'Möchtest du die Arbeits- und Fahrtzeiten zum hochladen freigeben?'
-        });
-        confirmPopup.then(function(res) {
-          if(res) {
-            model.dataModel.getActiveSession().setActive(false);
-            DataModel.update(model.dataModel, true); //model im local storage aktualisieren
-            $state.go('arbeitsoberflaeche');
-          } else {
-            /*Alles bleibt so wie es ist!*/
-          }
-        });
-    }
-})
-
-.controller('SessionuebersichtCtrl', function($scope, $state, $ionicPopup, DataModel, $ionicViewSwitcher, $ionicLoading) {
+.controller('SessionuebersichtCtrl', function($scope, $state, $ionicPopup, $ionicPlatform, $ionicHistory, HardwareBackButtonManager, DataModel, $ionicViewSwitcher, $ionicLoading) {
+    HardwareBackButtonManager.addCustomRoutine($ionicHistory.currentStateName());
     $scope.callSessiondetail=function(sessionId){
         model.dataModel.getSessionById(sessionId).setActive(true); //Session wird aktiv gesetzt
         $ionicViewSwitcher.nextDirection('forward'); //Richtung der Animation festlegen
@@ -237,6 +183,41 @@ angular.module('starter.controllers', [])
     }
     $scope.callArbeitsoberflaeche = function() {
         $state.go('arbeitsoberflaeche');
+    }
+    
+    $scope.data = {
+        showDelete : false
+    };
+    
+  
+    $scope.options = function(){
+      
+        // An elaborate, custom popup
+        var myPopup = $ionicPopup.show({
+          template: '<label class="item item-input"><input type="text" ng-model="useroptions.benutzername" placeholder="Benutzername"></label>'
+                + '<label class="item item-input"><input type="number" ng-model="useroptions.mandant" placeholder="Mandant"></label>'
+                + '<label class="item item-input"><input type="password" ng-model="useroptions.passwort" placeholder="Passwort"></label>',
+          title: 'Mandant &Auml;ndern',
+          subTitle: 'Pers&ouml;nliche Daten',
+          scope: $scope.useroptions,
+          buttons: [
+            { text: 'Abbrechen' },
+            {
+                text: '<b>Speichern</b>',
+                type: 'button-positive',
+                onTap: function(e) {
+                  /*Funktionalitaet beim Erstellen des Webservices beachten!*/
+                  return true;
+                }
+            }
+          ]
+        });
+        myPopup.then(function(res) {
+          console.log('Tapped!', res);
+        });
+        $timeout(function() {
+           myPopup.close(); //close the popup after 3 seconds for some reason
+        }, 3000);
     }
     
     $scope.updateDatabase = function() {
@@ -273,7 +254,7 @@ angular.module('starter.controllers', [])
                 //Session hochladen
                 if (model.dataModel.getMitarbeiter().getSessions().length!=0) {
                     DataModel.uploadData(model.dataModel, function(){
-                        model.dataModel = DataModel.syncWithSource(model.dataModel, true); //sync mit Webservice
+                        model.dataModel = DataModel.syncWithSource(model.dataModel); //sync mit Webservice
                         model.dataModel.then(function(data){ //ergebnis des Promises, also was passiert nunt?
                             model.dataModel = data;
                             DataModel.update(model.dataModel, true);
@@ -307,7 +288,8 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SessiondetailCtrl', function($scope, TimeCalculatorService, $state, DataModel, $ionicPopup, $ionicViewSwitcher) {
+.controller('SessiondetailCtrl', function($scope, TimeCalculatorService, HardwareBackButtonManager, $ionicHistory, $state, DataModel, $ionicPopup, $ionicViewSwitcher) {
+    HardwareBackButtonManager.addCustomRoutine($ionicHistory.currentStateName());
     $scope.activeSession = model.dataModel.getActiveSession(); //speichert aktive Session in den Scope
     $scope.fahrten = $scope.activeSession.toJson().fahrten; //speichert die Fahrten extra ab, für den ng-repeat
     $scope.arbeiten = $scope.activeSession.toJson().arbeiten;//speichert die Arbeiten extra ab, für den ng-repeat
@@ -922,20 +904,23 @@ angular.module('starter.controllers', [])
 })
 
 .controller('ListCtrl', function($scope, DataModel, TimeCalculatorService) {
-    $scope.shouldShowDelete = false;
+
     $scope.data = {
         showDelete: false
     }
      
     $scope.sessions = model.dataModel.getSessionList(); //setzt die Sessions
-    var sessionsObj = model.dataModel.getMitarbeiter().getSessions();
+    //var sessionsObj = model.dataModel.getMitarbeiter().getSessions();
     //datum auf angemessenes format zuschneiden
     for(var i=0,anz=$scope.sessions.length;i<anz;i++){
         var _ses = $scope.sessions[i];
-        _ses.date = sessionsObj[i].timeFrame();
+        _ses.date = model.dataModel.getSessionById($scope.sessions[i].id).timeFrame();
+        console.log(_ses.date);
         _ses.dateObj = TimeCalculatorService.createDateObject(_ses.ende-_ses.beginn);
         _ses.date.min = TimeCalculatorService.createGermanOutput(_ses.date.min);
         _ses.date.max = TimeCalculatorService.createGermanOutput(_ses.date.max);
+        console.log(_ses.date.min);
+        console.log(_ses.date.max);
         if (_ses.date.min === _ses.date.max) {
             _ses.date = _ses.date.min;
         }else{
@@ -943,6 +928,24 @@ angular.module('starter.controllers', [])
         }
     }
     
+      //Funktion zur Loeschung einzelner Einheiten
+    $scope.checkDelete= function ($event, show) {
+        
+        if ($scope.data.showDelete===true) {
+            $scope.data.showDelete = false;
+        }else if (show){
+          $scope.data = {
+            showDelete : true
+            };  
+        }
+        
+        if ($event.stopPropagation) $event.stopPropagation();
+        if ($event.preventDefault) $event.preventDefault();
+        $event.cancelBubble = true;
+        $event.returnValue = false;
+    }
+    
+
     $scope.onItemDelete = function(sessionId) {
         var deleteIndex = undefined; //geklickter index finden
         for(var i=0,anz=$scope.sessions.length;i<anz;i++){

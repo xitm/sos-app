@@ -498,7 +498,7 @@ angular.module('starter.services', [])
 //----------- 2. - Mitarbeiter_Class_Definition------//
 .factory('Mitarbeiter', function(Session){
     
-    function Mitarbeiter(id, vorname, nachname, adresse, kfz, letzteKilometer, letzteStandort){
+    function Mitarbeiter(id, mandant, vorname, nachname, adresse, kfz, letzteKilometer, letzteStandort){
         var ERR_MSG ={
             TYPE_ERR_VN : "Typenfehler: string für Vornamen erwartet!",
             TYPE_ERR_NN : "Typenfehler: string für Nachnamen erwartet!",
@@ -506,6 +506,7 @@ angular.module('starter.services', [])
         };
         
         var _id = undefined;
+        var _mandant = undefined;
         var _vorname = undefined;
         var _nachname = undefined;
         var _adresse = undefined;
@@ -520,6 +521,13 @@ angular.module('starter.services', [])
         }
         this.getId = function() {
             return _id;
+        }
+        
+        this.setMandant = function(mandant) {
+            _mandant = mandant;
+        }
+        this.getMandant = function() {
+            return _mandant;
         }
         
         //2.2 vorname_definitionen
@@ -587,12 +595,18 @@ angular.module('starter.services', [])
         }
         
         this.setId(id);
+        this.setMandant(mandant);
         this.setVorname(vorname);
         this.setNachname(nachname);
         this.setAdresse(adresse);
         this.setStandKfz(kfz);
-        this.setLetzteKilometer(letzteKilometer);
-        this.setLetzteStandort(letzteStandort);
+        if (letzteKilometer) {
+            this.setLetzteKilometer(letzteKilometer);
+        }
+        if (letzteStandort) {
+            this.setLetzteStandort(letzteStandort);
+        }
+        
     }
     
     Mitarbeiter.prototype.toJson = function(){
@@ -605,6 +619,7 @@ angular.module('starter.services', [])
         
         return {
             id : this.getId(),
+            mandant : this.getMandant(),
             vorname : this.getVorname(),
             nachname : this.getNachname(),
             adresse : this.getAdresse(),
@@ -620,7 +635,7 @@ angular.module('starter.services', [])
         //Methoden zur Aufbereitung des JSON-Strings
         var _sessions = JSONstructure.sessions; //sessions werden gesondert ausgewiesen
         //Ausgabe des fertigen Mitarbeiters
-        var ma = new Mitarbeiter(JSONstructure.id, JSONstructure.vorname, JSONstructure.nachname, JSONstructure.adresse, JSONstructure.kfz, JSONstructure.letzteKilometer, JSONstructure.letzteStandort);
+        var ma = new Mitarbeiter(JSONstructure.id, JSONstructure.mandant, JSONstructure.vorname, JSONstructure.nachname, JSONstructure.adresse, JSONstructure.kfz, JSONstructure.letzteKilometer, JSONstructure.letzteStandort);
         //zusätzliche Sessions usw adden!
         if (_sessions === undefined) {//vor allem beim Aufbauen des neuen Objektbaums bei Aktualisierung der Fall!
             //nix machen
@@ -775,7 +790,7 @@ angular.module('starter.services', [])
 //----------- 5. - Session_Class_Definition------//
 .factory('Session', function(Arbeit, Fahrt){
     
-    function Session(id, beginn, ende, clientId, deleted){
+    function Session(id, beginn, ende, clientId, deleted, active){
         var _id = undefined;
         var _beginn = undefined;
         var _ende = undefined;
@@ -853,6 +868,7 @@ angular.module('starter.services', [])
         this.setEnde(ende);
         this.setClientId(clientId); 
         if(deleted){this.setDeleted(deleted)};
+        if(active){this.setActive(active)};
     }
     
     Session.prototype.getFahrtById=function(id){
@@ -898,7 +914,8 @@ angular.module('starter.services', [])
             clientId : this.getClientId(),
             fahrten : _faRes,
             arbeiten : _arRes,
-            deleted : this.getDeleted()
+            deleted : this.getDeleted(),
+            active : this.getActive()
         }
     }
     
@@ -939,7 +956,7 @@ angular.module('starter.services', [])
         //Varbiablendeklarationen
         var _fahrten = JSONstructure.fahrten;//fahrconsole.log(JSONstructure.fahrten);
         var _arbeiten = JSONstructure.arbeiten;//arbeiten gesondert ausweisen
-        var ses = new Session(JSONstructure.id, JSONstructure.beginn, JSONstructure.ende, JSONstructure.clientId, JSONstructure.deleted);
+        var ses = new Session(JSONstructure.id, JSONstructure.beginn, JSONstructure.ende, JSONstructure.clientId, JSONstructure.deleted, JSONstructure.active);
         //zusätzliche Fahrten adden
         if (_fahrten) {//wenn keine Fahrten vorhanden sind -> undefined!
             for(var i = 0, anz=_fahrten.length; i<anz; i++){
@@ -968,10 +985,6 @@ angular.module('starter.services', [])
 .factory('Fahrt', function(){
     function Fahrt(id,beginn, ende,anfangskilometer,endkilometer,anfangsort,endort,leistungsId, kfz, active) {
         var _id = undefined;
-        //var _anfangsdatum = undefined;
-        //var _enddatum = undefined;
-        //var _anfangszeit = undefined;
-        //var _endzeit = undefined;
         var _beginn = undefined;
         var _ende = undefined;
         var _anfangskilometer = undefined;
@@ -989,37 +1002,6 @@ angular.module('starter.services', [])
         this.getId = function() {
             return _id;
         }
-        
-        //6.2 datum_definitionen
-        //this.setAnfangsdatum = function(datum) {
-        //    _datum = datum;
-        //}
-        //this.getAnfangsdatum = function() {
-        //    return _datum;
-        //}
-        //
-        //this.setEnddatum = function(enddatum) {
-        //    _enddatum = enddatum;
-        //}
-        //this.getEnddatum = function() {
-        //    return _enddatum;
-        //}
-        //
-        ////6.3 anfangszeit_definitionen
-        //this.setAnfangszeit = function(anfangszeit) {
-        //    _anfangszeit = anfangszeit;
-        //}
-        //this.getAnfangszeit = function() {
-        //    return _anfangszeit;
-        //}
-        //
-        ////6.4 endzeit_definitionen
-        //this.setEndzeit = function(endzeit) {
-        //    _endzeit = endzeit;
-        //}
-        //this.getEndzeit = function() {
-        //    return _endzeit;
-        //}
         
         this.setBeginn = function(beginn) {
             _beginn = beginn;
@@ -1142,10 +1124,6 @@ angular.module('starter.services', [])
 .factory('Arbeit', function(){
     function Arbeit(id, beginn, ende, leistungsId, active) {
         var _id = undefined;
-        //var _anfangsdatum = undefined;
-        //var _enddatum = undefined;
-        //var _anfangszeit = undefined;
-        //var _endzeit = undefined;
         var _beginn = undefined;
         var _ende = ende;
         var _leistungsId = undefined;
@@ -1158,37 +1136,6 @@ angular.module('starter.services', [])
         this.getId = function() {
             return _id;
         }
-        
-        ////7.2 datum_definitionen
-        //this.setAnfangsdatum = function(anfangsdatum) {
-        //    _anfangsdatum = anfangsdatum;
-        //}
-        //this.getAnfangsdatum = function() {
-        //    return _anfangsdatum;
-        //}
-        //
-        //this.setEnddatum = function(enddatum) {
-        //    _enddatum = enddatum;
-        //}
-        //this.getEnddatum = function() {
-        //    return _enddatum;
-        //}
-        //
-        ////7.3 anfangszeit_definitionen
-        //this.setAnfangszeit = function(anfangszeit) {
-        //    _anfangszeit = anfangszeit;
-        //}
-        //this.getAnfangszeit = function() {
-        //    return _anfangszeit;
-        //}
-        //
-        ////7.4 endzeit_definitionen
-        //this.setEndzeit = function(endzeit) {
-        //    _endzeit = endzeit;
-        //}
-        //this.getEndzeit = function() {
-        //    return _endzeit;
-        //}
         
         this.setBeginn = function(beginn) {
             _beginn = beginn;
@@ -1317,7 +1264,15 @@ angular.module('starter.services', [])
             }
             //Mitarbeiter wird abgefragt
             $http(httpMitarbeiterOptions).success(function(data){
-                _model.mitarbeiter = data[0];                   
+
+                _model.mitarbeiter = {
+                    vorname : data[0].vorname,
+                    mandant : data[0].mandant,
+                    nachname : data[0].nachname,
+                    adresse : data[0].adresse,
+                    kfz : data[0].kfz,
+                    id : data[0].id
+                }
                 checkFinishMitarbeiter = true;//pruefvariable auf true setzen
             });
             
@@ -1347,8 +1302,11 @@ angular.module('starter.services', [])
                         
                         //einzelne Attribute vom Mitarbeiter aktualisieren, damit Sessions nicht gelöscht werden!
                         objectBusinessObject.getMitarbeiter().setVorname(_model.mitarbeiter.vorname);
+                        objectBusinessObject.getMitarbeiter().setMandant(_model.mitarbeiter.mandant);
                         objectBusinessObject.getMitarbeiter().setNachname(_model.mitarbeiter.nachname);
                         objectBusinessObject.getMitarbeiter().setStandKfz(_model.mitarbeiter.kfz);
+                        objectBusinessObject.getMitarbeiter().setAdresse(_model.mitarbeiter.adresse);
+                        objectBusinessObject.getMitarbeiter().setId(_model.mitarbeiter.id);
                     }
                     
                     resolve(objectBusinessObject);//resolve bedeutet, das in Klammern stehende object wird zurueckgegeben
@@ -1387,4 +1345,77 @@ angular.module('starter.services', [])
         }
         this.update(model.dataModel, true);//model wird geupdatet und im localStorage angepasst
     }
+})
+
+.service( 'HardwareBackButtonManager', function($ionicPlatform, $state, $ionicPopup, $ionicViewSwitcher){
+    this.deregister = undefined;
+    
+    this.disable = function(){
+        this.deregister = $ionicPlatform.registerBackButtonAction(function(e){
+            e.preventDefault();
+            return false;
+        }, 101);
+    }
+    
+    this.addCustomRoutine = function(stateName){
+        this.deregister = $ionicPlatform.registerBackButtonAction(function(e){
+            e.preventDefault();
+            if (stateName==="sessionuebersicht") {
+                navigator.app.exitApp();
+            }
+            
+            if (stateName==="login") {
+                navigator.app.exitApp();
+            }
+            
+            if (stateName==="arbeitsoberflaeche") {
+                $state.go('sessionuebersicht');
+            }
+            if (stateName==="sessiondetail") {
+                if (!(model.dataModel.getActiveSession().getFahrten()[0]) && !(model.dataModel.getActiveSession().getArbeiten()[0])) {
+                    var confirmPopup = $ionicPopup.confirm({ //wenn nein -> Session loeschen?
+                        buttons: [
+                            { text: 'Abbrechen',
+                            onTap: function(){return false}},
+                            { text: 'OK',
+                                type : 'button-positive',
+                                onTap: function(){return true}}],
+                        title: "Keine Einheiten vorhanden",
+                        template: "In dieser Session sind keine Arbeits- und Fahrteinheiten mehr vorhanden, bei OK wird diese Session gel&ouml;scht"
+                    })
+                    confirmPopup.then(function(res) {
+                            if(res) {//wenn ja, Session wird geloescht
+                                //var id= model.dataModel.getActiveSession().toJson().id; //SessionId
+                                //model.dataModel.getSessionList().splice(id, 1); //aus dem array der sessions wird der ausgewaehlt, der geloescht werden soll
+                                //model.dataModel.getSessionById(id).setDeleted(true); //selbe session wird auf "deleted = true" gesetzt
+                                model.dataModel.getActiveSession().setDeleted(true);
+                                alert("nach delete, vor active");
+                                model.dataModel.getActiveSession().setActive(false);
+                                alert("direkt vor update");
+                                DataModel.update(model.dataModel, true); //speichern
+                                alert("bis vor switcher!");
+                                $ionicViewSwitcher.nextDirection('back');
+                                $state.go('sessionuebersicht');
+                            } else {
+                              /*Alles bleibt so wie es ist!*/
+                            }
+                        });
+                } else { //sonst, speichern!
+                    model.dataModel.getActiveSession().setActive(false);
+                    $ionicViewSwitcher.nextDirection('back')
+                    $state.go('sessionuebersicht');
+                    DataModel.update(model.dataModel, true);
+                }
+            }
+            return false;
+        }, 101);
+    }
+    
+    this.enable = function(){
+        if( this.deregister !== undefined ){
+            this.deregister();
+            this.deregister = undefined;
+        }
+    }
+    return this;
 });
