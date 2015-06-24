@@ -1122,11 +1122,12 @@ angular.module('starter.services', [])
 })
 //----------- 7. - Arbeit_Class_Definition------//
 .factory('Arbeit', function(){
-    function Arbeit(id, beginn, ende, leistungsId, active) {
+    function Arbeit(id, beginn, ende, leistungsId, kommentar, active) {
         var _id = undefined;
         var _beginn = undefined;
         var _ende = ende;
         var _leistungsId = undefined;
+        var _kommentar = undefined;
         var _active = false;
         
         //7.1 arbeitsId_definitionen
@@ -1159,6 +1160,14 @@ angular.module('starter.services', [])
             return _leistungsId;
         }
         
+        this.getKommentar = function() {
+            return _kommentar;
+        }
+        
+        this.setKommentar = function(kommentar) {
+            _kommentar = kommentar;
+        }
+
         //7.6 active
         this.setActive = function(active) {
             _active = active;
@@ -1168,13 +1177,10 @@ angular.module('starter.services', [])
         }
         
         this.setId(id);
-        //this.setAnfangsdatum(anfangsdatum);
-        //this.setEnddatum(enddatum);
-        //this.setAnfangszeit(anfangszeit);
-        //this.setEndzeit(endzeit);
         this.setBeginn(beginn);
         this.setEnde(ende);
         this.setLeistungsId(leistungsId);
+        this.setKommentar(kommentar);
         if (active) {
             this.setActive(active);
         }
@@ -1183,20 +1189,17 @@ angular.module('starter.services', [])
     Arbeit.prototype.toJson = function(){
         return {
             id : this.getId(),
-            //anfangsdatum : this.getAnfangsdatum(),
-            //enddatum: this.getEnddatum(),
-            //anfangszeit : this.getAnfangszeit(),
-            //endzeit : this.getEndzeit(),
             beginn : this.getBeginn(),
             ende : this.getEnde(),
             leistungsId : this.getLeistungsId(),
+            kommentar : this.getKommentar(),
             active : this.getActive()
         }
     }
     
     Arbeit.create = function(JSONstructure){
         
-        var ar = new Arbeit(JSONstructure.id, JSONstructure.beginn,JSONstructure.ende, JSONstructure.leistungsId);
+        var ar = new Arbeit(JSONstructure.id, JSONstructure.beginn,JSONstructure.ende, JSONstructure.leistungsId, JSONstructure.kommentar);
         return(
             ar
         )

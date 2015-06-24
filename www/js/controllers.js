@@ -606,7 +606,7 @@ angular.module('starter.controllers', [])
         var endzeit = document.getElementById("timeE").value;
         var beginn = TimeCalculatorService.createDateInMs(anfangsdatum, anfangszeit);
         var ende = TimeCalculatorService.createDateInMs(enddatum, endzeit);
-        
+        var kommentar = document.getElementById('kommentar').value;
         var dauer = TimeCalculatorService.createDateObject(ende-beginn)
         //console.log(dauer);
         if (dauer.stunden<0 || dauer.minutes<0 || dauer.days<0 || dauer.months<0 || dauer.years<0) {
@@ -661,24 +661,18 @@ angular.module('starter.controllers', [])
                     ende = TimeCalculatorService.createDateInMs(ende, endzeit);
                     
                     if (activeArbeit) {
-                        //activeArbeitObj.setAnfangsdatum(_anfangsdatum);
-                        //activeArbeitObj.setEnddatum(_enddatum);
-                        //activeArbeitObj.setAnfangszeit(_anfangszeit);
-                        //activeArbeitObj.setEndzeit(_endzeit);
                         activeArbeitObj.setBeginn(beginn);
                         activeArbeitObj.setEnde(ende);
                         activeArbeitObj.setLeistungsId(leisId);
                         activeArbeitObj.setActive(false);
+                        activeArbeitObj.setKommentar(kommentar);
                     }else{
                     var arbeit = new Arbeit.create({
                         id: arbeitsId,
-                        //anfangsdatum: _anfangsdatum,
-                        //enddatum: _enddatum,
-                        //anfangszeit: _anfangszeit,
-                        //endzeit: _endzeit,
                         beginn : beginn,
                         ende : ende,
-                        leistungsId : leisId
+                        leistungsId : leisId,
+                        kommentar : kommentar
                     })
                     currentsession.addArbeit(arbeit); //currentsession instanceof Session -> keine Suche im Array mehr notwendig
                   }
