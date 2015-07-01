@@ -251,7 +251,7 @@ angular.module('starter.controllers', [])
                 //Session hochladen
                 if (model.dataModel.getMitarbeiter().getSessions().length!=0) {
                     DataModel.uploadData(model.dataModel, function(){
-                        model.dataModel = DataModel.syncWithSource(model.dataModel); //sync mit Webservice
+                        model.dataModel = DataModel.syncWithSource(model.dataModel, false); //sync mit Webservice
                         model.dataModel.then(function(data){ //ergebnis des Promises, also was passiert nunt?
                             model.dataModel = data;
                             DataModel.update(model.dataModel, true);
@@ -666,7 +666,7 @@ angular.module('starter.controllers', [])
                         activeArbeitObj.setActive(false);
                         activeArbeitObj.setKommentar(kommentar);
                     }else{
-                    var arbeit = new Arbeit.create({
+                    var arbeit = Arbeit.create({
                         id: arbeitsId,
                         beginn : beginn,
                         ende : ende,

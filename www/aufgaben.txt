@@ -30,3 +30,7 @@ evtl. Arbeitsbescheinigung
 Technische Doku (Programmierumgebung etc.)
 APKs
 Code durchschauen!
+
+/*-------WICHTIGE VORSCHLAEGE-----------------*/
+HTTP-Service von Angular anwenden
+Dokumentation der Funktionen (jsDoc)!!

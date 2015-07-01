@@ -1199,10 +1199,8 @@ angular.module('starter.services', [])
     
     Arbeit.create = function(JSONstructure){
         
-        var ar = new Arbeit(JSONstructure.id, JSONstructure.beginn,JSONstructure.ende, JSONstructure.leistungsId, JSONstructure.kommentar);
-        return(
-            ar
-        )
+        return new Arbeit(JSONstructure.id, JSONstructure.beginn,JSONstructure.ende, JSONstructure.leistungsId, JSONstructure.kommentar);
+ 
     }
     return(Arbeit);
 })
@@ -1281,6 +1279,8 @@ angular.module('starter.services', [])
             
             var counter = 0;
             var timeout = undefined;
+            
+            //ANGULAR-METHODE fuer die Abfrage des Status; im http-Service
             function checkFinish(){
                 //nur wenn alle drei pruefvariablen true sind, also alle Responses bereits ankamen!
                 if (checkFinishClients===true && checkFinishLeistungen===true && checkFinishMitarbeiter===true) {
@@ -1316,7 +1316,7 @@ angular.module('starter.services', [])
                 }else{
                     //wenn mehr als 5 Fehlversuche gezaehlt wurden, wird abgebrochen!
                     if (counter > 5) {
-                        alert("keine Verbindung vorhanden!" + checkFinishClients + checkFinishLeistungen + checkFinishMitarbeiter);
+                        alert("keine Verbindung vorhanden!");
                         reject();
                     }else{
                         counter += 1; //counter um 1 erhoehen
