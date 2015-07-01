@@ -119,8 +119,8 @@
                 <div class="input-label">
                   Fahrtyp
                 </div>
-                <select id="leistung" >
-                    <option ng-repeat="leistung in leistungen" ng-selected="{{selected.value}}" data-leistung-id="{{leistung.id}}">{{leistung.name}}</option>
+                <select id="leistung">
+                    <option ng-repeat="leistung in leistungen" ng-selected="{{leistung.selected}}" data-leistung-id="{{leistung.id}}">{{leistung.name}}</option>
                 </select>
             </label>
       </div>
@@ -131,7 +131,7 @@
                   Fahrtyp
                 </div>
                 <select id="leistung" ng-model="selectLeistung">
-                    <option ng-repeat="leistung in leistungen" ng-selected="{{selected.value}}" data-leistung-id="{{leistung.id}}">{{leistung.name}}</option>
+                    <option ng-repeat="leistung in leistungen" data-leistung-id="{{leistung.id}}">{{leistung.name}}</option>
                 </select>
             </label>
       </div>

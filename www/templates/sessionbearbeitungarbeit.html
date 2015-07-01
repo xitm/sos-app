@@ -27,7 +27,7 @@
                   <span >Leistung</span>
                 </div>
                 <select id='leistung'>
-                    <option ng-repeat='leistung in leistungen' ng-selected="{{selected.value}}" data-leistungs-id="{{leistung.id}}" >{{leistung.name}}</option>
+                    <option ng-repeat='leistung in leistungen' data-leistungs-id="{{leistung.id}}" ng-selected="{{leistung.selected}}" >{{leistung.name}}</option>
                 </select>
             </label>
       </div>
@@ -38,7 +38,7 @@
                   <span >Leistung</span>
                 </div>
                 <select id='leistung' ng-model="selectLeistung">
-                    <option ng-repeat='leistung in leistungen' ng-selected="{{selected.value}}" data-leistungs-id="{{leistung.id}}">{{leistung.name}}</option>
+                    <option ng-repeat='leistung in leistungen' data-leistungs-id="{{leistung.id}}">{{leistung.name}}</option>
                 </select>
             </label>
       </div>

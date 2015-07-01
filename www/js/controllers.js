@@ -553,7 +553,6 @@ angular.module('starter.controllers', [])
     }
 
     $scope.leistungen = model.dataModel.getLeistungList('arbeit'); //Leistungen im JSON-Format
-    
 
     //Gespeichertes Datum voreintragen
     $scope.arbeit = {
@@ -565,12 +564,12 @@ angular.module('starter.controllers', [])
         for(var i=0, anz=$scope.leistungen.length; i<anz; i++){
             var _tempLeis = $scope.leistungen[i];
             if (activeArbeit.leistungsId===_tempLeis.id) {
-                $scope.selected = {value : i};
-                break;
+                _tempLeis.selected = true;
+            }else{
+                _tempLeis.selected = false;
             }
         }
     }
-    
     if (activeArbeit) {
         var anfang = {
             hours: (new Date(activeArbeit.beginn).getHours()==0)?("00"):((new Date(activeArbeit.beginn).getHours()<10 && new Date(activeArbeit.beginn).getHours()!=0)?("0"+new Date(activeArbeit.beginn).getHours()):(new Date(activeArbeit.beginn).getHours())),
@@ -720,8 +719,10 @@ angular.module('starter.controllers', [])
         for(var i=0, anz=$scope.leistungen.length; i<anz; i++){
             var _tempLeis = $scope.leistungen[i];
             if (activeFahrt.leistungsId===_tempLeis.id) {
-                $scope.selected = {value : i};
-                break;
+                _tempLeis.selected = true;
+            }
+            else{
+                _tempLeis.selected = false;
             }
         }
     }
